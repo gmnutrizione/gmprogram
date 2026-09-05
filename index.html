@@ -128,24 +128,35 @@
   .brand-name{ font-family:var(--font-display); font-size:21px; font-weight:600; letter-spacing:.01em; }
   .brand-tag{ font-size:12.5px; color:var(--ink-faint); margin-top:-2px; }
 
-  .mode-toggle{
-    display:flex; gap:3px; padding:4px; background:var(--surface);
-    border:1px solid var(--border); border-radius:999px; box-shadow:var(--shadow-1);
+  .btn-logout{
+    display:flex; align-items:center; gap:7px; border:1px solid var(--border); background:var(--surface);
+    color:var(--ink-soft); font-size:13px; font-weight:500; padding:9px 15px; border-radius:999px; cursor:pointer;
   }
-  .mode-toggle button{
-    display:flex; align-items:center; gap:7px;
-    border:none; background:transparent; color:var(--ink-soft);
-    font-size:13.5px; font-weight:500; padding:9px 16px; border-radius:999px;
-    cursor:pointer; transition:background .15s ease, color .15s ease;
-  }
-  .mode-toggle button svg{ width:15px; height:15px; }
-  .mode-toggle button.active{ background:var(--accent); color:#fff; }
-  .mode-toggle button:not(.active):hover{ background:var(--accent-soft); color:var(--accent-ink); }
+  .btn-logout:hover{ border-color:var(--critical); color:var(--critical); }
+  .btn-logout svg{ width:14px; height:14px; }
 
-  .mockup-note{
-    font-family:var(--font-display); font-style:italic; color:var(--ink-faint);
-    font-size:13.5px; margin:2px 0 26px;
+  /* ---------- Login ---------- */
+  #login-screen{
+    min-height:80vh; display:flex; align-items:center; justify-content:center; padding:20px;
   }
+  .login-card{
+    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:34px 30px; text-align:center;
+  }
+  .login-mark{
+    width:52px; height:52px; border-radius:14px; margin:0 auto 18px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(155deg, var(--accent) 0%, #0A6E60 100%); box-shadow:var(--shadow-1);
+  }
+  .login-card h1{ font-size:22px; margin-bottom:6px; }
+  .login-card p{ font-size:13.5px; color:var(--ink-faint); margin-bottom:22px; }
+  .login-card input{
+    width:100%; text-align:center; letter-spacing:.08em; font-family:var(--font-mono); font-size:16px;
+    padding:13px 12px; border-radius:var(--radius-s); border:1px solid var(--border); background:var(--surface-raised);
+    color:var(--ink); margin-bottom:12px; text-transform:uppercase;
+  }
+  .login-card input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .login-error{ font-size:12.8px; color:var(--critical); min-height:18px; margin-top:10px; }
+  .login-note{ font-size:11.8px; color:var(--ink-faint); margin-top:18px; line-height:1.5; }
 
   /* ---------- Tabs (generic) ---------- */
   .tabs{ display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:22px; overflow-x:auto; }
@@ -502,23 +513,33 @@
       </div>
     </div>
 
-    <div class="mode-toggle" role="tablist" aria-label="Cambia vista">
-      <button id="btn-view-nutri" class="active" onclick="setView('nutri')">
-        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.6" stroke="currentColor" stroke-width="1.7"/><path d="M8 20H16M12 16V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-        Studio · Nutrizionista
-      </button>
-      <button id="btn-view-paziente" onclick="setView('paziente')">
-        <svg viewBox="0 0 24 24" fill="none"><rect x="6.5" y="2.5" width="11" height="19" rx="2.3" stroke="currentColor" stroke-width="1.7"/><path d="M10.3 18.3H13.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-        App · Paziente
-      </button>
-    </div>
+    <button class="btn-logout" id="btn-logout" style="display:none;" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 17L20 12L15 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12H9M9 4H5C3.9 4 3 4.9 3 6V18C3 19.1 3.9 20 5 20H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Esci
+    </button>
   </div>
-  <p class="mockup-note">Mockup interattivo — usa il selettore in alto per esplorare la vista dello studio (desktop) e quella del paziente (app).</p>
+
+  <!-- =========================================================== -->
+  <!-- LOGIN                                                         -->
+  <!-- =========================================================== -->
+  <div id="login-screen">
+    <form class="login-card" onsubmit="return handleLogin(event)">
+      <div class="login-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <h1>Percorso</h1>
+      <p>Inserisci il tuo codice di accesso per continuare.</p>
+      <input type="text" id="login-code" placeholder="CODICE DI ACCESSO" autocomplete="off" autocapitalize="characters">
+      <button type="submit" class="btn primary" style="width:100%; justify-content:center;">Accedi</button>
+      <div class="login-error" id="login-error"></div>
+      <div class="login-note" id="login-note">Il codice ti è stato fornito dal tuo o dalla tua nutrizionista.</div>
+    </form>
+  </div>
 
   <!-- =========================================================== -->
   <!-- VISTA NUTRIZIONISTA                                           -->
   <!-- =========================================================== -->
-  <div id="view-nutri">
+  <div id="view-nutri" style="display:none;"
 
     <aside class="panel sidebar">
       <h2>I miei pazienti</h2>
@@ -534,12 +555,12 @@
     <div class="main">
       <div class="patient-header">
         <div>
-          <h1>Marta Ferrari</h1>
-          <div class="goal">34 anni · Obiettivo: ricomposizione corporea, calo massa grassa mantenendo massa magra entro dicembre 2026</div>
+          <h1 id="patient-name">—</h1>
+          <div class="goal" id="patient-goal">—</div>
         </div>
         <div class="next-visit">
           Prossimo controllo<br>
-          <span class="date">15 settembre 2026 · 17:30</span>
+          <span class="date" id="patient-next-visit">—</span>
         </div>
       </div>
 
@@ -555,35 +576,23 @@
         <div class="stat-grid">
           <div class="stat-tile">
             <div class="stat-label">Peso attuale</div>
-            <div class="stat-value">63,4<small>kg</small></div>
-            <div class="stat-delta good">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              −1,1 kg dall'ultimo controllo
-            </div>
+            <div class="stat-value" id="stat-peso">—</div>
+            <div class="stat-delta" id="stat-peso-delta"></div>
           </div>
           <div class="stat-tile">
             <div class="stat-label">Circonferenza vita</div>
-            <div class="stat-value">78<small>cm</small></div>
-            <div class="stat-delta good">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              −1 cm dall'ultimo controllo
-            </div>
+            <div class="stat-value" id="stat-vita">—</div>
+            <div class="stat-delta" id="stat-vita-delta"></div>
           </div>
           <div class="stat-tile">
             <div class="stat-label">Massa grassa (BIA)</div>
-            <div class="stat-value">24,1<small>%</small></div>
-            <div class="stat-delta good">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              −1,1% dall'ultimo controllo
-            </div>
+            <div class="stat-value" id="stat-grassa">—</div>
+            <div class="stat-delta" id="stat-grassa-delta"></div>
           </div>
           <div class="stat-tile">
-            <div class="stat-label">Aderenza al piano</div>
-            <div class="stat-value">92<small>%</small></div>
-            <div class="stat-delta good">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              stabile, ottimo riscontro
-            </div>
+            <div class="stat-label">Ultima rilevazione</div>
+            <div class="stat-value" id="stat-ultima" style="font-size:18px;">—</div>
+            <div class="stat-delta" id="stat-ultima-delta"></div>
           </div>
         </div>
 
@@ -591,8 +600,8 @@
           <div class="card">
             <div class="card-head">
               <div>
-                <h3>Andamento peso — ultimi 4 mesi</h3>
-                <p>22 apr 2026 → 25 ago 2026</p>
+                <h3>Andamento peso</h3>
+                <p id="overview-range">—</p>
               </div>
             </div>
             <div class="chart-wrap" id="chart-overview"></div>
@@ -608,18 +617,18 @@
                   <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
                 </div>
                 <div>
-                  <div class="file-name">Piano_MartaFerrari_Set26.pdf</div>
-                  <div class="file-meta">Caricato il 28 agosto 2026</div>
+                  <div class="file-name" id="overview-piano-nome">Nessun piano caricato</div>
+                  <div class="file-meta" id="overview-piano-data">—</div>
                 </div>
                 <div class="spacer"></div>
-                <span class="badge-current">Attivo</span>
+                <span class="badge-current" id="overview-piano-badge" style="display:none;">Attivo</span>
               </div>
               <button class="btn small" style="margin-top:13px; width:100%; justify-content:center;" onclick="setNutriTab('piano')">Vai alla sezione piano →</button>
             </div>
 
             <div class="card">
-              <h3 style="font-size:14.5px; margin-bottom:8px;">Nota per il prossimo controllo</h3>
-              <p style="font-size:12.8px; color:var(--ink-soft); margin:0;">Valutare incremento leggero dei carboidrati nei giorni di allenamento; ottima aderenza a colazione e spuntini. Richiedere nuove analisi del sangue a ottobre.</p>
+              <h3 style="font-size:14.5px; margin-bottom:8px;">Stato paziente</h3>
+              <p style="font-size:12.8px; color:var(--ink-soft); margin:0;" id="overview-note">—</p>
             </div>
           </div>
         </div>
@@ -634,11 +643,13 @@
               <p>Il paziente vedrà da subito, in app, solo l'ultima versione caricata — niente più PDF da rispedire via email.</p>
             </div>
           </div>
-          <div class="dropzone">
+          <input type="file" id="piano-file-input" accept="application/pdf" style="display:none;" onchange="handlePianoFile(event)">
+          <div class="dropzone" id="piano-dropzone" onclick="document.getElementById('piano-file-input').click()" style="cursor:pointer;">
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <div><b>Trascina qui il PDF del piano</b></div>
-            <div class="hint">oppure <a href="#" style="color:var(--accent-ink); font-weight:600; text-decoration:underline;">sfoglia i file</a> dal tuo computer · PDF, max 20MB</div>
+            <div><b id="piano-upload-label">Clicca per scegliere il PDF del piano</b></div>
+            <div class="hint">PDF, fino a circa 8MB</div>
           </div>
+          <div class="login-error" id="piano-upload-error" style="text-align:left;"></div>
         </div>
 
         <div class="card">
@@ -650,43 +661,18 @@
               <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
             </div>
             <div>
-              <div class="file-name">Piano_MartaFerrari_Set26.pdf</div>
-              <div class="file-meta">Caricato il 28 agosto 2026 · 340 KB</div>
+              <div class="file-name" id="piano-attivo-nome">Nessun piano caricato</div>
+              <div class="file-meta" id="piano-attivo-data">—</div>
             </div>
             <div class="spacer"></div>
-            <button class="btn small ghost">Anteprima</button>
-            <button class="btn small">Sostituisci</button>
-          </div>
-
-          <div class="note-strip">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8V13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.2" r="0.9" fill="currentColor"/></svg>
-            Ogni caricamento sostituisce automaticamente la versione visibile a Marta: nessuna azione richiesta da parte sua.
+            <a class="btn small ghost" id="piano-attivo-link" href="#" target="_blank" rel="noopener" style="display:none;">Apri</a>
           </div>
         </div>
 
         <div class="card">
           <div class="card-head"><h3>Storico versioni</h3></div>
-          <div class="version-history">
-            <div class="version-item latest">
-              <div class="version-dot"></div>
-              <div class="version-date">28 ago 2026</div>
-              <div class="version-desc"><b>Piano_MartaFerrari_Set26.pdf</b> — inserita fase di ricarica glucidica pre-evento, ridotti gli spuntini serali.</div>
-            </div>
-            <div class="version-item">
-              <div class="version-dot"></div>
-              <div class="version-date">14 lug 2026</div>
-              <div class="version-desc"><b>Piano_MartaFerrari_Lug26.pdf</b> — aumentate le proteine a pranzo, aggiunta variante vegetariana per il cenone.</div>
-            </div>
-            <div class="version-item">
-              <div class="version-dot"></div>
-              <div class="version-date">18 giu 2026</div>
-              <div class="version-desc"><b>Piano_MartaFerrari_Giu26.pdf</b> — piano estivo con pasti freddi, invariato l'apporto calorico.</div>
-            </div>
-            <div class="version-item">
-              <div class="version-dot"></div>
-              <div class="version-date">22 apr 2026</div>
-              <div class="version-desc"><b>Piano_MartaFerrari_Apr26.pdf</b> — piano iniziale di ricomposizione corporea.</div>
-            </div>
+          <div class="version-history" id="piano-storico">
+            <p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>
           </div>
         </div>
       </div>
@@ -701,54 +687,55 @@
             </div>
             <div class="field" style="width:150px;">
               <label>Data controllo</label>
-              <input type="date" value="2026-09-03">
+              <input type="date" id="f-data">
             </div>
           </div>
 
           <fieldset>
             <legend>Peso</legend>
             <div class="field-grid">
-              <div class="field"><label>Peso corporeo (kg)</label><input type="text" placeholder="63,4"></div>
+              <div class="field"><label>Peso corporeo (kg)</label><input type="text" id="f-peso" placeholder="63,4"></div>
             </div>
           </fieldset>
 
           <fieldset>
             <legend>Circonferenze (cm)</legend>
             <div class="field-grid">
-              <div class="field"><label>Vita</label><input type="text" placeholder="78"></div>
-              <div class="field"><label>Fianchi</label><input type="text" placeholder="98"></div>
-              <div class="field"><label>Torace</label><input type="text" placeholder="90"></div>
-              <div class="field"><label>Braccio</label><input type="text" placeholder="26,6"></div>
-              <div class="field"><label>Coscia</label><input type="text" placeholder="55"></div>
+              <div class="field"><label>Vita</label><input type="text" id="f-vita" placeholder="78"></div>
+              <div class="field"><label>Fianchi</label><input type="text" id="f-fianchi" placeholder="98"></div>
+              <div class="field"><label>Torace</label><input type="text" id="f-torace" placeholder="90"></div>
+              <div class="field"><label>Braccio</label><input type="text" id="f-braccio" placeholder="26,6"></div>
+              <div class="field"><label>Coscia</label><input type="text" id="f-cosciaCirc" placeholder="55"></div>
             </div>
           </fieldset>
 
           <fieldset>
             <legend>Plicometria (mm)</legend>
             <div class="field-grid">
-              <div class="field"><label>Tricipite</label><input type="text" placeholder="13"></div>
-              <div class="field"><label>Sottoscapolare</label><input type="text" placeholder="12"></div>
-              <div class="field"><label>Sovrailiaca</label><input type="text" placeholder="13"></div>
-              <div class="field"><label>Addominale</label><input type="text" placeholder="14"></div>
-              <div class="field"><label>Coscia</label><input type="text" placeholder="15"></div>
+              <div class="field"><label>Tricipite</label><input type="text" id="f-plicaTricipite" placeholder="13"></div>
+              <div class="field"><label>Sottoscapolare</label><input type="text" id="f-plicaSottoscapolare" placeholder="12"></div>
+              <div class="field"><label>Sovrailiaca</label><input type="text" id="f-plicaSovrailiaca" placeholder="13"></div>
+              <div class="field"><label>Addominale</label><input type="text" id="f-plicaAddominale" placeholder="14"></div>
+              <div class="field"><label>Coscia</label><input type="text" id="f-plicaCoscia" placeholder="15"></div>
             </div>
           </fieldset>
 
           <fieldset style="margin-bottom:6px;">
             <legend>Bioimpedenziometria (BIA)</legend>
             <div class="field-grid">
-              <div class="field"><label>Massa grassa (%)</label><input type="text" placeholder="24,1"></div>
-              <div class="field"><label>Massa magra (kg)</label><input type="text" placeholder="46,9"></div>
-              <div class="field"><label>Acqua corporea (%)</label><input type="text" placeholder="53,8"></div>
-              <div class="field"><label>Massa ossea (kg)</label><input type="text" placeholder="2,9"></div>
-              <div class="field"><label>Metabolismo basale (kcal)</label><input type="text" placeholder="1410"></div>
+              <div class="field"><label>Massa grassa (%)</label><input type="text" id="f-massaGrassa" placeholder="24,1"></div>
+              <div class="field"><label>Massa magra (kg)</label><input type="text" id="f-massaMagra" placeholder="46,9"></div>
+              <div class="field"><label>Acqua corporea (%)</label><input type="text" id="f-acqua" placeholder="53,8"></div>
+              <div class="field"><label>Massa ossea (kg)</label><input type="text" id="f-massaOssea" placeholder="2,9"></div>
+              <div class="field"><label>Metabolismo basale (kcal)</label><input type="text" id="f-metabolismo" placeholder="1410"></div>
             </div>
           </fieldset>
 
-          <button class="btn primary">
+          <button class="btn primary" type="button" id="btn-save-misurazione" onclick="saveMisurazione()">
             <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Salva rilevazione
           </button>
+          <div class="login-error" id="misurazione-error"></div>
         </div>
 
         <div class="card">
@@ -774,32 +761,20 @@
           <div class="compare-controls">
             <div class="compare-field">
               <label>Controllo meno recente</label>
-              <select id="compare-old">
-                <option>22 aprile 2026</option>
-                <option>20 maggio 2026</option>
-                <option>18 giugno 2026</option>
-              </select>
+              <select id="compare-old" onchange="renderCompareTable()"></select>
             </div>
             <div class="compare-vs">confrontato con</div>
             <div class="compare-field">
               <label>Controllo più recente</label>
-              <select id="compare-new">
-                <option>25 agosto 2026</option>
-                <option selected>25 agosto 2026</option>
-              </select>
+              <select id="compare-new" onchange="renderCompareTable()"></select>
             </div>
           </div>
 
-          <div class="headline-row">
-            <div class="headline-stat"><div class="hv">−4,8 kg</div><div class="hl">variazione peso</div></div>
-            <div class="headline-stat"><div class="hv">−6 cm</div><div class="hl">circonferenza vita</div></div>
-            <div class="headline-stat"><div class="hv">−5,4%</div><div class="hl">massa grassa</div></div>
-            <div class="headline-stat"><div class="hv">+0,8 kg</div><div class="hl">massa magra</div></div>
-          </div>
+          <div class="headline-row" id="headline-row"></div>
 
           <table class="compare-table">
             <thead>
-              <tr><th>Parametro</th><th>22 apr 2026</th><th>25 ago 2026</th><th>Confronto</th><th>Variazione</th></tr>
+              <tr><th>Parametro</th><th id="compare-th-old">—</th><th id="compare-th-new">—</th><th>Confronto</th><th>Variazione</th></tr>
             </thead>
             <tbody id="compare-body"></tbody>
           </table>
@@ -832,21 +807,21 @@
 
           <!-- HOME -->
           <div class="p-screen active" id="p-home">
-            <div class="p-greeting">Ciao Marta</div>
-            <div class="p-sub">Ecco il punto della situazione di oggi, 3 settembre.</div>
+            <div class="p-greeting" id="p-home-greeting">Ciao</div>
+            <div class="p-sub" id="p-home-sub">Ecco il punto della situazione di oggi.</div>
 
             <div class="p-card">
               <div class="p-card-top">
                 <div class="p-icon">
                   <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
                 </div>
-                <span class="pill good">
+                <span class="pill good" id="p-home-piano-badge">
                   <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   Aggiornato
                 </span>
               </div>
               <h4>Il tuo piano alimentare</h4>
-              <p>Ultima modifica il 28 agosto — fase di ricarica glucidica pre-evento.</p>
+              <p id="p-home-piano-data">—</p>
               <button class="btn primary small" style="width:100%; justify-content:center;" onclick="setPatientScreen('piano')">Apri il piano →</button>
             </div>
 
@@ -857,7 +832,7 @@
                 </div>
               </div>
               <h4>Prossimo controllo</h4>
-              <p>15 settembre 2026, ore 17:30 — studio Dott.ssa Percorso</p>
+              <p id="p-home-prossimo">—</p>
               <button class="btn small ghost" style="width:100%; justify-content:center;">Aggiungi al calendario</button>
             </div>
 
@@ -871,23 +846,14 @@
           <!-- PIANO -->
           <div class="p-screen" id="p-piano">
             <div class="p-greeting" style="font-size:18px;">Il tuo piano</div>
-            <div class="p-sub">Versione aggiornata al 28 agosto 2026 · sempre l'ultima caricata dalla tua nutrizionista</div>
-            <div class="p-plan-preview">
-              <b>Colazione</b>
-              Yogurt greco 150g · fiocchi d'avena 40g · frutti di bosco · 1 cucchiaino di miele
-              <b>Spuntino</b>
-              30g mandorle oppure 1 frutto di stagione
-              <b>Pranzo</b>
-              Petto di pollo o legumi 150g · riso basmati 70g · verdure a volontà · olio evo 1 cucchiaio
-              <b>Spuntino</b>
-              Yogurt magro 125g o 2 gallette di riso con hummus
-              <b>Cena</b>
-              Pesce o uova · verdure grigliate · pane integrale 40g
+            <div class="p-sub" id="p-piano-sub">—</div>
+            <div class="p-plan-preview" id="p-piano-empty">
+              Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.
             </div>
-            <button class="btn primary" style="width:100%; justify-content:center;">
+            <a class="btn primary" id="p-piano-link" href="#" target="_blank" rel="noopener" style="width:100%; justify-content:center; display:none;">
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 4V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              Scarica il PDF completo
-            </button>
+              Apri il PDF del piano
+            </a>
           </div>
 
           <!-- ANDAMENTO -->
@@ -906,11 +872,11 @@
           <!-- PROFILO -->
           <div class="p-screen" id="p-profilo">
             <div class="p-greeting" style="font-size:18px;">Il tuo profilo</div>
-            <div class="p-sub">Marta Ferrari · 34 anni</div>
+            <div class="p-sub" id="p-profilo-sub">—</div>
 
             <div class="p-card">
               <h4 style="margin-bottom:10px;">Il tuo riferimento</h4>
-              <p style="margin-bottom:12px;">Dott.ssa — Studio di Nutrizione Percorso</p>
+              <p style="margin-bottom:12px;">Studio di Nutrizione Percorso</p>
               <button class="btn small" style="width:100%; justify-content:center;">
                 <svg viewBox="0 0 24 24" fill="none"><path d="M4 5H20V17H7L4 20V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
                 Scrivi al tuo nutrizionista
@@ -949,96 +915,101 @@
     </div>
   </div>
 
-  <!-- =========================================================== -->
-  <!-- ROADMAP / IDEE                                                -->
-  <!-- =========================================================== -->
-  <div class="roadmap">
-    <div class="roadmap-head">
-      <h2>Altre idee per Percorso</h2>
-      <p>Funzionalità che possiamo aggiungere nelle prossime iterazioni, una volta validato questo primo nucleo con te e con i tuoi pazienti.</p>
-    </div>
-    <div class="roadmap-grid">
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Diario alimentare fotografico</h4>
-        <p>Il paziente fotografa i pasti dal telefono: aiuta te a valutare le porzioni reali e lui a restare motivato.</p>
-      </div>
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Messaggi diretti in app</h4>
-        <p>Un canale di messaggistica semplice, per domande rapide tra un controllo e l'altro, senza usare WhatsApp personale.</p>
-      </div>
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Promemoria pesata &amp; idratazione</h4>
-        <p>Notifiche gentili per pesarsi sempre alla stessa ora e per bere acqua, configurabili paziente per paziente.</p>
-      </div>
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Lista della spesa automatica</h4>
-        <p>Generata dal piano caricato, organizzata per reparto, così il paziente arriva al supermercato già pronto.</p>
-      </div>
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Sync con bilance smart</h4>
-        <p>Peso e, dove disponibile, BIA importati automaticamente da bilance impedenziometriche connesse, senza inserimento manuale.</p>
-      </div>
-      <div class="roadmap-card">
-        <span class="rtag">Idea</span>
-        <h4>Prenotazione controlli online</h4>
-        <p>Il paziente vede le tue disponibilità e prenota da solo il prossimo appuntamento, con conferma automatica.</p>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <div id="tooltip"></div>
 
 <script>
-  /* ================= DATA ================= */
-  const DATES = ['2026-04-22','2026-05-20','2026-06-18','2026-07-16','2026-08-25'];
-  const DATE_LABELS = ['22 apr','20 mag','18 giu','16 lug','25 ago'];
+  /* ================= CONFIGURAZIONE ================= */
+  // Incolla qui, tra virgolette, l'indirizzo dell'app web di Google Apps Script
+  // (vedi LEGGIMI-DATI.md). Finché resta vuoto, il sito mostra solo la schermata di accesso.
+  let API_URL = "";
 
-  const METRICS = {
-    peso:          { label:'Peso corporeo',        unit:'kg', good:'down', values:[68.2,67.0,65.8,64.5,63.4] },
-    vita:          { label:'Circonferenza vita',   unit:'cm', good:'down', values:[84,82,80.5,79,78] },
-    fianchi:       { label:'Circonferenza fianchi',unit:'cm', good:'down', values:[102,101,100,99,98] },
-    plicaAddome:   { label:'Plica addominale',     unit:'mm', good:'down', values:[24,22,19,16,14] },
-    plicaTric:     { label:'Plica tricipite',      unit:'mm', good:'down', values:[18,16.5,15,14,13] },
-    massaGrassa:   { label:'Massa grassa (BIA)',   unit:'%',  good:'down', values:[29.5,27.8,26.5,25.2,24.1] },
-    massaMagra:    { label:'Massa magra (BIA)',    unit:'kg', good:'up',   values:[46.1,46.3,46.5,46.7,46.9] },
-    acqua:         { label:'Acqua corporea (BIA)', unit:'%',  good:'up',   values:[52,52.5,53,53.4,53.8] },
-  };
-
-  const COMPARE_ROWS = [
-    { label:'Peso corporeo', unit:'kg', old:68.2, nu:63.4, good:'down' },
-    { label:'Circonferenza vita', unit:'cm', old:84, nu:78, good:'down' },
-    { label:'Circonferenza fianchi', unit:'cm', old:102, nu:98, good:'down' },
-    { label:'Circonferenza torace', unit:'cm', old:92, nu:90, good:'down' },
-    { label:'Plica tricipite', unit:'mm', old:18, nu:13, good:'down' },
-    { label:'Plica sottoscapolare', unit:'mm', old:16, nu:12, good:'down' },
-    { label:'Plica sovrailiaca', unit:'mm', old:20, nu:13, good:'down' },
-    { label:'Plica addominale', unit:'mm', old:24, nu:14, good:'down' },
-    { label:'Plica coscia', unit:'mm', old:22, nu:15, good:'down' },
-    { label:'Massa grassa (BIA)', unit:'%', old:29.5, nu:24.1, good:'down' },
-    { label:'Massa magra (BIA)', unit:'kg', old:46.1, nu:46.9, good:'up' },
-    { label:'Acqua corporea (BIA)', unit:'%', old:52, nu:53.8, good:'up' },
-    { label:'Metabolismo basale', unit:'kcal', old:1390, nu:1410, good:'up' },
+  /* ================= METRICHE ================= */
+  const METRIC_DEFS = [
+    { key:'peso',        field:'Peso',                label:'Peso corporeo',        unit:'kg', good:'down' },
+    { key:'vita',        field:'Vita',                label:'Circonferenza vita',   unit:'cm', good:'down' },
+    { key:'fianchi',     field:'Fianchi',             label:'Circonferenza fianchi',unit:'cm', good:'down' },
+    { key:'plicaAddome', field:'PlicaAddominale',     label:'Plica addominale',     unit:'mm', good:'down' },
+    { key:'plicaTric',   field:'PlicaTricipite',      label:'Plica tricipite',      unit:'mm', good:'down' },
+    { key:'massaGrassa', field:'MassaGrassa',         label:'Massa grassa (BIA)',   unit:'%',  good:'down' },
+    { key:'massaMagra',  field:'MassaMagra',          label:'Massa magra (BIA)',    unit:'kg', good:'up'   },
+    { key:'acqua',       field:'AcquaCorporea',       label:'Acqua corporea (BIA)', unit:'%',  good:'up'   },
   ];
-
-  const PATIENTS = [
-    { name:'Marta Ferrari', age:34, status:'good', note:'Controllo 15 set' },
-    { name:'Luca Bianchi', age:41, status:'warning', note:'Da monitorare' },
-    { name:'Sara Conti', age:29, status:'warning', note:'Piano da aggiornare' },
-    { name:'Davide Romano', age:52, status:'critical', note:'Da ricontattare' },
-    { name:'Elena Greco', age:38, status:'good', note:'Controllo 22 set' },
-    { name:'Paolo Russo', age:46, status:'good', note:'Controllo 30 set' },
+  const COMPARE_DEFS = [
+    { field:'Peso', label:'Peso corporeo', unit:'kg', good:'down' },
+    { field:'Vita', label:'Circonferenza vita', unit:'cm', good:'down' },
+    { field:'Fianchi', label:'Circonferenza fianchi', unit:'cm', good:'down' },
+    { field:'Torace', label:'Circonferenza torace', unit:'cm', good:'down' },
+    { field:'PlicaTricipite', label:'Plica tricipite', unit:'mm', good:'down' },
+    { field:'PlicaSottoscapolare', label:'Plica sottoscapolare', unit:'mm', good:'down' },
+    { field:'PlicaSovrailiaca', label:'Plica sovrailiaca', unit:'mm', good:'down' },
+    { field:'PlicaAddominale', label:'Plica addominale', unit:'mm', good:'down' },
+    { field:'PlicaCoscia', label:'Plica coscia', unit:'mm', good:'down' },
+    { field:'MassaGrassa', label:'Massa grassa (BIA)', unit:'%', good:'down' },
+    { field:'MassaMagra', label:'Massa magra (BIA)', unit:'kg', good:'up' },
+    { field:'AcquaCorporea', label:'Acqua corporea (BIA)', unit:'%', good:'up' },
+    { field:'Metabolismo', label:'Metabolismo basale', unit:'kcal', good:'up' },
   ];
+  const PATIENT_METRIC_KEYS = ['peso','vita','massaGrassa'];
 
-  function fmt(v, unit){
+  /* ================= STATO ================= */
+  let SESSION = null;
+  let PATIENTS = [];
+  let currentPatientCode = null;
+  let currentPatientMeta = null;
+  let currentRows = [];
+  let METRICS = {};
+  let currentMetric = 'peso';
+  let patientMetric = 'peso';
+  let currentPlan = null;
+  let currentPlanHistory = [];
+
+  function fmt(v){
+    if(v === null || v === undefined || v === '') return '—';
     let s = (Math.round(v*10)/10).toString().replace('.', ',');
     return s;
+  }
+  function parseNum(v){
+    if(v === '' || v === null || v === undefined) return null;
+    if(typeof v === 'number') return isNaN(v) ? null : v;
+    const s = String(v).trim().replace(',', '.');
+    if(s === '') return null;
+    const n = parseFloat(s);
+    return isNaN(n) ? null : n;
+  }
+  function fmtDateLabel(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'short'}); }
+  function fmtDateFull(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}); }
+  function fmtDateShort(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'short', year:'2-digit'}); }
+
+  function buildMetricsFromRows(rows){
+    const out = {};
+    METRIC_DEFS.forEach(def => {
+      const pts = rows
+        .map(r => ({ date: new Date(r.Data), value: parseNum(r[def.field]) }))
+        .filter(p => p.value !== null && !isNaN(p.date.getTime()));
+      out[def.key] = {
+        label: def.label, unit: def.unit, good: def.good,
+        values: pts.map(p => p.value),
+        labels: pts.map(p => fmtDateLabel(p.date)),
+        dates: pts.map(p => p.date),
+      };
+    });
+    return out;
+  }
+
+  /* ================= API ================= */
+  function apiConfigured(){ return !!API_URL; }
+  async function apiGet(action, params){
+    if(!apiConfigured()) throw new Error('CONFIG');
+    const qs = new URLSearchParams(Object.assign({action}, params||{})).toString();
+    const res = await fetch(API_URL + '?' + qs);
+    return res.json();
+  }
+  async function apiPost(action, body){
+    if(!apiConfigured()) throw new Error('CONFIG');
+    const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(Object.assign({action}, body||{})) });
+    return res.json();
   }
 
   /* ================= ICONS ================= */
@@ -1053,28 +1024,33 @@
   /* ================= PATIENT LIST ================= */
   function renderPatientList(){
     const el = document.getElementById('patient-list');
-    el.innerHTML = PATIENTS.map((p,i) => `
-      <div class="patient ${i===0?'active':''}" onclick="selectPatient(this)">
-        <div class="avatar">${p.name.split(' ').map(w=>w[0]).join('')}</div>
+    if(!PATIENTS.length){
+      el.innerHTML = '<p style="font-size:12.8px; color:var(--ink-faint);">Nessun paziente attivo trovato nel foglio.</p>';
+      return;
+    }
+    el.innerHTML = PATIENTS.map(p => `
+      <div class="patient" data-codice="${p.Codice}" onclick="selectPatientByCode('${p.Codice}')">
+        <div class="avatar">${(p.Nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
         <div class="patient-info">
-          <div class="patient-name">${p.name}</div>
-          <div class="patient-meta">${p.age} anni · ${p.note}</div>
+          <div class="patient-name">${p.Nome||'—'}</div>
+          <div class="patient-meta">${p.Eta?p.Eta+' anni · ':''}${p.ProssimoControllo||''}</div>
           <div class="patient-status">
-            <span class="pill ${p.status}">${STATUS_ICON[p.status]}${STATUS_LABEL[p.status]}</span>
+            <span class="pill ${p.StatoTipo||'good'}">${STATUS_ICON[p.StatoTipo||'good']}${p.StatoTesto||''}</span>
           </div>
         </div>
       </div>
     `).join('');
-  }
-  function selectPatient(node){
-    document.querySelectorAll('.patient').forEach(p => p.classList.remove('active'));
-    node.classList.add('active');
   }
 
   /* ================= CHART ENGINE ================= */
   // viewBox: 0 0 W H. Renders a line+area chart with hover tooltip + crosshair.
   function drawChart(container, values, opts){
     opts = opts || {};
+    const labels = opts.labels || [];
+    if(!values || values.length === 0){
+      container.innerHTML = `<div style="padding:${opts.big?'40px':'8px'} 0; text-align:center; color:var(--ink-faint); font-size:12.5px;">Nessun dato ancora disponibile</div>`;
+      return;
+    }
     const W = opts.w || 600, H = opts.h || 220;
     const padL = opts.padL !== undefined ? opts.padL : 6;
     const padR = opts.padR !== undefined ? opts.padR : 6;
@@ -1084,7 +1060,7 @@
     const span = (max - min) || 1;
     const lo = min - span*0.22, hi = max + span*0.28;
     const n = values.length;
-    const x = i => padL + (i/(n-1)) * (W - padL - padR);
+    const x = i => n===1 ? (padL + (W-padL-padR)/2) : padL + (i/(n-1)) * (W - padL - padR);
     const y = v => padT + (1 - (v-lo)/(hi-lo)) * (H - padT - padB);
 
     const pts = values.map((v,i) => [x(i), y(v)]);
@@ -1115,7 +1091,7 @@
 
     let axisLabels = '';
     if(opts.showAxis){
-      DATE_LABELS.forEach((lbl,i) => {
+      labels.forEach((lbl,i) => {
         axisLabels += `<text class="axis-label" x="${x(i)}" y="${H-4}" text-anchor="${i===0?'start':(i===n-1?'end':'middle')}">${lbl}</text>`;
       });
     }
@@ -1128,7 +1104,7 @@
 
     const dots = pts.map((p,i) => `
       <circle class="chart-pt" cx="${p[0]}" cy="${p[1]}" r="${opts.big?4:3}" fill="var(--surface)" stroke="${color}" stroke-width="2"/>
-      <circle class="chart-pt-hit" data-date="${DATE_LABELS[i]}" data-val="${fmt(values[i])} ${opts.unit||''}" data-cx="${p[0]}" cx="${p[0]}" cy="${p[1]}" r="14"/>
+      <circle class="chart-pt-hit" data-date="${labels[i]||''}" data-val="${fmt(values[i])} ${opts.unit||''}" data-cx="${p[0]}" cx="${p[0]}" cy="${p[1]}" r="14"/>
     `).join('');
 
     const svg = `
@@ -1178,12 +1154,10 @@
   }
 
   /* ================= NUTRI: big chart + chips + sparklines ================= */
-  let currentMetric = 'peso';
-
   function renderBigChart(){
     const m = METRICS[currentMetric];
     document.getElementById('big-chart-title').textContent = m.label;
-    drawChart(document.getElementById('chart-main'), m.values, { big:true, showAxis:true, unit:m.unit, color:'var(--accent)', h:230 });
+    drawChart(document.getElementById('chart-main'), m.values, { big:true, showAxis:true, unit:m.unit, color:'var(--accent)', h:230, labels:m.labels });
   }
 
   function renderChips(){
@@ -1202,72 +1176,334 @@
     const grid = document.getElementById('spark-grid');
     grid.innerHTML = Object.keys(METRICS).map(k => {
       const m = METRICS[k];
+      if(!m.values.length){
+        return `<div class="spark-card" data-k="${k}" onclick="selectMetric('${k}')">
+          <div class="spark-top"><div class="spark-label">${m.label}</div></div>
+          <div class="spark-value">—</div>
+          <div class="spark-delta">nessun dato</div>
+        </div>`;
+      }
       const first = m.values[0], last = m.values[m.values.length-1];
       const delta = last - first;
       const isGood = (m.good==='down' && delta<0) || (m.good==='up' && delta>0);
-      const arrow = delta<0 ? ARROW_DOWN : ARROW_UP;
       return `<div class="spark-card" data-k="${k}" onclick="selectMetric('${k}')">
         <div class="spark-top">
           <div class="spark-label">${m.label}</div>
         </div>
         <div class="spark-value">${fmt(last)}<span style="font-size:11px;color:var(--ink-faint);"> ${m.unit}</span></div>
-        <div class="spark-delta ${isGood?'good':''}">${delta<0?'−':'+'}${fmt(Math.abs(delta))} ${m.unit}</div>
+        <div class="spark-delta ${m.values.length>1?(isGood?'good':''):''}">${m.values.length>1 ? (delta<0?'−':'+')+fmt(Math.abs(delta))+' '+m.unit : 'primo controllo'}</div>
         <div class="spark-chart" id="spark-${k}"></div>
       </div>`;
     }).join('');
     Object.keys(METRICS).forEach(k => {
       const c = document.getElementById('spark-'+k);
-      drawChart(c, METRICS[k].values, { w:260, h:36, color:'var(--accent)' });
+      if(METRICS[k].values.length) drawChart(c, METRICS[k].values, { w:260, h:36, color:'var(--accent)' });
+      else c.innerHTML = '';
     });
     document.querySelectorAll('.spark-card').forEach(c => c.classList.toggle('selected', c.dataset.k===currentMetric));
   }
 
   /* ================= COMPARE TABLE ================= */
+  function populateCompareSelects(){
+    const oldSel = document.getElementById('compare-old'), newSel = document.getElementById('compare-new');
+    if(!currentRows.length){ oldSel.innerHTML=''; newSel.innerHTML=''; return; }
+    const opts = currentRows.map((r,i) => `<option value="${i}">${fmtDateFull(new Date(r.Data))}</option>`).join('');
+    oldSel.innerHTML = opts; newSel.innerHTML = opts;
+    oldSel.value = 0; newSel.value = currentRows.length-1;
+  }
+
   function renderCompareTable(){
     const body = document.getElementById('compare-body');
-    body.innerHTML = COMPARE_ROWS.map(r => {
+    const headline = document.getElementById('headline-row');
+    if(currentRows.length < 2){
+      body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-faint); padding:16px 10px;">Servono almeno due controlli per poter fare un confronto.</td></tr>`;
+      headline.innerHTML = '';
+      document.getElementById('compare-th-old').textContent = '—';
+      document.getElementById('compare-th-new').textContent = '—';
+      return;
+    }
+    const oldIdx = +document.getElementById('compare-old').value || 0;
+    const newIdx = +document.getElementById('compare-new').value || (currentRows.length-1);
+    const oldRow = currentRows[oldIdx], newRow = currentRows[newIdx];
+    document.getElementById('compare-th-old').textContent = fmtDateFull(new Date(oldRow.Data));
+    document.getElementById('compare-th-new').textContent = fmtDateFull(new Date(newRow.Data));
+
+    const rows = COMPARE_DEFS.map(d => ({ ...d, old: parseNum(oldRow[d.field]), nu: parseNum(newRow[d.field]) }))
+      .filter(r => r.old !== null && r.nu !== null);
+
+    body.innerHTML = rows.length ? rows.map(r => {
       const delta = r.nu - r.old;
       const isGood = (r.good==='down' && delta<0) || (r.good==='up' && delta>0) || delta===0;
       const arrow = delta===0 ? '' : (delta<0 ? ARROW_DOWN : ARROW_UP);
-      const maxV = Math.max(r.old, r.nu) || 1;
+      const maxV = Math.max(Math.abs(r.old), Math.abs(r.nu)) || 1;
       return `<tr>
         <td class="row-label">${r.label} <span class="unit">${r.unit}</span></td>
         <td class="compare-val">${fmt(r.old)}</td>
         <td class="compare-val">${fmt(r.nu)}</td>
         <td class="bars">
-          <div class="bar-track"><div class="bar-fill old" style="width:${(r.old/maxV*100).toFixed(0)}%"></div></div>
-          <div class="bar-track"><div class="bar-fill new" style="width:${(r.nu/maxV*100).toFixed(0)}%"></div></div>
+          <div class="bar-track"><div class="bar-fill old" style="width:${(Math.abs(r.old)/maxV*100).toFixed(0)}%"></div></div>
+          <div class="bar-track"><div class="bar-fill new" style="width:${(Math.abs(r.nu)/maxV*100).toFixed(0)}%"></div></div>
         </td>
         <td><span class="delta-cell ${isGood?'good':'neutral'}">${arrow}${delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+r.unit}</span></td>
       </tr>`;
+    }).join('') : `<tr><td colspan="5" style="color:var(--ink-faint); padding:16px 10px;">Nessun dato numerico da confrontare tra questi due controlli.</td></tr>`;
+
+    const headlineDefs = [
+      { field:'Peso', label:'variazione peso', unit:'kg' },
+      { field:'Vita', label:'circonferenza vita', unit:'cm' },
+      { field:'MassaGrassa', label:'massa grassa', unit:'%' },
+      { field:'MassaMagra', label:'massa magra', unit:'kg' },
+    ];
+    headline.innerHTML = headlineDefs.map(d => {
+      const oldV = parseNum(oldRow[d.field]), newV = parseNum(newRow[d.field]);
+      if(oldV===null || newV===null) return '';
+      const delta = newV - oldV;
+      return `<div class="headline-stat"><div class="hv">${delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+d.unit}</div><div class="hl">${d.label}</div></div>`;
     }).join('');
   }
 
-  /* ================= PATIENT VIEW ================= */
+  /* ================= PANORAMICA ================= */
+  function setStat(valId, deltaId, metric, unit){
+    const valEl = document.getElementById(valId), deltaEl = document.getElementById(deltaId);
+    if(!metric || !metric.values.length){ valEl.innerHTML = '—'; deltaEl.textContent=''; deltaEl.className='stat-delta'; return; }
+    const last = metric.values[metric.values.length-1];
+    valEl.innerHTML = fmt(last) + '<small>'+unit+'</small>';
+    if(metric.values.length>1){
+      const prev = metric.values[metric.values.length-2];
+      const delta = last-prev;
+      const isGood = (metric.good==='down'&&delta<0) || (metric.good==='up'&&delta>0) || delta===0;
+      deltaEl.className = 'stat-delta ' + (isGood?'good':'warn');
+      deltaEl.innerHTML = (delta===0?'':(delta<0?ARROW_DOWN:ARROW_UP)) + (delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+unit) + ' dall\'ultimo controllo';
+    } else {
+      deltaEl.textContent = 'primo controllo registrato';
+      deltaEl.className = 'stat-delta';
+    }
+  }
+
+  function renderPanoramica(){
+    setStat('stat-peso','stat-peso-delta', METRICS.peso, 'kg');
+    setStat('stat-vita','stat-vita-delta', METRICS.vita, 'cm');
+    setStat('stat-grassa','stat-grassa-delta', METRICS.massaGrassa, '%');
+
+    const ultimaEl = document.getElementById('stat-ultima');
+    const ultimaDeltaEl = document.getElementById('stat-ultima-delta');
+    if(currentRows.length){
+      ultimaEl.textContent = fmtDateFull(new Date(currentRows[currentRows.length-1].Data));
+      ultimaDeltaEl.textContent = currentRows.length + (currentRows.length===1 ? ' controllo registrato' : ' controlli registrati');
+    } else {
+      ultimaEl.textContent = '—';
+      ultimaDeltaEl.textContent = 'nessun controllo ancora';
+    }
+
+    const rangeEl = document.getElementById('overview-range');
+    const pesoM = METRICS.peso;
+    rangeEl.textContent = (pesoM && pesoM.dates.length)
+      ? fmtDateFull(pesoM.dates[0]) + ' → ' + fmtDateFull(pesoM.dates[pesoM.dates.length-1])
+      : 'Nessuna misurazione ancora';
+
+    drawChart(document.getElementById('chart-overview'), (pesoM&&pesoM.values)||[], { big:true, showAxis:true, unit:'kg', title:'Peso corporeo', color:'var(--accent)', h:200, labels:(pesoM&&pesoM.labels)||[] });
+
+    const nomeEl = document.getElementById('overview-piano-nome');
+    const dataEl = document.getElementById('overview-piano-data');
+    const badgeEl = document.getElementById('overview-piano-badge');
+    if(currentPlan){
+      nomeEl.textContent = currentPlan.NomeFile;
+      dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
+      badgeEl.style.display = '';
+    } else {
+      nomeEl.textContent = 'Nessun piano caricato';
+      dataEl.textContent = '—';
+      badgeEl.style.display = 'none';
+    }
+
+    document.getElementById('overview-note').textContent = (currentPatientMeta && currentPatientMeta.StatoTesto) || '—';
+  }
+
+  /* ================= PIANO (nutrizionista) ================= */
+  function renderPianoTab(){
+    const nomeEl = document.getElementById('piano-attivo-nome'), dataEl = document.getElementById('piano-attivo-data'), linkEl = document.getElementById('piano-attivo-link');
+    if(currentPlan){
+      nomeEl.textContent = currentPlan.NomeFile;
+      dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
+      linkEl.href = currentPlan.Url; linkEl.style.display = '';
+    } else {
+      nomeEl.textContent = 'Nessun piano caricato'; dataEl.textContent = '—'; linkEl.style.display = 'none';
+    }
+    const storicoEl = document.getElementById('piano-storico');
+    if(!currentPlanHistory.length){
+      storicoEl.innerHTML = '<p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>';
+      return;
+    }
+    storicoEl.innerHTML = currentPlanHistory.map((v,i) => `
+      <div class="version-item ${i===0?'latest':''}">
+        <div class="version-dot"></div>
+        <div class="version-date">${fmtDateShort(new Date(v.Data))}</div>
+        <div class="version-desc"><b>${v.NomeFile}</b></div>
+      </div>`).join('');
+  }
+
+  function handlePianoFile(evt){
+    const file = evt.target.files[0];
+    if(!file) return;
+    const errEl = document.getElementById('piano-upload-error');
+    const labelEl = document.getElementById('piano-upload-label');
+    errEl.textContent = '';
+    if(file.size > 9*1024*1024){ errEl.textContent = 'Il file è troppo grande (limite consigliato circa 8MB).'; evt.target.value=''; return; }
+    labelEl.textContent = 'Caricamento in corso…';
+    const reader = new FileReader();
+    reader.onload = async function(){
+      const base64 = reader.result.split(',')[1];
+      try{
+        const res = await apiPost('caricaPiano', { codice: SESSION.codice, paziente: currentPatientCode, filename: file.name, mime: file.type || 'application/pdf', fileBase64: base64 });
+        if(res.ok){
+          await loadPiano(currentPatientCode);
+          renderPanoramica();
+        } else {
+          errEl.textContent = res.error || 'Errore durante il caricamento.';
+        }
+      } catch(err){
+        errEl.textContent = 'Errore di connessione: ' + err.message;
+      }
+      labelEl.textContent = 'Clicca per scegliere il PDF del piano';
+    };
+    reader.readAsDataURL(file);
+    evt.target.value = '';
+  }
+
+  /* ================= MISURAZIONI: salvataggio ================= */
+  const MISURAZIONE_FIELD_IDS = {
+    Peso:'f-peso', Vita:'f-vita', Fianchi:'f-fianchi', Torace:'f-torace', Braccio:'f-braccio', CosciaCirc:'f-cosciaCirc',
+    PlicaTricipite:'f-plicaTricipite', PlicaSottoscapolare:'f-plicaSottoscapolare', PlicaSovrailiaca:'f-plicaSovrailiaca',
+    PlicaAddominale:'f-plicaAddominale', PlicaCoscia:'f-plicaCoscia',
+    MassaGrassa:'f-massaGrassa', MassaMagra:'f-massaMagra', AcquaCorporea:'f-acqua', MassaOssea:'f-massaOssea', Metabolismo:'f-metabolismo',
+  };
+
+  async function saveMisurazione(){
+    const errEl = document.getElementById('misurazione-error');
+    errEl.textContent = '';
+    const dataVal = document.getElementById('f-data').value;
+    if(!dataVal){ errEl.textContent = 'Inserisci la data del controllo.'; return; }
+    const body = { codice: SESSION.codice, paziente: currentPatientCode, data: dataVal };
+    Object.keys(MISURAZIONE_FIELD_IDS).forEach(field => {
+      body[field] = parseNum(document.getElementById(MISURAZIONE_FIELD_IDS[field]).value);
+    });
+    const btn = document.getElementById('btn-save-misurazione');
+    btn.disabled = true;
+    try{
+      const res = await apiPost('aggiungiMisurazione', body);
+      if(res.ok){
+        Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
+        await loadMisurazioni(currentPatientCode);
+        renderChips(); renderBigChart(); renderSparkGrid(); renderPanoramica();
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    btn.disabled = false;
+  }
+
+  /* ================= CARICAMENTO DATI PAZIENTE ================= */
+  async function loadMisurazioni(codice){
+    const res = await apiGet('misurazioni', { codice: SESSION.codice, paziente: codice });
+    currentRows = res.ok ? res.misurazioni : [];
+    METRICS = buildMetricsFromRows(currentRows);
+    populateCompareSelects();
+  }
+  async function loadPiano(codice){
+    const res = await apiGet('piano', { codice: SESSION.codice, paziente: codice });
+    currentPlan = res.ok ? res.attivo : null;
+    currentPlanHistory = res.ok ? res.storico : [];
+  }
+
+  /* ================= VISTA NUTRIZIONISTA ================= */
+  async function loadPazienti(){
+    const res = await apiGet('pazienti', { codice: SESSION.codice });
+    if(!res.ok){ document.getElementById('patient-list').innerHTML = '<p style="font-size:12.8px;color:var(--critical);">'+(res.error||'Errore nel caricare i pazienti.')+'</p>'; return; }
+    PATIENTS = res.pazienti;
+    renderPatientList();
+    if(PATIENTS.length) await selectPatientByCode(PATIENTS[0].Codice);
+  }
+
+  async function selectPatientByCode(codice){
+    currentPatientCode = codice;
+    currentPatientMeta = PATIENTS.find(p => p.Codice === codice) || null;
+    document.querySelectorAll('.patient').forEach(el => el.classList.toggle('active', el.dataset.codice === codice));
+    if(currentPatientMeta){
+      document.getElementById('patient-name').textContent = currentPatientMeta.Nome || '—';
+      document.getElementById('patient-goal').textContent = (currentPatientMeta.Eta ? currentPatientMeta.Eta+' anni · ' : '') + 'Obiettivo: ' + (currentPatientMeta.Obiettivo || '—');
+      document.getElementById('patient-next-visit').textContent = currentPatientMeta.ProssimoControllo || '—';
+    }
+    currentMetric = 'peso';
+    await Promise.all([loadMisurazioni(codice), loadPiano(codice)]);
+    const activeTab = document.querySelector('#view-nutri .tab-btn.active');
+    setNutriTab(activeTab ? activeTab.dataset.tab : 'panoramica');
+  }
+
+  /* ================= VISTA PAZIENTE ================= */
+  function renderPatientHomeCards(){
+    const badge = document.getElementById('p-home-piano-badge');
+    const dataEl = document.getElementById('p-home-piano-data');
+    const linkEl = document.getElementById('p-piano-link');
+    const emptyEl = document.getElementById('p-piano-empty');
+    const subEl = document.getElementById('p-piano-sub');
+    if(currentPlan){
+      dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(currentPlan.Data));
+      badge.style.display = '';
+      linkEl.href = currentPlan.Url; linkEl.style.display = 'flex';
+      emptyEl.style.display = 'none';
+      subEl.textContent = 'Versione aggiornata al ' + fmtDateFull(new Date(currentPlan.Data)) + " · sempre l'ultima caricata dalla tua nutrizionista";
+    } else {
+      dataEl.textContent = 'Nessun piano caricato ancora.';
+      badge.style.display = 'none';
+      linkEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      subEl.textContent = 'In attesa del primo piano alimentare.';
+    }
+  }
+
   function renderPatientCharts(){
-    drawChart(document.getElementById('chart-home-preview'), METRICS.peso.values, { w:340, h:64, color:'var(--accent)' });
+    const m = METRICS.peso || { values:[], labels:[] };
+    drawChart(document.getElementById('chart-home-preview'), m.values, { w:340, h:64, color:'var(--accent)' });
     renderPatientChips();
   }
-  let patientMetric = 'peso';
-  const PATIENT_METRIC_KEYS = ['peso','vita','massaGrassa'];
   function renderPatientChips(){
     const row = document.getElementById('chip-row-paziente');
     row.innerHTML = PATIENT_METRIC_KEYS.map(k => `<button class="chip ${k===patientMetric?'active':''}" onclick="selectPatientMetric('${k}')">${METRICS[k].label}</button>`).join('');
-    drawChart(document.getElementById('chart-paziente'), METRICS[patientMetric].values, { big:true, showAxis:true, unit:METRICS[patientMetric].unit, title:METRICS[patientMetric].label, color:'var(--accent)', w:340, h:200 });
+    const m = METRICS[patientMetric];
+    drawChart(document.getElementById('chart-paziente'), m.values, { big:true, showAxis:true, unit:m.unit, title:m.label, color:'var(--accent)', w:340, h:200, labels:m.labels });
   }
   function selectPatientMetric(k){ patientMetric = k; renderPatientChips(); }
 
   function renderCheckinList(){
     const el = document.getElementById('p-checkin-list');
-    el.innerHTML = DATE_LABELS.map((lbl,i) => `
-      <div class="p-checkin-row">
+    if(!currentRows.length){ el.innerHTML = '<p style="padding:10px 0; color:var(--ink-faint); font-size:12.8px;">Nessun controllo registrato ancora.</p>'; return; }
+    el.innerHTML = currentRows.slice().reverse().map(r => {
+      const vita = parseNum(r.Vita), grassa = parseNum(r.MassaGrassa), peso = parseNum(r.Peso);
+      return `<div class="p-checkin-row">
         <div>
-          <div class="p-checkin-date">${lbl} 2026</div>
-          <div class="p-checkin-sub">Vita ${fmt(METRICS.vita.values[i])} cm · Massa grassa ${fmt(METRICS.massaGrassa.values[i])}%</div>
+          <div class="p-checkin-date">${fmtDateFull(new Date(r.Data))}</div>
+          <div class="p-checkin-sub">Vita ${vita!==null?fmt(vita)+' cm':'—'} · Massa grassa ${grassa!==null?fmt(grassa)+'%':'—'}</div>
         </div>
-        <div class="p-checkin-val">${fmt(METRICS.peso.values[i])} kg</div>
-      </div>
-    `).join('');
+        <div class="p-checkin-val">${peso!==null?fmt(peso)+' kg':'—'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  async function enterPazienteView(){
+    const p = SESSION.paziente;
+    document.getElementById('p-home-greeting').textContent = 'Ciao' + (p.Nome ? ' '+p.Nome.split(' ')[0] : '');
+    const oggi = new Date();
+    document.getElementById('p-home-sub').textContent = 'Ecco il punto della situazione di oggi, ' + oggi.toLocaleDateString('it-IT',{day:'numeric', month:'long'}) + '.';
+    document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
+    document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo || 'Nessun controllo in programma';
+    currentMetric = 'peso'; patientMetric = 'peso';
+    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice)]);
+    renderPatientHomeCards();
+    renderPatientCharts();
+    renderCheckinList();
+    setPatientScreen('home');
   }
 
   function setPatientScreen(name){
@@ -1276,32 +1512,69 @@
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen===name));
   }
 
-  /* ================= TAB / VIEW SWITCHING ================= */
+  /* ================= TAB SWITCHING (nutrizionista) ================= */
   function setNutriTab(name){
     document.querySelectorAll('#view-nutri .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
     document.querySelectorAll('#view-nutri .tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
-    if(name==='panoramica') drawChart(document.getElementById('chart-overview'), METRICS.peso.values, { big:true, showAxis:true, unit:'kg', title:'Peso corporeo', color:'var(--accent)', h:200 });
+    if(name==='panoramica') renderPanoramica();
+    if(name==='piano') renderPianoTab();
     if(name==='misurazioni'){ renderChips(); renderBigChart(); renderSparkGrid(); }
     if(name==='confronto') renderCompareTable();
   }
 
-  function setView(name){
-    document.getElementById('view-nutri').style.display = name==='nutri' ? 'grid' : 'none';
-    document.getElementById('view-paziente').style.display = name==='paziente' ? 'flex' : 'none';
-    document.getElementById('btn-view-nutri').classList.toggle('active', name==='nutri');
-    document.getElementById('btn-view-paziente').classList.toggle('active', name==='paziente');
-    if(name==='paziente') renderPatientCharts();
+  /* ================= LOGIN / LOGOUT ================= */
+  async function handleLogin(evt){
+    evt.preventDefault();
+    const codeInput = document.getElementById('login-code');
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
+    const code = codeInput.value.trim();
+    if(!code){ errEl.textContent = 'Inserisci un codice.'; return false; }
+    if(!apiConfigured()){
+      errEl.textContent = 'Il sito non è ancora collegato al Google Sheet: segui il file LEGGIMI-DATI.md.';
+      return false;
+    }
+    try{
+      const res = await apiGet('login', { codice: code });
+      if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
+      SESSION = { role: res.role, codice: code, paziente: res.paziente || null };
+      await enterApp();
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    return false;
+  }
+
+  async function enterApp(){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'flex';
+    if(SESSION.role === 'nutrizionista'){
+      document.getElementById('view-nutri').style.display = 'grid';
+      document.getElementById('view-paziente').style.display = 'none';
+      await loadPazienti();
+    } else {
+      document.getElementById('view-paziente').style.display = 'flex';
+      document.getElementById('view-nutri').style.display = 'none';
+      await enterPazienteView();
+    }
+  }
+
+  function logout(){
+    SESSION = null; currentPatientCode = null; currentPatientMeta = null;
+    currentRows = []; METRICS = {}; currentPlan = null; currentPlanHistory = [];
+    document.getElementById('view-nutri').style.display = 'none';
+    document.getElementById('view-paziente').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'none';
+    document.getElementById('login-code').value = '';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-screen').style.display = 'flex';
   }
 
   /* ================= INIT ================= */
-  renderPatientList();
-  drawChart(document.getElementById('chart-overview'), METRICS.peso.values, { big:true, showAxis:true, unit:'kg', title:'Peso corporeo', color:'var(--accent)', h:200 });
-  renderChips();
-  renderBigChart();
-  renderSparkGrid();
-  renderCompareTable();
-  renderCheckinList();
+  if(!apiConfigured()){
+    document.getElementById('login-note').innerHTML = 'Il sito non è ancora collegato al Google Sheet.<br>Segui il file <b>LEGGIMI-DATI.md</b> per completare il collegamento.';
+  }
 </script>
 
 </body>
