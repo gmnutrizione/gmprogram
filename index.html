@@ -535,6 +535,19 @@
   }
   .roadmap-card h4{ font-size:13.8px; margin-bottom:4px; }
   .roadmap-card p{ font-size:12.3px; color:var(--ink-faint); }
+
+  /* ---------- Schermi stretti (telefono): titolo su una riga, contenuti più vicini ai bordi ---------- */
+  @media (max-width: 600px){
+    .shell{ padding:12px 10px 100px; }
+    .brand-name{ font-size:14.5px; }
+    .brand-tag{ font-size:10.3px; }
+    .brand-mark{ width:28px; height:28px; }
+    .brand-mark svg{ width:15px; height:15px; }
+    .brand{ gap:8px; }
+    .app-content{ padding:2px 0 104px; }
+    .p-card{ padding:14px 12px; border-radius:14px; }
+    .bottom-nav{ padding:8px 4px calc(10px + env(safe-area-inset-bottom)); }
+  }
 </style>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -1037,7 +1050,7 @@
     { key:'massaGrassa',       field:'Massa grassa',            label:'Massa grassa',          unit:'%',  good:'down' },
   ];
   const COMPARE_DEFS = METRIC_DEFS.map(d => ({ field:d.field, label:d.label, unit:d.unit, good:d.good }));
-  const PATIENT_METRIC_KEYS = ['peso','vita','massaGrassa'];
+  const PATIENT_METRIC_KEYS = METRIC_DEFS.map(d => d.key);
 
   /* ================= STATO ================= */
   let SESSION = null;
@@ -1422,7 +1435,9 @@
       dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
       linkEl.href = currentPlan.Url; linkEl.style.display = '';
     } else {
-      nomeEl.textContent = 'Nessun piano caricato'; dataEl.textContent = '—'; linkEl.style.display = 'none';
+      nomeEl.textContent = pianoLoadError ? 'Errore nel caricamento' : 'Nessun piano caricato';
+      dataEl.textContent = pianoLoadError || '—';
+      linkEl.style.display = 'none';
     }
     const storicoEl = document.getElementById('piano-storico');
     if(!currentPlanHistory.length){
@@ -1521,15 +1536,26 @@
 
   /* ================= CARICAMENTO DATI PAZIENTE ================= */
   async function loadMisurazioni(codice){
-    const res = await apiGet('misurazioni', { codice: SESSION.codice, paziente: codice });
-    currentRows = res.ok ? res.misurazioni : [];
+    try{
+      const res = await apiGet('misurazioni', { codice: SESSION.codice, paziente: codice });
+      currentRows = res.ok ? res.misurazioni : [];
+    } catch(err){
+      currentRows = [];
+    }
     METRICS = buildMetricsFromRows(currentRows);
     populateCompareSelects();
   }
+  let pianoLoadError = null;
   async function loadPiano(codice){
-    const res = await apiGet('piano', { codice: SESSION.codice, paziente: codice });
-    currentPlan = res.ok ? res.attivo : null;
-    currentPlanHistory = res.ok ? res.storico : [];
+    try{
+      const res = await apiGet('piano', { codice: SESSION.codice, paziente: codice });
+      currentPlan = res.ok ? res.attivo : null;
+      currentPlanHistory = res.ok ? res.storico : [];
+      pianoLoadError = res.ok ? null : (res.error || 'Errore nel caricamento del piano.');
+    } catch(err){
+      currentPlan = null; currentPlanHistory = [];
+      pianoLoadError = 'Errore di connessione: ' + err.message;
+    }
   }
 
   /* ================= VISTA NUTRIZIONISTA ================= */
@@ -1658,7 +1684,10 @@
       badge.style.display = 'none';
       linkEl.style.display = 'none';
       emptyEl.style.display = 'block';
-      subEl.textContent = 'In attesa del primo piano alimentare.';
+      subEl.textContent = pianoLoadError ? '' : 'In attesa del primo piano alimentare.';
+      emptyEl.textContent = pianoLoadError
+        ? 'Non riusciamo a caricare il piano: ' + pianoLoadError
+        : 'Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.';
     }
   }
 
@@ -1719,7 +1748,7 @@
     const oggi = new Date();
     document.getElementById('p-home-sub').textContent = 'Ecco il punto della situazione di oggi, ' + oggi.toLocaleDateString('it-IT',{day:'numeric', month:'long'}) + '.';
     document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
-    document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo || 'Nessun controllo in programma';
+    document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
     currentMetric = 'peso'; patientMetric = 'peso';
     await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice)]);
     renderPatientHomeCards();
