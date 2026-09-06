@@ -125,7 +125,7 @@
     display:flex; align-items:center; justify-content:center;
     box-shadow: var(--shadow-1);
   }
-  .brand-name{ font-family:var(--font-display); font-size:21px; font-weight:600; letter-spacing:.01em; }
+  .brand-name{ font-family:var(--font-display); font-size:18.5px; font-weight:600; letter-spacing:.01em; }
   .brand-tag{ font-size:12.5px; color:var(--ink-faint); margin-top:-2px; }
 
   .btn-logout{
@@ -221,10 +221,19 @@
     padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
     box-shadow:var(--shadow-1); margin-bottom:22px;
   }
-  .patient-header h1{ font-size:23px; }
+  .patient-header h1{ font-size:23px; display:flex; align-items:center; gap:10px; }
   .patient-header .goal{ font-size:13.5px; color:var(--ink-soft); margin-top:5px; max-width:46ch; }
-  .next-visit{ text-align:right; font-size:13px; color:var(--ink-faint); }
-  .next-visit .date{ font-family:var(--font-mono); font-size:14px; color:var(--ink); font-weight:600; }
+  .next-visit{ text-align:right; font-size:14.5px; font-weight:600; color:var(--ink-soft); }
+  .next-visit .date{ display:block; font-family:var(--font-mono); font-size:16px; color:var(--ink); font-weight:600; margin-top:3px; }
+  .status-led{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .status-led.good{ background:var(--good); }
+  .status-led.warning{ background:var(--warning); }
+  .status-led.critical{ background:var(--critical); }
+  #patient-status-select{
+    font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--ink-soft);
+    border:1px solid var(--border); background:var(--surface-raised); border-radius:999px;
+    padding:4px 10px; cursor:pointer;
+  }
 
   /* ---------- Stat tiles ---------- */
   .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
@@ -331,20 +340,35 @@
   .note-strip svg{ width:15px; height:15px; flex:none; margin-top:1px; }
 
   /* ---------- Measurement form ---------- */
-  fieldset{ border:none; padding:0; margin:0 0 16px; }
+  fieldset{ border:none; padding:0; margin:0 0 12px; }
   fieldset legend{
-    font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint);
-    padding:0; margin-bottom:9px;
+    font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-ink);
+    padding:0; margin-bottom:7px;
   }
-  .field-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .field-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
   @media (max-width: 880px){ .field-grid{ grid-template-columns:repeat(3,1fr); } }
   @media (max-width: 560px){ .field-grid{ grid-template-columns:repeat(2,1fr); } }
-  .field label{ display:flex; align-items:flex-end; min-height:28px; line-height:1.25; font-size:11.5px; color:var(--ink-faint); margin-bottom:4px; }
+  .field label{ display:flex; align-items:flex-end; min-height:22px; line-height:1.2; font-size:12.5px; font-weight:500; color:var(--ink); margin-bottom:3px; }
   .field input, .field select{
-    width:100%; font-family:var(--font-mono); font-size:13px; padding:8px 9px; border-radius:7px;
+    width:100%; font-family:var(--font-mono); font-size:13px; padding:7px 9px; border-radius:7px;
     border:1px solid var(--border); background:var(--surface-raised); color:var(--ink);
   }
   .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+
+  /* ---------- Nuova rilevazione: box compatto ---------- */
+  #card-nuova-rilevazione{ padding:16px 18px; }
+  #card-nuova-rilevazione .card-head{ margin-bottom:10px; }
+  #card-nuova-rilevazione fieldset{ margin-bottom:9px; }
+
+  /* ---------- Toast di conferma ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(12px);
+    display:flex; align-items:center; gap:8px; background:var(--accent-ink); color:#fff;
+    padding:11px 18px; border-radius:999px; font-size:13.3px; font-weight:600; box-shadow:var(--shadow-2);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:200;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast svg{ width:16px; height:16px; flex:none; }
 
   /* ---------- Metric chips ---------- */
   .chip-row{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
@@ -395,23 +419,25 @@
   .spark-card svg{ width:100%; height:36px; margin-top:6px; overflow:visible; }
 
   /* ---------- Comparison ---------- */
-  .compare-controls{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; margin-bottom:18px; }
+  .compare-controls{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px; }
   .compare-field label{ display:block; font-size:11.5px; color:var(--ink-faint); margin-bottom:4px; }
   .compare-field select{
     font-family:var(--font-body); font-size:13.5px; font-weight:500; padding:9px 12px; border-radius:var(--radius-s);
     border:1px solid var(--border); background:var(--surface-raised); color:var(--ink); min-width:190px;
   }
   .compare-vs{ color:var(--ink-faint); font-size:13px; padding-bottom:9px; }
-  .headline-row{ display:flex; gap:26px; flex-wrap:wrap; padding:18px 22px; background:var(--accent-soft); border-radius:var(--radius-m); margin-bottom:20px; }
-  .headline-stat .hv{ font-family:var(--font-mono); font-size:23px; font-weight:700; color:var(--accent-ink); }
+  .headline-row{ display:flex; gap:20px; flex-wrap:wrap; padding:13px 18px; background:var(--accent-soft); border-radius:var(--radius-m); margin-bottom:14px; }
+  .headline-stat .hv{ font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-ink); }
   .headline-stat .hl{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+
+  #card-confronto{ padding:16px 18px; }
 
   table.compare-table{ width:100%; border-collapse:collapse; }
   .compare-table th{
-    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint);
-    font-weight:600; padding:0 10px 10px; border-bottom:1px solid var(--border);
+    text-align:left; font-size:13.5px; text-transform:none; letter-spacing:0; color:var(--ink);
+    font-weight:700; padding:0 10px 8px; border-bottom:1px solid var(--border);
   }
-  .compare-table td{ padding:11px 10px; border-bottom:1px solid var(--border-soft); vertical-align:middle; font-size:13.3px; }
+  .compare-table td{ padding:8px 10px; border-bottom:1px solid var(--border-soft); vertical-align:middle; font-size:13.3px; }
   .compare-table tr:last-child td{ border-bottom:none; }
   .row-label{ font-weight:600; white-space:nowrap; }
   .row-label .unit{ font-weight:400; color:var(--ink-faint); font-size:11.5px; }
@@ -429,21 +455,12 @@
   .legend-row span{ display:inline-flex; align-items:center; gap:6px; }
   .legend-dot{ width:9px; height:9px; border-radius:50%; }
 
-  /* ---------- Patient (phone) view ---------- */
-  #view-paziente{ display:flex; justify-content:center; }
-  .phone{
-    width:390px; max-width:100%; border-radius:42px; background:var(--ink);
-    padding:14px; box-shadow:var(--shadow-2);
+  /* ---------- Patient (app) view ---------- */
+  #view-paziente{ }
+  .app-container{
+    width:480px; max-width:100%; margin:0 auto; display:flex; flex-direction:column;
   }
-  .phone-screen{
-    background:var(--paper); border-radius:30px; overflow:hidden; display:flex; flex-direction:column;
-    height:760px;
-  }
-  .status-bar{ display:flex; justify-content:space-between; align-items:center; padding:14px 24px 4px; font-family:var(--font-mono); font-size:12.5px; font-weight:600; flex:none; }
-  .status-icons{ display:flex; gap:5px; align-items:center; }
-  .status-icons svg{ width:15px; height:15px; }
-  .phone-content{ flex:1; overflow-y:auto; padding:14px 18px 20px; }
-  .phone-content::-webkit-scrollbar{ display:none; }
+  .app-content{ flex:1; padding:4px 2px 104px; }
 
   .p-greeting{ font-family:var(--font-display); font-size:21px; font-weight:600; margin:6px 0 3px; }
   .p-sub{ font-size:12.8px; color:var(--ink-faint); margin-bottom:16px; }
@@ -471,8 +488,11 @@
   .p-plan-preview b:first-child{ margin-top:0; }
 
   .bottom-nav{
-    display:flex; flex:none; border-top:1px solid var(--border); background:var(--surface);
-    padding:8px 6px 12px;
+    display:flex; position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    width:480px; max-width:100%; z-index:40;
+    border-top:1px solid var(--border); background:var(--surface);
+    padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 16px rgba(0,0,0,.05);
   }
   .nav-btn{
     flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none;
@@ -529,7 +549,7 @@
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
       </div>
       <div>
-        <div class="brand-name">Percorso</div>
+        <div class="brand-name">GM Program - Gestionale pazienti</div>
         <div class="brand-tag">Piano alimentare &amp; monitoraggio pazienti</div>
       </div>
     </div>
@@ -590,14 +610,13 @@
           <div class="field"><label>Prossimo controllo — data</label><input type="date" id="np-data-controllo"></div>
           <div class="field"><label>Prossimo controllo — ora (facoltativa)</label><input type="time" id="np-ora-controllo"></div>
           <div class="field">
-            <label>Stato iniziale</label>
-            <select id="np-statoTipo" onchange="onNewPatientStatoChange()">
-              <option value="good">Va bene (verde)</option>
-              <option value="warning">Da monitorare (giallo)</option>
-              <option value="critical">Da ricontattare (rosso)</option>
+            <label>Stato paziente</label>
+            <select id="np-statoTipo">
+              <option value="good">Attivo (verde)</option>
+              <option value="warning">Sospeso (giallo)</option>
+              <option value="critical">Inattivo (rosso)</option>
             </select>
           </div>
-          <div class="field"><label>Testo dello stato (modificabile)</label><input type="text" id="np-statoTesto" oninput="onNewPatientStatoTestoInput()"></div>
         </div>
         <div class="login-error" id="add-patient-error"></div>
         <div style="display:flex; gap:10px; margin-top:16px;">
@@ -613,11 +632,19 @@
     <div class="main">
       <div class="patient-header">
         <div>
-          <h1 id="patient-name">—</h1>
+          <h1>
+            <span id="patient-name">—</span>
+            <span class="status-led good" id="patient-status-led"></span>
+            <select id="patient-status-select" onchange="updatePatientStatus()" title="Stato del paziente nello studio">
+              <option value="good">Attivo</option>
+              <option value="warning">Sospeso</option>
+              <option value="critical">Inattivo</option>
+            </select>
+          </h1>
           <div class="goal" id="patient-goal">—</div>
         </div>
         <div class="next-visit">
-          Prossimo controllo<br>
+          Prossimo controllo
           <span class="date" id="patient-next-visit">—</span>
         </div>
       </div>
@@ -683,11 +710,6 @@
               </div>
               <button class="btn small" style="margin-top:13px; width:100%; justify-content:center;" onclick="setNutriTab('piano')">Vai alla sezione piano →</button>
             </div>
-
-            <div class="card">
-              <h3 style="font-size:14.5px; margin-bottom:8px;">Stato paziente</h3>
-              <p style="font-size:12.8px; color:var(--ink-soft); margin:0;" id="overview-note">—</p>
-            </div>
           </div>
         </div>
       </div>
@@ -737,7 +759,7 @@
 
       <!-- ---- MISURAZIONI ---- -->
       <div class="tab-panel" id="tab-misurazioni">
-        <div class="card">
+        <div class="card" id="card-nuova-rilevazione">
           <div class="card-head">
             <div>
               <h3>Nuova rilevazione</h3>
@@ -765,8 +787,8 @@
               <div class="field"><label>Fianchi</label><input type="text" id="f-fianchi" placeholder="98"></div>
               <div class="field"><label>Spalle</label><input type="text" id="f-spalle" placeholder="110"></div>
               <div class="field"><label>Coscia dx</label><input type="text" id="f-cosciaDx" placeholder="55"></div>
-              <div class="field"><label>Coscia sx</label><input type="text" id="f-cosciaSx" placeholder="55"></div>
               <div class="field"><label>Interno coscia dx</label><input type="text" id="f-internoCosciaDx" placeholder="40"></div>
+              <div class="field"><label>Coscia sx</label><input type="text" id="f-cosciaSx" placeholder="55"></div>
               <div class="field"><label>Interno coscia sx</label><input type="text" id="f-internoCosciaSx" placeholder="40"></div>
               <div class="field"><label>Braccio dx</label><input type="text" id="f-braccioDx" placeholder="26,6"></div>
               <div class="field"><label>Braccio sx</label><input type="text" id="f-braccioSx" placeholder="26,6"></div>
@@ -823,7 +845,7 @@
 
       <!-- ---- CONFRONTO ---- -->
       <div class="tab-panel" id="tab-confronto">
-        <div class="card">
+        <div class="card" id="card-confronto">
           <div class="compare-controls">
             <div class="compare-field">
               <label>Controllo meno recente</label>
@@ -859,17 +881,9 @@
   <!-- VISTA PAZIENTE                                                -->
   <!-- =========================================================== -->
   <div id="view-paziente" style="display:none;">
-    <div class="phone">
-      <div class="phone-screen">
-        <div class="status-bar">
-          <span>9:41</span>
-          <div class="status-icons">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M2 8C7 3 17 3 22 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5.5 11.5C9 8 15 8 18.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>
-            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="10" width="12" height="4" fill="currentColor"/><rect x="21" y="10.5" width="1.6" height="3" rx="0.6" fill="currentColor"/></svg>
-          </div>
-        </div>
+    <div class="app-container">
 
-        <div class="phone-content">
+        <div class="app-content">
 
           <!-- HOME -->
           <div class="p-screen active" id="p-home">
@@ -925,7 +939,7 @@
           <!-- ANDAMENTO -->
           <div class="p-screen" id="p-andamento">
             <div class="p-greeting" style="font-size:18px;">Il tuo andamento</div>
-            <div class="p-sub">−4,8 kg rispetto al primo controllo di aprile</div>
+            <div class="p-sub" id="p-andamento-sub">—</div>
             <div class="chip-row" id="chip-row-paziente"></div>
             <div class="chart-wrap" id="chart-paziente"></div>
 
@@ -977,8 +991,12 @@
             Profilo
           </button>
         </div>
-      </div>
     </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="toast-text">Salvato</span>
   </div>
 
 </div>
@@ -1084,10 +1102,23 @@
   const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const ICON_DOT = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>';
   const ICON_ALERT = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 4L22 20H2L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17.6" r="0.9" fill="currentColor"/></svg>';
-  const STATUS_LABEL = { good:"In linea con l'obiettivo", warning:'Da monitorare', critical:'Da ricontattare' };
+  const STATUS_LABEL = { good:'Attivo', warning:'Sospeso', critical:'Inattivo' };
   const STATUS_ICON = { good:ICON_CHECK, warning:ICON_ALERT, critical:ICON_ALERT };
   const ARROW_UP = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 15L12 9L18 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const ARROW_DOWN = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* ================= FORMATTAZIONE PROSSIMO CONTROLLO ================= */
+  // ProssimoControllo è salvato come stringa "15 settembre 2026 · 17:30" (oppure solo la data, senza orario).
+  function soloData_(prossimoControllo){
+    if(!prossimoControllo) return '';
+    return String(prossimoControllo).split(' · ')[0];
+  }
+  function conOra_(prossimoControllo){
+    if(!prossimoControllo) return '—';
+    const parti = String(prossimoControllo).split(' · ');
+    if(parti.length > 1) return parti[0] + ' alle ore ' + parti[1];
+    return parti[0];
+  }
 
   /* ================= PATIENT LIST ================= */
   function renderPatientList(){
@@ -1101,10 +1132,7 @@
         <div class="avatar">${(p.Nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
         <div class="patient-info">
           <div class="patient-name">${p.Nome||'—'}</div>
-          <div class="patient-meta">${p.Eta?p.Eta+' anni · ':''}${p.ProssimoControllo||''}</div>
-          <div class="patient-status">
-            <span class="pill ${p.StatoTipo||'good'}">${STATUS_ICON[p.StatoTipo||'good']}${p.StatoTesto||''}</span>
-          </div>
+          <div class="patient-meta">${p.Eta?p.Eta+' anni · ':''}${soloData_(p.ProssimoControllo)}</div>
         </div>
       </div>
     `).join('');
@@ -1384,14 +1412,12 @@
       dataEl.textContent = '—';
       badgeEl.style.display = 'none';
     }
-
-    document.getElementById('overview-note').textContent = (currentPatientMeta && currentPatientMeta.StatoTesto) || '—';
   }
 
   /* ================= PIANO (nutrizionista) ================= */
   function renderPianoTab(){
     const nomeEl = document.getElementById('piano-attivo-nome'), dataEl = document.getElementById('piano-attivo-data'), linkEl = document.getElementById('piano-attivo-link');
-    if(currentPlan){
+    if(currentPlan && currentPlan.Url){
       nomeEl.textContent = currentPlan.NomeFile;
       dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
       linkEl.href = currentPlan.Url; linkEl.style.display = '';
@@ -1427,16 +1453,32 @@
         if(res.ok){
           await loadPiano(currentPatientCode);
           renderPanoramica();
+          if(res.warning){
+            errEl.style.color = 'var(--accent-warm)';
+            errEl.textContent = res.warning;
+          }
         } else {
+          errEl.style.color = '';
           errEl.textContent = res.error || 'Errore durante il caricamento.';
         }
       } catch(err){
+        errEl.style.color = '';
         errEl.textContent = 'Errore di connessione: ' + err.message;
       }
       labelEl.textContent = 'Clicca per scegliere il PDF del piano';
     };
     reader.readAsDataURL(file);
     evt.target.value = '';
+  }
+
+  /* ================= TOAST DI CONFERMA ================= */
+  let toastTimer = null;
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
   }
 
   /* ================= MISURAZIONI: salvataggio ================= */
@@ -1467,6 +1509,7 @@
         Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
         await loadMisurazioni(currentPatientCode);
         renderChips(); renderBigChart(); renderSparkGrid(); renderPanoramica();
+        showToast('Rilevazione salvata correttamente');
       } else {
         errEl.textContent = res.error || 'Errore durante il salvataggio.';
       }
@@ -1507,17 +1550,9 @@
     const y = +parts[0], m = +parts[1], d = +parts[2];
     return `${d} ${MESI_IT[m-1]} ${y}`;
   }
-  let npStatoTestoTouched = false;
-  function onNewPatientStatoTestoInput(){ npStatoTestoTouched = true; }
-  function onNewPatientStatoChange(){
-    if(npStatoTestoTouched) return;
-    document.getElementById('np-statoTesto').value = STATUS_LABEL[document.getElementById('np-statoTipo').value] || '';
-  }
   function openAddPatientModal(){
     ['np-nome','np-codice','np-eta','np-obiettivo','np-data-controllo','np-ora-controllo'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('np-statoTipo').value = 'good';
-    npStatoTestoTouched = false;
-    onNewPatientStatoChange();
     document.getElementById('add-patient-error').textContent = '';
     document.getElementById('add-patient-overlay').style.display = 'flex';
     document.getElementById('np-nome').focus();
@@ -1538,7 +1573,7 @@
     const dataControllo = document.getElementById('np-data-controllo').value;
     const oraControllo = document.getElementById('np-ora-controllo').value;
     const statoTipo = document.getElementById('np-statoTipo').value;
-    const statoTesto = document.getElementById('np-statoTesto').value.trim() || STATUS_LABEL[statoTipo];
+    const statoTesto = STATUS_LABEL[statoTipo];
 
     let prossimoControllo = '';
     if(dataControllo){
@@ -1576,12 +1611,33 @@
     if(currentPatientMeta){
       document.getElementById('patient-name').textContent = currentPatientMeta.Nome || '—';
       document.getElementById('patient-goal').textContent = (currentPatientMeta.Eta ? currentPatientMeta.Eta+' anni · ' : '') + 'Obiettivo: ' + (currentPatientMeta.Obiettivo || '—');
-      document.getElementById('patient-next-visit').textContent = currentPatientMeta.ProssimoControllo || '—';
+      document.getElementById('patient-next-visit').textContent = conOra_(currentPatientMeta.ProssimoControllo);
+      const stato = currentPatientMeta.StatoTipo || 'good';
+      document.getElementById('patient-status-led').className = 'status-led ' + stato;
+      document.getElementById('patient-status-select').value = stato;
     }
     currentMetric = 'peso';
     await Promise.all([loadMisurazioni(codice), loadPiano(codice)]);
     const activeTab = document.querySelector('#view-nutri .tab-btn.active');
     setNutriTab(activeTab ? activeTab.dataset.tab : 'panoramica');
+  }
+
+  async function updatePatientStatus(){
+    if(!currentPatientMeta) return;
+    const statoTipo = document.getElementById('patient-status-select').value;
+    const statoTesto = STATUS_LABEL[statoTipo] || '';
+    document.getElementById('patient-status-led').className = 'status-led ' + statoTipo;
+    // Aggiorna subito in locale, poi conferma con il foglio Google in background.
+    currentPatientMeta.StatoTipo = statoTipo;
+    currentPatientMeta.StatoTesto = statoTesto;
+    const p = PATIENTS.find(p => p.Codice === currentPatientCode);
+    if(p){ p.StatoTipo = statoTipo; p.StatoTesto = statoTesto; }
+    try{
+      const res = await apiPost('aggiornaStatoPaziente', { codice: SESSION.codice, paziente: currentPatientCode, statoTipo, statoTesto });
+      if(!res.ok) showToast(res.error || 'Errore nel salvataggio dello stato.');
+    } catch(err){
+      showToast('Errore di connessione: ' + err.message);
+    }
   }
 
   /* ================= VISTA PAZIENTE ================= */
@@ -1591,7 +1647,7 @@
     const linkEl = document.getElementById('p-piano-link');
     const emptyEl = document.getElementById('p-piano-empty');
     const subEl = document.getElementById('p-piano-sub');
-    if(currentPlan){
+    if(currentPlan && currentPlan.Url){
       dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(currentPlan.Data));
       badge.style.display = '';
       linkEl.href = currentPlan.Url; linkEl.style.display = 'flex';
@@ -1616,14 +1672,37 @@
     row.innerHTML = PATIENT_METRIC_KEYS.map(k => `<button class="chip ${k===patientMetric?'active':''}" onclick="selectPatientMetric('${k}')">${METRICS[k].label}</button>`).join('');
     const m = METRICS[patientMetric];
     drawChart(document.getElementById('chart-paziente'), m.values, { big:true, showAxis:true, unit:m.unit, title:m.label, color:'var(--accent)', w:340, h:200, labels:m.labels });
+    updateAndamentoSub();
   }
   function selectPatientMetric(k){ patientMetric = k; renderPatientChips(); }
+
+  function updateAndamentoSub(){
+    const subEl = document.getElementById('p-andamento-sub');
+    const m = METRICS[patientMetric];
+    if(!subEl || !m) return;
+    if(!m.values.length){
+      subEl.textContent = 'Nessun controllo registrato ancora.';
+      return;
+    }
+    if(m.values.length < 2){
+      subEl.textContent = 'Primo controllo registrato il ' + fmtDateFull(m.dates[0]) + '.';
+      return;
+    }
+    const first = m.values[0], last = m.values[m.values.length-1];
+    const delta = Math.round((last-first)*10)/10;
+    const meseLabel = m.dates[0].toLocaleDateString('it-IT', {month:'long'});
+    if(delta === 0){
+      subEl.textContent = 'Invariato rispetto al primo controllo di ' + meseLabel + '.';
+    } else {
+      subEl.textContent = (delta<0?'−':'+') + fmt(Math.abs(delta)) + ' ' + m.unit + ' rispetto al primo controllo di ' + meseLabel + '.';
+    }
+  }
 
   function renderCheckinList(){
     const el = document.getElementById('p-checkin-list');
     if(!currentRows.length){ el.innerHTML = '<p style="padding:10px 0; color:var(--ink-faint); font-size:12.8px;">Nessun controllo registrato ancora.</p>'; return; }
     el.innerHTML = currentRows.slice().reverse().map(r => {
-      const vita = parseNum(r.Vita), grassa = parseNum(r.MassaGrassa), peso = parseNum(r.Peso);
+      const vita = parseNum(r.Vita), grassa = parseNum(r['Massa grassa']), peso = parseNum(r.Peso);
       return `<div class="p-checkin-row">
         <div>
           <div class="p-checkin-date">${fmtDateFull(new Date(r.Data))}</div>
@@ -1704,7 +1783,7 @@
         await loadPazienti();
       }
     } else {
-      document.getElementById('view-paziente').style.display = 'flex';
+      document.getElementById('view-paziente').style.display = 'block';
       document.getElementById('view-nutri').style.display = 'none';
       await enterPazienteView();
     }
