@@ -1,21 +1,1903 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>La Congrega degli Sticker</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Percorso - gestione pazienti nutrizionali: piano alimentare sempre aggiornato, misurazioni e confronto controlli.">
+<meta name="theme-color" content="#0B8A78">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Percorso</title>
+<style>
+  /* ---------- Design tokens ---------- */
+  :root{
+    --ink:#17221D;
+    --ink-soft:#48564C;
+    --ink-faint:#7C8A76;
+    --paper:#F1F3EC;
+    --surface:#FBFCF8;
+    --surface-raised:#FFFFFF;
+    --border:#DCE2D3;
+    --border-soft:#E7EBE0;
+    --accent:#0B8A78;
+    --accent-ink:#04352D;
+    --accent-soft:#E1F0EB;
+    --accent-warm:#C08A2E;
+    --accent-warm-soft:#F5EAD3;
+    --sage:#8A9A82;
+    --good:#1F9463;
+    --good-soft:#E4F3EA;
+    --warning:#C79A2E;
+    --warning-soft:#FAF1DD;
+    --critical:#D14B36;
+    --critical-soft:#FBE8E3;
+    --shadow-1: 0 1px 2px rgba(23,34,29,.06), 0 1px 1px rgba(23,34,29,.04);
+    --shadow-2: 0 8px 24px rgba(23,34,29,.10), 0 2px 6px rgba(23,34,29,.06);
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 22px;
+    --font-display:'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body:'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+    --font-mono:'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7ECE3;
+      --ink-soft:#A9B6A2;
+      --ink-faint:#79876F;
+      --paper:#121A16;
+      --surface:#1B2620;
+      --surface-raised:#212E27;
+      --border:#2C3B32;
+      --border-soft:#243128;
+      --accent:#2AA893;
+      --accent-ink:#D8F2EC;
+      --accent-soft:#1E3931;
+      --accent-warm:#E0A94E;
+      --accent-warm-soft:#3A2E19;
+      --sage:#7C9074;
+      --good:#0EA87C;
+      --good-soft:#123027;
+      --warning:#B88A2A;
+      --warning-soft:#332711;
+      --critical:#C63A5C;
+      --critical-soft:#341A20;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7ECE3;
+    --ink-soft:#A9B6A2;
+    --ink-faint:#79876F;
+    --paper:#121A16;
+    --surface:#1B2620;
+    --surface-raised:#212E27;
+    --border:#2C3B32;
+    --border-soft:#243128;
+    --accent:#2AA893;
+    --accent-ink:#D8F2EC;
+    --accent-soft:#1E3931;
+    --accent-warm:#E0A94E;
+    --accent-warm-soft:#3A2E19;
+    --sage:#7C9074;
+    --good:#0EA87C;
+    --good-soft:#123027;
+    --warning:#B88A2A;
+    --warning-soft:#332711;
+    --critical:#C63A5C;
+    --critical-soft:#341A20;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:var(--font-display);
+    font-weight:600;
+    text-wrap:balance;
+    color:var(--ink);
+    margin:0;
+  }
+  .num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+
+  /* ---------- Shell / top bar ---------- */
+  .shell{ max-width:1320px; margin:0 auto; padding:22px 28px 64px; }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:20px; flex-wrap:wrap; margin-bottom:6px;
+  }
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .brand-mark{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    background:linear-gradient(155deg, var(--accent) 0%, #0A6E60 100%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow-1);
+  }
+  .brand-name{ font-family:var(--font-display); font-size:18.5px; font-weight:600; letter-spacing:.01em; }
+  .brand-tag{ font-size:12.5px; color:var(--ink-faint); margin-top:-2px; }
+
+  .btn-logout{
+    display:flex; align-items:center; gap:7px; border:1px solid var(--border); background:var(--surface);
+    color:var(--ink-soft); font-size:13px; font-weight:500; padding:9px 15px; border-radius:999px; cursor:pointer;
+  }
+  .btn-logout:hover{ border-color:var(--critical); color:var(--critical); }
+  .btn-logout svg{ width:14px; height:14px; }
+
+  /* ---------- Login ---------- */
+  #login-screen{
+    min-height:80vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .login-card{
+    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:34px 30px; text-align:center;
+  }
+  .login-mark{
+    width:52px; height:52px; border-radius:14px; margin:0 auto 18px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(155deg, var(--accent) 0%, #0A6E60 100%); box-shadow:var(--shadow-1);
+  }
+  .login-card h1{ font-size:22px; margin-bottom:6px; }
+  .login-card p{ font-size:13.5px; color:var(--ink-faint); margin-bottom:22px; }
+  .login-card input{
+    width:100%; text-align:center; letter-spacing:.08em; font-family:var(--font-mono); font-size:16px;
+    padding:13px 12px; border-radius:var(--radius-s); border:1px solid var(--border); background:var(--surface-raised);
+    color:var(--ink); margin-bottom:12px; text-transform:uppercase;
+  }
+  .login-card input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .login-error{ font-size:12.8px; color:var(--critical); min-height:18px; margin-top:10px; }
+  .login-note{ font-size:11.8px; color:var(--ink-faint); margin-top:18px; line-height:1.5; }
+
+  /* ---------- Tabs (generic) ---------- */
+  .tabs{ display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:22px; overflow-x:auto; }
+  .tab-btn{
+    border:none; background:transparent; cursor:pointer; font-family:inherit;
+    font-size:14px; font-weight:500; color:var(--ink-faint);
+    padding:11px 4px; margin-right:22px; border-bottom:2.5px solid transparent;
+    white-space:nowrap; transition:color .15s ease, border-color .15s ease;
+  }
+  .tab-btn:hover{ color:var(--ink); }
+  .tab-btn.active{ color:var(--accent-ink); border-color:var(--accent); font-weight:600; }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  /* ---------- Nutrizionista layout ---------- */
+  #view-nutri{ display:grid; grid-template-columns:266px 1fr; gap:26px; align-items:start; }
+  @media (max-width: 880px){ #view-nutri{ grid-template-columns:1fr; } }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-m); box-shadow:var(--shadow-1);
+  }
+  .sidebar{ padding:18px; position:sticky; top:20px; }
+  @media (max-width: 880px){ .sidebar{ position:static; top:auto; } }
+  .sidebar h2{ font-size:14px; text-transform:uppercase; letter-spacing:.06em; font-weight:600; color:var(--ink-soft); font-family:var(--font-body); margin-bottom:14px; }
+  .search{
+    display:flex; align-items:center; gap:8px; background:var(--surface-raised);
+    border:1px solid var(--border); border-radius:var(--radius-s); padding:9px 11px;
+    color:var(--ink-faint); font-size:13.5px; margin-bottom:16px;
+  }
+  .search svg{ width:15px; height:15px; flex:none; }
+
+  .patient-list{ display:flex; flex-direction:column; gap:4px; }
+  .patient{
+    display:flex; align-items:center; gap:11px; padding:10px; border-radius:var(--radius-s);
+    cursor:pointer; border:1px solid transparent; transition:background .15s ease, border-color .15s ease;
+  }
+  .patient:hover{ background:var(--accent-soft); }
+  .patient.active{ background:var(--accent-soft); border-color:var(--accent); }
+  .avatar{
+    width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:600; font-size:14px; color:var(--accent-ink); background:var(--accent-soft);
+    border:1px solid var(--border);
+  }
+  .patient.active .avatar{ background:var(--accent); color:#fff; border-color:transparent; }
+  .patient-info{ min-width:0; flex:1; }
+  .patient-name{ font-size:13.8px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .patient-meta{ font-size:12px; color:var(--ink-faint); margin-top:1px; }
+  .pill{
+    display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600;
+    padding:3px 9px 3px 7px; border-radius:999px; white-space:nowrap;
+  }
+  .pill svg{ width:10px; height:10px; }
+  .pill.good{ background:var(--good-soft); color:var(--good); }
+  .pill.warning{ background:var(--warning-soft); color:var(--warning); }
+  .pill.critical{ background:var(--critical-soft); color:var(--critical); }
+  .patient-status{ margin-top:5px; }
+
+  .main{ min-width:0; }
+  .patient-header{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+    padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-1); margin-bottom:22px;
+  }
+  .patient-header h1{ font-size:23px; display:flex; align-items:center; gap:10px; }
+  .patient-header .goal{ font-size:13.5px; color:var(--ink-soft); margin-top:5px; max-width:46ch; }
+  .next-visit{ text-align:right; font-size:14.5px; font-weight:600; color:var(--ink-soft); }
+  .next-visit .date{ display:block; font-family:var(--font-mono); font-size:16px; color:var(--ink); font-weight:600; margin-top:3px; }
+  .status-led{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .status-led.good{ background:var(--good); }
+  .status-led.warning{ background:var(--warning); }
+  .status-led.critical{ background:var(--critical); }
+  #patient-status-select{
+    font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--ink-soft);
+    border:1px solid var(--border); background:var(--surface-raised); border-radius:999px;
+    padding:4px 10px; cursor:pointer;
+  }
+
+  /* ---------- Stat tiles ---------- */
+  .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+  @media (max-width: 720px){ .stat-grid{ grid-template-columns:repeat(2,1fr); } }
+  .stat-tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
+    padding:16px 17px; box-shadow:var(--shadow-1);
+  }
+  .stat-label{ font-size:12px; color:var(--ink-faint); font-weight:500; }
+  .stat-value{ font-family:var(--font-mono); font-size:24px; font-weight:600; margin-top:6px; letter-spacing:-.01em; }
+  .stat-value small{ font-size:13px; font-weight:500; color:var(--ink-faint); margin-left:2px; }
+  .stat-delta{ display:flex; align-items:center; gap:4px; font-size:12.5px; font-weight:600; margin-top:7px; }
+  .stat-delta svg{ width:12px; height:12px; }
+  .stat-delta.good{ color:var(--good); }
+  .stat-delta.warn{ color:var(--warning); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
+    padding:20px 22px; box-shadow:var(--shadow-1);
+  }
+  .card + .card{ margin-top:16px; }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:14px; flex-wrap:wrap; }
+  .card-head h3{ font-size:16px; }
+  .card-head p{ font-size:12.5px; color:var(--ink-faint); margin-top:2px; }
+  .two-col{ display:grid; grid-template-columns:1.15fr .85fr; gap:16px; align-items:start; }
+  @media (max-width: 880px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; font-size:13.3px; font-weight:600;
+    padding:9px 15px; border-radius:999px; border:1px solid var(--border); cursor:pointer;
+    background:var(--surface-raised); color:var(--ink); transition:transform .1s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn svg{ width:14px; height:14px; }
+  .btn:hover{ background:var(--accent-soft); border-color:var(--accent); }
+  .btn:active{ transform:scale(.97); }
+  .btn.primary{ background:var(--accent); color:#fff; border-color:transparent; }
+  .btn.primary:hover{ background:#0A7A6A; }
+  .btn.ghost{ background:transparent; }
+  .btn.small{ padding:6px 12px; font-size:12.5px; }
+
+  /* ---------- Modale nuovo paziente ---------- */
+  .sidebar-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .sidebar-head h2{ margin-bottom:0; }
+  .btn-add{
+    display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:999px;
+    background:var(--accent-soft); color:var(--accent-ink); border:none; cursor:pointer; flex:none;
+    transition:background .15s ease, color .15s ease;
+  }
+  .btn-add:hover{ background:var(--accent); color:#fff; }
+  .btn-add svg{ width:14px; height:14px; }
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(23,34,29,.45); display:flex; align-items:center; justify-content:center;
+    padding:20px; z-index:80;
+  }
+  .modal-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m); box-shadow:var(--shadow-1);
+    padding:26px; width:100%; max-width:580px; max-height:88vh; overflow:auto;
+  }
+  .modal-card h3{ font-size:18px; margin-bottom:4px; }
+  .modal-card > p{ font-size:13px; color:var(--ink-faint); margin-bottom:18px; }
+
+  /* ---------- Upload zone ---------- */
+  .dropzone{
+    border:1.5px dashed var(--border); border-radius:var(--radius-m); padding:30px 20px;
+    text-align:center; background:var(--surface-raised); transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover{ border-color:var(--accent); background:var(--accent-soft); }
+  .dropzone svg{ width:30px; height:30px; color:var(--accent); margin-bottom:10px; }
+  .dropzone .hint{ font-size:12px; color:var(--ink-faint); margin-top:5px; }
+
+  .file-row{
+    display:flex; align-items:center; gap:12px; padding:13px 14px; border:1px solid var(--border);
+    border-radius:var(--radius-s); background:var(--surface-raised);
+  }
+  .file-row + .file-row{ margin-top:8px; }
+  .file-icon{
+    width:34px; height:34px; border-radius:8px; background:var(--critical-soft); color:var(--critical);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .file-icon svg{ width:17px; height:17px; }
+  .file-name{ font-size:13.5px; font-weight:600; }
+  .file-meta{ font-size:12px; color:var(--ink-faint); margin-top:1px; }
+  .file-row .spacer{ flex:1; }
+  .badge-current{
+    font-size:11px; font-weight:600; color:var(--good); background:var(--good-soft);
+    padding:3px 9px; border-radius:999px; flex:none;
+  }
+  .version-history{ display:flex; flex-direction:column; gap:0; margin-top:4px; }
+  .version-item{
+    display:flex; gap:12px; padding:11px 2px; border-bottom:1px solid var(--border-soft); align-items:flex-start;
+  }
+  .version-item:last-child{ border-bottom:none; }
+  .version-dot{ width:8px; height:8px; border-radius:50%; background:var(--border); margin-top:5px; flex:none; }
+  .version-item.latest .version-dot{ background:var(--accent); }
+  .version-date{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); white-space:nowrap; flex:none; width:92px; }
+  .version-desc{ font-size:13px; color:var(--ink-soft); }
+  .version-desc b{ color:var(--ink); font-weight:600; }
+
+  .note-strip{
+    display:flex; gap:9px; align-items:flex-start; background:var(--accent-soft); color:var(--accent-ink);
+    border-radius:var(--radius-s); padding:11px 13px; font-size:12.8px; margin-top:16px;
+  }
+  .note-strip svg{ width:15px; height:15px; flex:none; margin-top:1px; }
+
+  /* ---------- Measurement form ---------- */
+  fieldset{ border:none; padding:0; margin:0 0 12px; }
+  fieldset legend{
+    font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-ink);
+    padding:0; margin-bottom:7px;
+  }
+  .field-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  @media (max-width: 880px){ .field-grid{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width: 560px){ .field-grid{ grid-template-columns:repeat(2,1fr); } }
+  .field label{ display:flex; align-items:flex-end; min-height:22px; line-height:1.2; font-size:12.5px; font-weight:500; color:var(--ink); margin-bottom:3px; }
+  .field input, .field select{
+    width:100%; font-family:var(--font-mono); font-size:13px; padding:7px 9px; border-radius:7px;
+    border:1px solid var(--border); background:var(--surface-raised); color:var(--ink);
+  }
+  .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+
+  /* ---------- Nuova rilevazione: box compatto ---------- */
+  #card-nuova-rilevazione{ padding:16px 18px; }
+  #card-nuova-rilevazione .card-head{ margin-bottom:10px; }
+  #card-nuova-rilevazione fieldset{ margin-bottom:9px; }
+
+  /* ---------- Toast di conferma ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(12px);
+    display:flex; align-items:center; gap:8px; background:var(--accent-ink); color:#fff;
+    padding:11px 18px; border-radius:999px; font-size:13.3px; font-weight:600; box-shadow:var(--shadow-2);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:200;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast svg{ width:16px; height:16px; flex:none; }
+
+  /* ---------- Metric chips ---------- */
+  .chip-row{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
+  .chip{
+    font-size:12.5px; font-weight:500; padding:7px 13px; border-radius:999px; border:1px solid var(--border);
+    background:var(--surface-raised); color:var(--ink-soft); cursor:pointer; transition:all .15s ease;
+  }
+  .chip:hover{ border-color:var(--accent); color:var(--accent-ink); }
+  .chip.active{ background:var(--accent); color:#fff; border-color:transparent; }
+
+  /* ---------- Chart ---------- */
+  .chart-wrap{ position:relative; }
+  .chart-wrap svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .chart-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .chart-title{ font-size:13.5px; font-weight:600; }
+  .chart-current{ font-family:var(--font-mono); font-size:19px; font-weight:600; }
+  .chart-current small{ font-size:12px; color:var(--ink-faint); font-weight:400; }
+  .grid-line{ stroke:var(--border-soft); stroke-width:1; }
+  .axis-label{ font-family:var(--font-mono); font-size:9.5px; fill:var(--ink-faint); }
+  .chart-line{ fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .chart-area{ opacity:.14; }
+  .chart-pt{ cursor:pointer; }
+  .chart-pt-hit{ fill:transparent; cursor:pointer; }
+  .crosshair{ stroke:var(--ink-faint); stroke-width:1; stroke-dasharray:3 3; opacity:0; pointer-events:none; }
+  .end-label{ font-family:var(--font-mono); font-size:11px; font-weight:600; }
+
+  #tooltip{
+    position:fixed; pointer-events:none; z-index:999; background:var(--ink); color:var(--paper);
+    font-family:var(--font-mono); font-size:11.5px; padding:6px 10px; border-radius:7px;
+    transform:translate(-50%,-130%); opacity:0; transition:opacity .1s ease; white-space:nowrap; box-shadow:var(--shadow-2);
+  }
+  #tooltip.show{ opacity:1; }
+  #tooltip .t-date{ color:var(--ink-faint); }
+
+  /* ---------- Sparkline grid ---------- */
+  .spark-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media (max-width: 980px){ .spark-grid{ grid-template-columns:repeat(2,1fr); } }
+  .spark-card{
+    border:1px solid var(--border); border-radius:var(--radius-s); padding:13px 14px; cursor:pointer;
+    background:var(--surface-raised); transition:border-color .15s ease, background .15s ease;
+  }
+  .spark-card:hover, .spark-card.selected{ border-color:var(--accent); background:var(--accent-soft); }
+  .spark-top{ display:flex; justify-content:space-between; align-items:baseline; }
+  .spark-label{ font-size:11.5px; color:var(--ink-faint); font-weight:500; }
+  .spark-value{ font-family:var(--font-mono); font-size:16px; font-weight:600; margin-top:2px; }
+  .spark-delta{ font-family:var(--font-mono); font-size:11px; font-weight:600; }
+  .spark-delta.good{ color:var(--good); }
+  .spark-card svg{ width:100%; height:36px; margin-top:6px; overflow:visible; }
+
+  /* ---------- Comparison ---------- */
+  .compare-controls{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px; }
+  .compare-field label{ display:block; font-size:11.5px; color:var(--ink-faint); margin-bottom:4px; }
+  .compare-field select{
+    font-family:var(--font-body); font-size:13.5px; font-weight:500; padding:9px 12px; border-radius:var(--radius-s);
+    border:1px solid var(--border); background:var(--surface-raised); color:var(--ink); min-width:190px;
+  }
+  .compare-vs{ color:var(--ink-faint); font-size:13px; padding-bottom:9px; }
+  .headline-row{ display:flex; gap:20px; flex-wrap:wrap; padding:13px 18px; background:var(--accent-soft); border-radius:var(--radius-m); margin-bottom:14px; }
+  .headline-stat .hv{ font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-ink); }
+  .headline-stat .hl{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+
+  #card-confronto{ padding:16px 18px; }
+
+  table.compare-table{ width:100%; border-collapse:collapse; }
+  .compare-table th{
+    text-align:left; font-size:13.5px; text-transform:none; letter-spacing:0; color:var(--ink);
+    font-weight:700; padding:0 10px 8px; border-bottom:1px solid var(--border);
+  }
+  .compare-table td{ padding:8px 10px; border-bottom:1px solid var(--border-soft); vertical-align:middle; font-size:13.3px; }
+  .compare-table tr:last-child td{ border-bottom:none; }
+  .row-label{ font-weight:600; white-space:nowrap; }
+  .row-label .unit{ font-weight:400; color:var(--ink-faint); font-size:11.5px; }
+  .bars{ min-width:140px; }
+  .bar-track{ height:6px; border-radius:4px; background:var(--border-soft); position:relative; margin:3px 0; }
+  .bar-fill{ height:100%; border-radius:4px; }
+  .bar-fill.old{ background:var(--sage); }
+  .bar-fill.new{ background:var(--accent); }
+  .compare-val{ font-family:var(--font-mono); white-space:nowrap; }
+  .delta-cell{ display:flex; align-items:center; gap:4px; font-family:var(--font-mono); font-weight:600; white-space:nowrap; }
+  .delta-cell svg{ width:12px; height:12px; }
+  .delta-cell.good{ color:var(--good); }
+  .delta-cell.neutral{ color:var(--ink-faint); }
+  .legend-row{ display:flex; gap:18px; font-size:12px; color:var(--ink-soft); margin-top:14px; }
+  .legend-row span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend-dot{ width:9px; height:9px; border-radius:50%; }
+
+  /* ---------- Patient (app) view ---------- */
+  #view-paziente{ }
+  .app-container{
+    width:480px; max-width:100%; margin:0 auto; display:flex; flex-direction:column;
+  }
+  .app-content{ flex:1; padding:4px 2px 104px; }
+
+  .p-greeting{ font-family:var(--font-display); font-size:21px; font-weight:600; margin:6px 0 3px; }
+  .p-sub{ font-size:12.8px; color:var(--ink-faint); margin-bottom:16px; }
+
+  .p-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
+    padding:16px 17px; box-shadow:var(--shadow-1);
+  }
+  .p-card + .p-card{ margin-top:12px; }
+  .p-card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:9px; }
+  .p-card-top h4{ font-size:14.5px; }
+  .p-card p{ font-size:12.8px; color:var(--ink-soft); margin:0 0 12px; }
+  .p-icon{
+    width:32px; height:32px; border-radius:9px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .p-icon svg{ width:16px; height:16px; }
+  .p-icon.warm{ background:var(--accent-warm-soft); color:var(--accent-warm); }
+
+  .p-plan-preview{
+    background:var(--surface-raised); border:1px solid var(--border-soft); border-radius:10px; padding:12px 13px;
+    font-size:12.3px; color:var(--ink-soft); line-height:1.6; margin-bottom:12px;
+  }
+  .p-plan-preview b{ display:block; color:var(--ink); font-size:12px; text-transform:uppercase; letter-spacing:.03em; margin:9px 0 3px; }
+  .p-plan-preview b:first-child{ margin-top:0; }
+
+  .bottom-nav{
+    display:flex; position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    width:480px; max-width:100%; z-index:40;
+    border-top:1px solid var(--border); background:var(--surface);
+    padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 16px rgba(0,0,0,.05);
+  }
+  .nav-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none;
+    color:var(--ink-faint); font-size:10.5px; font-weight:500; padding:6px 2px; border-radius:10px; cursor:pointer;
+  }
+  .nav-btn svg{ width:19px; height:19px; }
+  .nav-btn.active{ color:var(--accent); }
+
+  .p-screen{ display:none; }
+  .p-screen.active{ display:block; }
+
+  .p-checkin-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-soft); }
+  .p-checkin-row:last-child{ border-bottom:none; }
+  .p-checkin-date{ font-size:12.8px; font-weight:600; }
+  .p-checkin-sub{ font-size:11.3px; color:var(--ink-faint); }
+  .p-checkin-val{ font-family:var(--font-mono); font-size:13.5px; font-weight:600; text-align:right; }
+
+  .toggle-row{ display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--border-soft); }
+  .toggle-row:last-child{ border-bottom:none; }
+  .toggle-row span{ font-size:13px; }
+  .switch{ width:38px; height:22px; border-radius:999px; background:var(--border); position:relative; flex:none; }
+  .switch.on{ background:var(--accent); }
+  .switch::after{ content:''; position:absolute; width:16px; height:16px; border-radius:50%; background:#fff; top:3px; left:3px; transition:left .15s ease; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+  .switch.on::after{ left:19px; }
+
+  /* ---------- Roadmap ---------- */
+  .roadmap{ margin-top:46px; }
+  .roadmap-head{ margin-bottom:16px; }
+  .roadmap-head h2{ font-size:19px; }
+  .roadmap-head p{ font-size:13px; color:var(--ink-faint); margin-top:4px; max-width:60ch; }
+  .roadmap-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width: 900px){ .roadmap-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width: 560px){ .roadmap-grid{ grid-template-columns:1fr; } }
+  .roadmap-card{
+    border:1.5px dashed var(--border); border-radius:var(--radius-m); padding:15px 16px; background:var(--surface);
+  }
+  .roadmap-card .rtag{
+    display:inline-block; font-size:10.3px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent-warm); background:var(--accent-warm-soft); padding:2px 9px; border-radius:999px; margin-bottom:9px;
+  }
+  .roadmap-card h4{ font-size:13.8px; margin-bottom:4px; }
+  .roadmap-card p{ font-size:12.3px; color:var(--ink-faint); }
+
+  /* ---------- Schermi stretti (telefono): titolo su una riga, contenuti più vicini ai bordi ---------- */
+  @media (max-width: 600px){
+    .shell{ padding:12px 10px 100px; }
+    .brand-name{ font-size:14.5px; }
+    .brand-tag{ font-size:10.3px; }
+    .brand-mark{ width:28px; height:28px; }
+    .brand-mark svg{ width:15px; height:15px; }
+    .brand{ gap:8px; }
+    .app-content{ padding:2px 0 104px; }
+    .p-card{ padding:14px 12px; border-radius:14px; }
+    .bottom-nav{ padding:8px 4px calc(10px + env(safe-area-inset-bottom)); }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
 </head>
 <body>
-  <div id="app"></div>
+<div class="shell">
 
-  <script src="js/data/characters.js"></script>
-  <script src="js/data/monsters.js"></script>
-  <script src="js/data/equipment.js"></script>
-  <script src="js/data/specials.js"></script>
-  <script src="js/engine/state.js"></script>
-  <script src="js/engine/rules.js"></script>
-  <script src="js/engine/ui.js"></script>
-  <script src="js/main.js"></script>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">GM Program - Gestionale pazienti</div>
+        <div class="brand-tag">Piano alimentare &amp; monitoraggio pazienti</div>
+      </div>
+    </div>
+
+    <button class="btn-logout" id="btn-logout" style="display:none;" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 17L20 12L15 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12H9M9 4H5C3.9 4 3 4.9 3 6V18C3 19.1 3.9 20 5 20H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Esci
+    </button>
+  </div>
+
+  <!-- =========================================================== -->
+  <!-- LOGIN                                                         -->
+  <!-- =========================================================== -->
+  <div id="login-screen">
+    <form class="login-card" onsubmit="return handleLogin(event)">
+      <div class="login-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <h1>Percorso</h1>
+      <p id="login-prompt">Inserisci il tuo codice di accesso per continuare.</p>
+      <input type="text" id="login-code" placeholder="CODICE DI ACCESSO" autocomplete="off" autocapitalize="characters">
+      <button type="submit" class="btn primary" id="login-submit-btn" style="width:100%; justify-content:center;">Accedi</button>
+      <div class="login-error" id="login-error"></div>
+      <div class="login-note" id="login-note">Il codice ti è stato fornito dal tuo o dalla tua nutrizionista.</div>
+    </form>
+  </div>
+
+  <!-- =========================================================== -->
+  <!-- VISTA NUTRIZIONISTA                                           -->
+  <!-- =========================================================== -->
+  <div id="view-nutri" style="display:none;">
+
+    <aside class="panel sidebar">
+      <div class="sidebar-head">
+        <h2>I miei pazienti</h2>
+        <button class="btn-add" type="button" onclick="openAddPatientModal()" title="Aggiungi paziente">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Cerca paziente…
+      </div>
+      <div class="patient-list" id="patient-list">
+        <!-- filled by JS -->
+      </div>
+    </aside>
+
+    <div class="modal-overlay" id="add-patient-overlay" style="display:none;" onclick="if(event.target===this) closeAddPatientModal();">
+      <div class="modal-card">
+        <h3>Nuovo paziente</h3>
+        <p>Aggiungilo qui: comparirà subito nella lista e potrà accedere con il proprio codice.</p>
+        <div class="field-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="field"><label>Nome e cognome</label><input type="text" id="np-nome" placeholder="Es. Anna Rossi"></div>
+          <div class="field"><label>Codice di accesso paziente</label><input type="text" id="np-codice" placeholder="Es. AR04"></div>
+          <div class="field"><label>Età</label><input type="text" id="np-eta" placeholder="Es. 29"></div>
+          <div class="field"><label>Obiettivo</label><input type="text" id="np-obiettivo" placeholder="Es. Definizione muscolare"></div>
+          <div class="field"><label>Prossimo controllo — data</label><input type="date" id="np-data-controllo"></div>
+          <div class="field"><label>Prossimo controllo — ora (facoltativa)</label><input type="time" id="np-ora-controllo"></div>
+          <div class="field">
+            <label>Stato paziente</label>
+            <select id="np-statoTipo">
+              <option value="good">Attivo (verde)</option>
+              <option value="warning">Sospeso (giallo)</option>
+              <option value="critical">Inattivo (rosso)</option>
+            </select>
+          </div>
+        </div>
+        <div class="login-error" id="add-patient-error"></div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn ghost" type="button" onclick="closeAddPatientModal()">Annulla</button>
+          <button class="btn primary" type="button" id="btn-add-patient-save" onclick="saveNewPatient()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salva paziente
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="patient-header">
+        <div>
+          <h1>
+            <span id="patient-name">—</span>
+            <span class="status-led good" id="patient-status-led"></span>
+            <select id="patient-status-select" onchange="updatePatientStatus()" title="Stato del paziente nello studio">
+              <option value="good">Attivo</option>
+              <option value="warning">Sospeso</option>
+              <option value="critical">Inattivo</option>
+            </select>
+          </h1>
+          <div class="goal" id="patient-goal">—</div>
+        </div>
+        <div class="next-visit">
+          Prossimo controllo
+          <span class="date" id="patient-next-visit">—</span>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="panoramica" onclick="setNutriTab('panoramica')">Panoramica</button>
+        <button class="tab-btn" data-tab="piano" onclick="setNutriTab('piano')">Piano alimentare</button>
+        <button class="tab-btn" data-tab="misurazioni" onclick="setNutriTab('misurazioni')">Misurazioni</button>
+        <button class="tab-btn" data-tab="confronto" onclick="setNutriTab('confronto')">Confronto controlli</button>
+      </div>
+
+      <!-- ---- PANORAMICA ---- -->
+      <div class="tab-panel active" id="tab-panoramica">
+        <div class="stat-grid">
+          <div class="stat-tile">
+            <div class="stat-label">Peso attuale</div>
+            <div class="stat-value" id="stat-peso">—</div>
+            <div class="stat-delta" id="stat-peso-delta"></div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Circonferenza vita</div>
+            <div class="stat-value" id="stat-vita">—</div>
+            <div class="stat-delta" id="stat-vita-delta"></div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Massa grassa (BIA)</div>
+            <div class="stat-value" id="stat-grassa">—</div>
+            <div class="stat-delta" id="stat-grassa-delta"></div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Ultima rilevazione</div>
+            <div class="stat-value" id="stat-ultima" style="font-size:18px;">—</div>
+            <div class="stat-delta" id="stat-ultima-delta"></div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>Andamento peso</h3>
+                <p id="overview-range">—</p>
+              </div>
+            </div>
+            <div class="chart-wrap" id="chart-overview"></div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-head" style="margin-bottom:8px;">
+                <h3 style="font-size:14.5px;">Piano alimentare attivo</h3>
+              </div>
+              <div class="file-row" style="border:none; padding:0;">
+                <div class="file-icon">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
+                </div>
+                <div>
+                  <div class="file-name" id="overview-piano-nome">Nessun piano caricato</div>
+                  <div class="file-meta" id="overview-piano-data">—</div>
+                </div>
+                <div class="spacer"></div>
+                <span class="badge-current" id="overview-piano-badge" style="display:none;">Attivo</span>
+              </div>
+              <button class="btn small" style="margin-top:13px; width:100%; justify-content:center;" onclick="setNutriTab('piano')">Vai alla sezione piano →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- PIANO ALIMENTARE ---- -->
+      <div class="tab-panel" id="tab-piano">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Carica un nuovo piano</h3>
+              <p>Il paziente vedrà da subito, in app, solo l'ultima versione caricata — niente più PDF da rispedire via email.</p>
+            </div>
+          </div>
+          <input type="file" id="piano-file-input" accept="application/pdf" style="display:none;" onchange="handlePianoFile(event)">
+          <div class="dropzone" id="piano-dropzone" onclick="document.getElementById('piano-file-input').click()" style="cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <div><b id="piano-upload-label">Clicca per scegliere il PDF del piano</b></div>
+            <div class="hint">PDF, fino a circa 8MB</div>
+          </div>
+          <div class="login-error" id="piano-upload-error" style="text-align:left;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Piano corrente</h3>
+          </div>
+          <div class="file-row">
+            <div class="file-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
+            </div>
+            <div>
+              <div class="file-name" id="piano-attivo-nome">Nessun piano caricato</div>
+              <div class="file-meta" id="piano-attivo-data">—</div>
+            </div>
+            <div class="spacer"></div>
+            <a class="btn small ghost" id="piano-attivo-link" href="#" target="_blank" rel="noopener" style="display:none;">Apri</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Storico versioni</h3></div>
+          <div class="version-history" id="piano-storico">
+            <p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- MISURAZIONI ---- -->
+      <div class="tab-panel" id="tab-misurazioni">
+        <div class="card" id="card-nuova-rilevazione">
+          <div class="card-head">
+            <div>
+              <h3>Nuova rilevazione</h3>
+              <p>Inserisci i dati raccolti nel controllo di oggi.</p>
+            </div>
+            <div class="field" style="width:150px;">
+              <label>Data controllo</label>
+              <input type="date" id="f-data">
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>Peso</legend>
+            <div class="field-grid">
+              <div class="field"><label>Peso corporeo (kg)</label><input type="text" id="f-peso" placeholder="63,4"></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Circonferenze (cm)</legend>
+            <div class="field-grid">
+              <div class="field"><label>Petto</label><input type="text" id="f-petto" placeholder="90"></div>
+              <div class="field"><label>Vita</label><input type="text" id="f-vita" placeholder="78"></div>
+              <div class="field"><label>Ombelico</label><input type="text" id="f-ombelico" placeholder="82"></div>
+              <div class="field"><label>Fianchi</label><input type="text" id="f-fianchi" placeholder="98"></div>
+              <div class="field"><label>Spalle</label><input type="text" id="f-spalle" placeholder="110"></div>
+              <div class="field"><label>Coscia dx</label><input type="text" id="f-cosciaDx" placeholder="55"></div>
+              <div class="field"><label>Interno coscia dx</label><input type="text" id="f-internoCosciaDx" placeholder="40"></div>
+              <div class="field"><label>Coscia sx</label><input type="text" id="f-cosciaSx" placeholder="55"></div>
+              <div class="field"><label>Interno coscia sx</label><input type="text" id="f-internoCosciaSx" placeholder="40"></div>
+              <div class="field"><label>Braccio dx</label><input type="text" id="f-braccioDx" placeholder="26,6"></div>
+              <div class="field"><label>Braccio sx</label><input type="text" id="f-braccioSx" placeholder="26,6"></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Plicometria (mm)</legend>
+            <div class="field-grid">
+              <div class="field"><label>Pettorale</label><input type="text" id="f-plicaPettorale" placeholder="10"></div>
+              <div class="field"><label>Addominale</label><input type="text" id="f-plicaAddominale" placeholder="14"></div>
+              <div class="field"><label>Ascellare</label><input type="text" id="f-plicaAscellare" placeholder="12"></div>
+              <div class="field"><label>Sovrailiaca</label><input type="text" id="f-plicaSovrailiaca" placeholder="13"></div>
+              <div class="field"><label>Coscia</label><input type="text" id="f-plicaCoscia" placeholder="15"></div>
+              <div class="field"><label>Tricipitale</label><input type="text" id="f-plicaTricipitale" placeholder="13"></div>
+              <div class="field"><label>Sottoscapolare</label><input type="text" id="f-plicaSottoscapolare" placeholder="12"></div>
+            </div>
+          </fieldset>
+
+          <fieldset style="margin-bottom:6px;">
+            <legend>Bioimpedenziometria (BIA)</legend>
+            <div class="field-grid">
+              <div class="field"><label>Acqua totale (%)</label><input type="text" id="f-acquaTotale" placeholder="53,8"></div>
+              <div class="field"><label>Acqua extracellulare (%)</label><input type="text" id="f-acquaExtra" placeholder="22,5"></div>
+              <div class="field"><label>Acqua intracellulare (%)</label><input type="text" id="f-acquaIntra" placeholder="31,3"></div>
+              <div class="field"><label>Massa magra (kg)</label><input type="text" id="f-massaMagra" placeholder="46,9"></div>
+              <div class="field"><label>Massa grassa (%)</label><input type="text" id="f-massaGrassa" placeholder="24,1"></div>
+            </div>
+          </fieldset>
+
+          <button class="btn primary" type="button" id="btn-save-misurazione" onclick="saveMisurazione()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salva rilevazione
+          </button>
+          <div class="login-error" id="misurazione-error"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3 id="big-chart-title">Peso corporeo</h3>
+              <p>Seleziona un parametro per vedere l'andamento nel tempo</p>
+            </div>
+          </div>
+          <div class="chip-row" id="chip-row-nutri"></div>
+          <div class="chart-wrap" id="chart-main"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Tutti i parametri</h3></div>
+          <div class="spark-grid" id="spark-grid"></div>
+        </div>
+      </div>
+
+      <!-- ---- CONFRONTO ---- -->
+      <div class="tab-panel" id="tab-confronto">
+        <div class="card" id="card-confronto">
+          <div class="compare-controls">
+            <div class="compare-field">
+              <label>Controllo meno recente</label>
+              <select id="compare-old" onchange="renderCompareTable()"></select>
+            </div>
+            <div class="compare-vs">confrontato con</div>
+            <div class="compare-field">
+              <label>Controllo più recente</label>
+              <select id="compare-new" onchange="renderCompareTable()"></select>
+            </div>
+          </div>
+
+          <div class="headline-row" id="headline-row"></div>
+
+          <table class="compare-table">
+            <thead>
+              <tr><th>Parametro</th><th id="compare-th-old">—</th><th id="compare-th-new">—</th><th>Confronto</th><th>Variazione</th></tr>
+            </thead>
+            <tbody id="compare-body"></tbody>
+          </table>
+
+          <div class="legend-row">
+            <span><span class="legend-dot" style="background:var(--sage)"></span> controllo meno recente</span>
+            <span><span class="legend-dot" style="background:var(--accent)"></span> controllo più recente</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <!-- VISTA PAZIENTE                                                -->
+  <!-- =========================================================== -->
+  <div id="view-paziente" style="display:none;">
+    <div class="app-container">
+
+        <div class="app-content">
+
+          <!-- HOME -->
+          <div class="p-screen active" id="p-home">
+            <div class="p-greeting" id="p-home-greeting">Ciao</div>
+            <div class="p-sub" id="p-home-sub">Ecco il punto della situazione di oggi.</div>
+
+            <div class="p-card">
+              <div class="p-card-top">
+                <div class="p-icon">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3V8H19" stroke="currentColor" stroke-width="1.6"/></svg>
+                </div>
+                <span class="pill good" id="p-home-piano-badge">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Aggiornato
+                </span>
+              </div>
+              <h4>Il tuo piano alimentare</h4>
+              <p id="p-home-piano-data">—</p>
+              <button class="btn primary small" style="width:100%; justify-content:center;" onclick="setPatientScreen('piano')">Apri il piano →</button>
+            </div>
+
+            <div class="p-card">
+              <div class="p-card-top">
+                <div class="p-icon warm">
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9H21" stroke="currentColor" stroke-width="1.6"/><path d="M8 2V6M16 2V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+              <h4>Prossimo controllo</h4>
+              <p id="p-home-prossimo">—</p>
+              <button class="btn small ghost" style="width:100%; justify-content:center;">Aggiungi al calendario</button>
+            </div>
+
+            <div class="p-card">
+              <div class="p-card-top"><h4>Il tuo andamento</h4></div>
+              <div class="chart-wrap" id="chart-home-preview"></div>
+              <button class="btn small ghost" style="width:100%; justify-content:center; margin-top:10px;" onclick="setPatientScreen('andamento')">Vedi tutti i dati →</button>
+            </div>
+          </div>
+
+          <!-- PIANO -->
+          <div class="p-screen" id="p-piano">
+            <div class="p-greeting" style="font-size:18px;">Il tuo piano</div>
+            <div class="p-sub" id="p-piano-sub">—</div>
+            <div class="p-plan-preview" id="p-piano-empty">
+              Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.
+            </div>
+            <a class="btn primary" id="p-piano-link" href="#" target="_blank" rel="noopener" style="width:100%; justify-content:center; display:none;">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 4V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Apri il PDF del piano
+            </a>
+          </div>
+
+          <!-- ANDAMENTO -->
+          <div class="p-screen" id="p-andamento">
+            <div class="p-greeting" style="font-size:18px;">Il tuo andamento</div>
+            <div class="p-sub" id="p-andamento-sub">—</div>
+            <div class="chip-row" id="chip-row-paziente"></div>
+            <div class="chart-wrap" id="chart-paziente"></div>
+
+            <h4 style="font-size:13.5px; margin:18px 0 6px;">Storico controlli</h4>
+            <div class="p-card" style="padding:4px 14px;">
+              <div id="p-checkin-list"></div>
+            </div>
+          </div>
+
+          <!-- PROFILO -->
+          <div class="p-screen" id="p-profilo">
+            <div class="p-greeting" style="font-size:18px;">Il tuo profilo</div>
+            <div class="p-sub" id="p-profilo-sub">—</div>
+
+            <div class="p-card">
+              <h4 style="margin-bottom:10px;">Il tuo riferimento</h4>
+              <p style="margin-bottom:12px;">Studio di Nutrizione Percorso</p>
+              <button class="btn small" style="width:100%; justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 5H20V17H7L4 20V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                Scrivi al tuo nutrizionista
+              </button>
+            </div>
+
+            <div class="p-card">
+              <h4 style="margin-bottom:6px;">Notifiche</h4>
+              <div class="toggle-row"><span>Piano aggiornato</span><div class="switch on"></div></div>
+              <div class="toggle-row"><span>Promemoria controllo</span><div class="switch on"></div></div>
+              <div class="toggle-row"><span>Promemoria pesata settimanale</span><div class="switch"></div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bottom-nav">
+          <button class="nav-btn active" onclick="setPatientScreen('home')" data-screen="home">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 11L12 4L20 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10V19C6 19.6 6.4 20 7 20H17C17.6 20 18 19.6 18 19V10" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            Home
+          </button>
+          <button class="nav-btn" onclick="setPatientScreen('piano')" data-screen="piano">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.7"/><path d="M8 12H16M8 15.5H16M8 8.5H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Piano
+          </button>
+          <button class="nav-btn" onclick="setPatientScreen('andamento')" data-screen="andamento">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V15M9.5 19V10M15 19V13M20 19V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Andamento
+          </button>
+          <button class="nav-btn" onclick="setPatientScreen('profilo')" data-screen="profilo">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M5 20C5.8 16.5 8.5 14.5 12 14.5C15.5 14.5 18.2 16.5 19 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            Profilo
+          </button>
+        </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="toast-text">Salvato</span>
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+  /* ================= CONFIGURAZIONE ================= */
+  // Incolla qui, tra virgolette, l'indirizzo dell'app web di Google Apps Script
+  // (vedi LEGGIMI-DATI.md). Finché resta vuoto, il sito mostra solo la schermata di accesso.
+  let API_URL = "https://script.google.com/macros/s/AKfycbztU0aeMEJHAb0z13_FvIdn_K-bnX8Djoj9mN_Cr3QAE6ew9yitdTuzlsHRzhU-8aFk/exec";
+
+  /* ================= METRICHE ================= */
+  const METRIC_DEFS = [
+    { key:'peso',              field:'Peso',                    label:'Peso corporeo',         unit:'kg', good:'down' },
+    { key:'petto',             field:'Petto',                   label:'Circonferenza petto',   unit:'cm', good:'down' },
+    { key:'vita',              field:'Vita',                    label:'Circonferenza vita',    unit:'cm', good:'down' },
+    { key:'ombelico',          field:'Ombelico',                label:'Circonferenza ombelico',unit:'cm', good:'down' },
+    { key:'fianchi',           field:'Fianchi',                 label:'Circonferenza fianchi', unit:'cm', good:'down' },
+    { key:'cosciaDx',          field:'Coscia dx',               label:'Coscia dx',             unit:'cm', good:'down' },
+    { key:'internoCosciaDx',   field:'Interno Coscia dx',       label:'Interno coscia dx',     unit:'cm', good:'down' },
+    { key:'cosciaSx',          field:'Coscia sx',               label:'Coscia sx',             unit:'cm', good:'down' },
+    { key:'internoCosciaSx',   field:'Interno Coscia sx',       label:'Interno coscia sx',     unit:'cm', good:'down' },
+    { key:'spalle',            field:'Spalle',                  label:'Circonferenza spalle',  unit:'cm', good:'down' },
+    { key:'braccioDx',         field:'Braccio dx',              label:'Braccio dx',            unit:'cm', good:'down' },
+    { key:'braccioSx',         field:'Braccio sx',              label:'Braccio sx',            unit:'cm', good:'down' },
+    { key:'plicaPettorale',    field:'Plica pettorale',         label:'Plica pettorale',       unit:'mm', good:'down' },
+    { key:'plicaAddominale',   field:'Plica addominale',        label:'Plica addominale',      unit:'mm', good:'down' },
+    { key:'plicaAscellare',    field:'Plica ascellare',         label:'Plica ascellare',       unit:'mm', good:'down' },
+    { key:'plicaSovrailiaca',  field:'Plica sovrailiaca',       label:'Plica sovrailiaca',     unit:'mm', good:'down' },
+    { key:'plicaCoscia',       field:'Plica coscia',            label:'Plica coscia',          unit:'mm', good:'down' },
+    { key:'plicaTricipitale',  field:'Plica tricipitale',       label:'Plica tricipitale',     unit:'mm', good:'down' },
+    { key:'plicaSottoscapolare', field:'Plica sottoscapolare',  label:'Plica sottoscapolare',  unit:'mm', good:'down' },
+    { key:'acquaTotale',       field:'Acqua totale',            label:'Acqua corporea totale', unit:'%',  good:'up'   },
+    { key:'acquaExtra',        field:'Acqua Extracellulare',    label:'Acqua extracellulare',  unit:'%',  good:'down' },
+    { key:'acquaIntra',        field:'Acqua intracellulare',    label:'Acqua intracellulare',  unit:'%',  good:'up'   },
+    { key:'massaMagra',        field:'Massa magra',             label:'Massa magra',           unit:'kg', good:'up'   },
+    { key:'massaGrassa',       field:'Massa grassa',            label:'Massa grassa',          unit:'%',  good:'down' },
+  ];
+  const COMPARE_DEFS = METRIC_DEFS.map(d => ({ field:d.field, label:d.label, unit:d.unit, good:d.good }));
+  const PATIENT_METRIC_KEYS = METRIC_DEFS.map(d => d.key);
+
+  /* ================= STATO ================= */
+  let SESSION = null;
+  let PATIENTS = [];
+  let currentPatientCode = null;
+  let currentPatientMeta = null;
+  let currentRows = [];
+  let METRICS = {};
+  let currentMetric = 'peso';
+  let patientMetric = 'peso';
+  let currentPlan = null;
+  let currentPlanHistory = [];
+
+  function fmt(v){
+    if(v === null || v === undefined || v === '') return '—';
+    let s = (Math.round(v*10)/10).toString().replace('.', ',');
+    return s;
+  }
+  function parseNum(v){
+    if(v === '' || v === null || v === undefined) return null;
+    if(typeof v === 'number') return isNaN(v) ? null : v;
+    const s = String(v).trim().replace(',', '.');
+    if(s === '') return null;
+    const n = parseFloat(s);
+    return isNaN(n) ? null : n;
+  }
+  function fmtDateLabel(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'short'}); }
+  function fmtDateFull(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}); }
+  function fmtDateShort(d){ return d.toLocaleDateString('it-IT', {day:'numeric', month:'short', year:'2-digit'}); }
+
+  function buildMetricsFromRows(rows){
+    const out = {};
+    METRIC_DEFS.forEach(def => {
+      const pts = rows
+        .map(r => ({ date: new Date(r.Data), value: parseNum(r[def.field]) }))
+        .filter(p => p.value !== null && !isNaN(p.date.getTime()));
+      out[def.key] = {
+        label: def.label, unit: def.unit, good: def.good,
+        values: pts.map(p => p.value),
+        labels: pts.map(p => fmtDateLabel(p.date)),
+        dates: pts.map(p => p.date),
+      };
+    });
+    return out;
+  }
+
+  /* ================= API ================= */
+  function apiConfigured(){ return !!API_URL; }
+  async function apiGet(action, params){
+    if(!apiConfigured()) throw new Error('CONFIG');
+    const qs = new URLSearchParams(Object.assign({action}, params||{})).toString();
+    const res = await fetch(API_URL + '?' + qs);
+    return res.json();
+  }
+  async function apiPost(action, body){
+    if(!apiConfigured()) throw new Error('CONFIG');
+    const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(Object.assign({action}, body||{})) });
+    return res.json();
+  }
+
+  /* ================= ICONS ================= */
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const ICON_DOT = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>';
+  const ICON_ALERT = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 4L22 20H2L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17.6" r="0.9" fill="currentColor"/></svg>';
+  const STATUS_LABEL = { good:'Attivo', warning:'Sospeso', critical:'Inattivo' };
+  const STATUS_ICON = { good:ICON_CHECK, warning:ICON_ALERT, critical:ICON_ALERT };
+  const ARROW_UP = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 15L12 9L18 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const ARROW_DOWN = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* ================= FORMATTAZIONE PROSSIMO CONTROLLO ================= */
+  // ProssimoControllo è salvato come stringa "15 settembre 2026 · 17:30" (oppure solo la data, senza orario).
+  // Rete di sicurezza: se qualcuno scrive la data direttamente nella cella del foglio Google (invece
+  // che dal pulsante "+" del programma), Google Sheets la riconosce come data vera e l'app riceverebbe
+  // un timestamp grezzo tipo "2026-09-29T22:00:00.000Z". Lo riconosciamo qui e lo riformattiamo bene
+  // (il backend fa la stessa cosa alla fonte, ma teniamo anche questa protezione lato app).
+  function normalizzaProssimoControllo_(val){
+    if(!val) return '';
+    const s = String(val);
+    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)) return s;
+    const d = new Date(s);
+    if(isNaN(d.getTime())) return s;
+    let testo = d.getDate() + ' ' + MESI_IT[d.getMonth()] + ' ' + d.getFullYear();
+    const ore = d.getHours(), minuti = d.getMinutes();
+    if(ore !== 0 || minuti !== 0){
+      testo += ' · ' + String(ore).padStart(2,'0') + ':' + String(minuti).padStart(2,'0');
+    }
+    return testo;
+  }
+  function soloData_(prossimoControllo){
+    if(!prossimoControllo) return '';
+    return normalizzaProssimoControllo_(prossimoControllo).split(' · ')[0];
+  }
+  function conOra_(prossimoControllo){
+    if(!prossimoControllo) return '—';
+    const parti = normalizzaProssimoControllo_(prossimoControllo).split(' · ');
+    if(parti.length > 1) return parti[0] + ' alle ore ' + parti[1];
+    return parti[0];
+  }
+
+  /* ================= PATIENT LIST ================= */
+  function renderPatientList(){
+    const el = document.getElementById('patient-list');
+    if(!PATIENTS.length){
+      el.innerHTML = '<p style="font-size:12.8px; color:var(--ink-faint);">Nessun paziente attivo trovato nel foglio.</p>';
+      return;
+    }
+    el.innerHTML = PATIENTS.map(p => `
+      <div class="patient" data-codice="${p.Codice}" onclick="selectPatientByCode('${p.Codice}')">
+        <div class="avatar">${(p.Nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+        <div class="patient-info">
+          <div class="patient-name">${p.Nome||'—'}</div>
+          <div class="patient-meta">${p.Eta?p.Eta+' anni · ':''}${soloData_(p.ProssimoControllo)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ================= CHART ENGINE ================= */
+  // viewBox: 0 0 W H. Renders a line+area chart with hover tooltip + crosshair.
+  function drawChart(container, values, opts){
+    opts = opts || {};
+    const labels = opts.labels || [];
+    if(!values || values.length === 0){
+      container.innerHTML = `<div style="padding:${opts.big?'40px':'8px'} 0; text-align:center; color:var(--ink-faint); font-size:12.5px;">Nessun dato ancora disponibile</div>`;
+      return;
+    }
+    const W = opts.w || 600, H = opts.h || 220;
+    const padL = opts.padL !== undefined ? opts.padL : 6;
+    const padR = opts.padR !== undefined ? opts.padR : 6;
+    const padT = opts.big ? 34 : 10;
+    const padB = opts.showAxis ? 22 : 6;
+    const min = Math.min(...values), max = Math.max(...values);
+    const span = (max - min) || 1;
+    const lo = min - span*0.22, hi = max + span*0.28;
+    const n = values.length;
+    const x = i => n===1 ? (padL + (W-padL-padR)/2) : padL + (i/(n-1)) * (W - padL - padR);
+    const y = v => padT + (1 - (v-lo)/(hi-lo)) * (H - padT - padB);
+
+    const pts = values.map((v,i) => [x(i), y(v)]);
+
+    // smooth path via simple quadratic-ish midpoint smoothing
+    function pathFrom(pts){
+      let d = `M ${pts[0][0]},${pts[0][1]}`;
+      for(let i=0;i<pts.length-1;i++){
+        const [x0,y0] = pts[i], [x1,y1] = pts[i+1];
+        const mx = (x0+x1)/2;
+        d += ` C ${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+      }
+      return d;
+    }
+    const linePath = pathFrom(pts);
+    const areaPath = linePath + ` L ${pts[n-1][0]},${H-padB} L ${pts[0][0]},${H-padB} Z`;
+
+    const color = opts.color || 'var(--accent)';
+    const uid = 'g' + Math.random().toString(36).slice(2,9);
+
+    let gridSvg = '';
+    if(opts.showAxis){
+      for(let gy=0; gy<=2; gy++){
+        const yy = padT + gy*(H-padT-padB)/2;
+        gridSvg += `<line class="grid-line" x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}"/>`;
+      }
+    }
+
+    let axisLabels = '';
+    if(opts.showAxis){
+      labels.forEach((lbl,i) => {
+        axisLabels += `<text class="axis-label" x="${x(i)}" y="${H-4}" text-anchor="${i===0?'start':(i===n-1?'end':'middle')}">${lbl}</text>`;
+      });
+    }
+
+    let head = '';
+    if(opts.big){
+      head = `<text class="chart-title" x="${padL}" y="16" fill="var(--ink-soft)" font-family="var(--font-body)" font-weight="600" font-size="12">${opts.title||''}</text>
+              <text x="${W-padR}" y="17" text-anchor="end" font-family="var(--font-mono)" font-size="15" font-weight="700" fill="var(--ink)">${fmt(values[n-1])}<tspan fill="var(--ink-faint)" font-family="var(--font-body)" font-weight="400" font-size="11"> ${opts.unit||''}</tspan></text>`;
+    }
+
+    const dots = pts.map((p,i) => `
+      <circle class="chart-pt" cx="${p[0]}" cy="${p[1]}" r="${opts.big?4:3}" fill="var(--surface)" stroke="${color}" stroke-width="2"/>
+      <circle class="chart-pt-hit" data-date="${labels[i]||''}" data-val="${fmt(values[i])} ${opts.unit||''}" data-cx="${p[0]}" cx="${p[0]}" cy="${p[1]}" r="14"/>
+    `).join('');
+
+    const svg = `
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-uid="${uid}">
+        <defs>
+          <linearGradient id="fade-${uid}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${color}" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        ${gridSvg}
+        ${head}
+        <path class="chart-area" d="${areaPath}" fill="url(#fade-${uid})"/>
+        <path class="chart-line" d="${linePath}" stroke="${color}" stroke-width="${opts.big?2.4:2}"/>
+        <line class="crosshair" x1="0" y1="${padT}" x2="0" y2="${H-padB}"/>
+        ${dots}
+        ${axisLabels}
+      </svg>`;
+    container.innerHTML = svg;
+    wireHover(container);
+  }
+
+  function wireHover(container){
+    const svg = container.querySelector('svg');
+    const crosshair = svg.querySelector('.crosshair');
+    svg.querySelectorAll('.chart-pt-hit').forEach(hit => {
+      hit.addEventListener('mouseenter', (e) => {
+        const tip = document.getElementById('tooltip');
+        tip.innerHTML = `<span class="t-date">${hit.dataset.date}</span> &nbsp; ${hit.dataset.val}`;
+        tip.classList.add('show');
+        if(crosshair){
+          crosshair.setAttribute('x1', hit.dataset.cx);
+          crosshair.setAttribute('x2', hit.dataset.cx);
+          crosshair.style.opacity = 1;
+        }
+      });
+      hit.addEventListener('mousemove', (e) => {
+        const tip = document.getElementById('tooltip');
+        tip.style.left = e.clientX + 'px';
+        tip.style.top = e.clientY + 'px';
+      });
+      hit.addEventListener('mouseleave', () => {
+        document.getElementById('tooltip').classList.remove('show');
+        if(crosshair) crosshair.style.opacity = 0;
+      });
+    });
+  }
+
+  /* ================= NUTRI: big chart + chips + sparklines ================= */
+  function renderBigChart(){
+    const m = METRICS[currentMetric];
+    document.getElementById('big-chart-title').textContent = m.label;
+    drawChart(document.getElementById('chart-main'), m.values, { big:true, showAxis:true, unit:m.unit, color:'var(--accent)', h:230, labels:m.labels });
+  }
+
+  function renderChips(){
+    const row = document.getElementById('chip-row-nutri');
+    row.innerHTML = Object.keys(METRICS).map(k => `<button class="chip ${k===currentMetric?'active':''}" data-k="${k}" onclick="selectMetric('${k}')">${METRICS[k].label}</button>`).join('');
+  }
+
+  function selectMetric(k){
+    currentMetric = k;
+    renderChips();
+    renderBigChart();
+    document.querySelectorAll('.spark-card').forEach(c => c.classList.toggle('selected', c.dataset.k===k));
+  }
+
+  function renderSparkGrid(){
+    const grid = document.getElementById('spark-grid');
+    grid.innerHTML = Object.keys(METRICS).map(k => {
+      const m = METRICS[k];
+      if(!m.values.length){
+        return `<div class="spark-card" data-k="${k}" onclick="selectMetric('${k}')">
+          <div class="spark-top"><div class="spark-label">${m.label}</div></div>
+          <div class="spark-value">—</div>
+          <div class="spark-delta">nessun dato</div>
+          <div class="spark-chart" id="spark-${k}"></div>
+        </div>`;
+      }
+      const first = m.values[0], last = m.values[m.values.length-1];
+      const delta = last - first;
+      const isGood = (m.good==='down' && delta<0) || (m.good==='up' && delta>0);
+      return `<div class="spark-card" data-k="${k}" onclick="selectMetric('${k}')">
+        <div class="spark-top">
+          <div class="spark-label">${m.label}</div>
+        </div>
+        <div class="spark-value">${fmt(last)}<span style="font-size:11px;color:var(--ink-faint);"> ${m.unit}</span></div>
+        <div class="spark-delta ${m.values.length>1?(isGood?'good':''):''}">${m.values.length>1 ? (delta<0?'−':'+')+fmt(Math.abs(delta))+' '+m.unit : 'primo controllo'}</div>
+        <div class="spark-chart" id="spark-${k}"></div>
+      </div>`;
+    }).join('');
+    Object.keys(METRICS).forEach(k => {
+      const c = document.getElementById('spark-'+k);
+      if(METRICS[k].values.length) drawChart(c, METRICS[k].values, { w:260, h:36, color:'var(--accent)' });
+      else c.innerHTML = '';
+    });
+    document.querySelectorAll('.spark-card').forEach(c => c.classList.toggle('selected', c.dataset.k===currentMetric));
+  }
+
+  /* ================= COMPARE TABLE ================= */
+  function populateCompareSelects(){
+    const oldSel = document.getElementById('compare-old'), newSel = document.getElementById('compare-new');
+    if(!currentRows.length){ oldSel.innerHTML=''; newSel.innerHTML=''; return; }
+    const opts = currentRows.map((r,i) => `<option value="${i}">${fmtDateFull(new Date(r.Data))}</option>`).join('');
+    oldSel.innerHTML = opts; newSel.innerHTML = opts;
+    oldSel.value = 0; newSel.value = currentRows.length-1;
+  }
+
+  function renderCompareTable(){
+    const body = document.getElementById('compare-body');
+    const headline = document.getElementById('headline-row');
+    if(currentRows.length < 2){
+      body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-faint); padding:16px 10px;">Servono almeno due controlli per poter fare un confronto.</td></tr>`;
+      headline.innerHTML = '';
+      document.getElementById('compare-th-old').textContent = '—';
+      document.getElementById('compare-th-new').textContent = '—';
+      return;
+    }
+    const oldIdx = +document.getElementById('compare-old').value || 0;
+    const newIdx = +document.getElementById('compare-new').value || (currentRows.length-1);
+    const oldRow = currentRows[oldIdx], newRow = currentRows[newIdx];
+    document.getElementById('compare-th-old').textContent = fmtDateFull(new Date(oldRow.Data));
+    document.getElementById('compare-th-new').textContent = fmtDateFull(new Date(newRow.Data));
+
+    const rows = COMPARE_DEFS.map(d => ({ ...d, old: parseNum(oldRow[d.field]), nu: parseNum(newRow[d.field]) }))
+      .filter(r => r.old !== null && r.nu !== null);
+
+    body.innerHTML = rows.length ? rows.map(r => {
+      const delta = r.nu - r.old;
+      const isGood = (r.good==='down' && delta<0) || (r.good==='up' && delta>0) || delta===0;
+      const arrow = delta===0 ? '' : (delta<0 ? ARROW_DOWN : ARROW_UP);
+      const maxV = Math.max(Math.abs(r.old), Math.abs(r.nu)) || 1;
+      return `<tr>
+        <td class="row-label">${r.label} <span class="unit">${r.unit}</span></td>
+        <td class="compare-val">${fmt(r.old)}</td>
+        <td class="compare-val">${fmt(r.nu)}</td>
+        <td class="bars">
+          <div class="bar-track"><div class="bar-fill old" style="width:${(Math.abs(r.old)/maxV*100).toFixed(0)}%"></div></div>
+          <div class="bar-track"><div class="bar-fill new" style="width:${(Math.abs(r.nu)/maxV*100).toFixed(0)}%"></div></div>
+        </td>
+        <td><span class="delta-cell ${isGood?'good':'neutral'}">${arrow}${delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+r.unit}</span></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="5" style="color:var(--ink-faint); padding:16px 10px;">Nessun dato numerico da confrontare tra questi due controlli.</td></tr>`;
+
+    const headlineDefs = [
+      { field:'Peso', label:'variazione peso', unit:'kg' },
+      { field:'Vita', label:'circonferenza vita', unit:'cm' },
+      { field:'Massa grassa', label:'massa grassa', unit:'%' },
+      { field:'Massa magra', label:'massa magra', unit:'kg' },
+    ];
+    headline.innerHTML = headlineDefs.map(d => {
+      const oldV = parseNum(oldRow[d.field]), newV = parseNum(newRow[d.field]);
+      if(oldV===null || newV===null) return '';
+      const delta = newV - oldV;
+      return `<div class="headline-stat"><div class="hv">${delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+d.unit}</div><div class="hl">${d.label}</div></div>`;
+    }).join('');
+  }
+
+  /* ================= PANORAMICA ================= */
+  function setStat(valId, deltaId, metric, unit){
+    const valEl = document.getElementById(valId), deltaEl = document.getElementById(deltaId);
+    if(!metric || !metric.values.length){ valEl.innerHTML = '—'; deltaEl.textContent=''; deltaEl.className='stat-delta'; return; }
+    const last = metric.values[metric.values.length-1];
+    valEl.innerHTML = fmt(last) + '<small>'+unit+'</small>';
+    if(metric.values.length>1){
+      const prev = metric.values[metric.values.length-2];
+      const delta = last-prev;
+      const isGood = (metric.good==='down'&&delta<0) || (metric.good==='up'&&delta>0) || delta===0;
+      deltaEl.className = 'stat-delta ' + (isGood?'good':'warn');
+      deltaEl.innerHTML = (delta===0?'':(delta<0?ARROW_DOWN:ARROW_UP)) + (delta===0?'invariato':(delta<0?'−':'+')+fmt(Math.abs(delta))+' '+unit) + ' dall\'ultimo controllo';
+    } else {
+      deltaEl.textContent = 'primo controllo registrato';
+      deltaEl.className = 'stat-delta';
+    }
+  }
+
+  function renderPanoramica(){
+    setStat('stat-peso','stat-peso-delta', METRICS.peso, 'kg');
+    setStat('stat-vita','stat-vita-delta', METRICS.vita, 'cm');
+    setStat('stat-grassa','stat-grassa-delta', METRICS.massaGrassa, '%');
+
+    const ultimaEl = document.getElementById('stat-ultima');
+    const ultimaDeltaEl = document.getElementById('stat-ultima-delta');
+    if(currentRows.length){
+      ultimaEl.textContent = fmtDateFull(new Date(currentRows[currentRows.length-1].Data));
+      ultimaDeltaEl.textContent = currentRows.length + (currentRows.length===1 ? ' controllo registrato' : ' controlli registrati');
+    } else {
+      ultimaEl.textContent = '—';
+      ultimaDeltaEl.textContent = 'nessun controllo ancora';
+    }
+
+    const rangeEl = document.getElementById('overview-range');
+    const pesoM = METRICS.peso;
+    rangeEl.textContent = (pesoM && pesoM.dates.length)
+      ? fmtDateFull(pesoM.dates[0]) + ' → ' + fmtDateFull(pesoM.dates[pesoM.dates.length-1])
+      : 'Nessuna misurazione ancora';
+
+    drawChart(document.getElementById('chart-overview'), (pesoM&&pesoM.values)||[], { big:true, showAxis:true, unit:'kg', title:'Peso corporeo', color:'var(--accent)', h:200, labels:(pesoM&&pesoM.labels)||[] });
+
+    const nomeEl = document.getElementById('overview-piano-nome');
+    const dataEl = document.getElementById('overview-piano-data');
+    const badgeEl = document.getElementById('overview-piano-badge');
+    if(currentPlan){
+      nomeEl.textContent = currentPlan.NomeFile;
+      dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
+      badgeEl.style.display = '';
+    } else {
+      nomeEl.textContent = 'Nessun piano caricato';
+      dataEl.textContent = '—';
+      badgeEl.style.display = 'none';
+    }
+  }
+
+  /* ================= PIANO (nutrizionista) ================= */
+  function renderPianoTab(){
+    const nomeEl = document.getElementById('piano-attivo-nome'), dataEl = document.getElementById('piano-attivo-data'), linkEl = document.getElementById('piano-attivo-link');
+    if(currentPlan && currentPlan.Url){
+      nomeEl.textContent = currentPlan.NomeFile;
+      dataEl.textContent = 'Caricato il ' + fmtDateFull(new Date(currentPlan.Data));
+      linkEl.href = currentPlan.Url; linkEl.style.display = '';
+    } else {
+      nomeEl.textContent = pianoLoadError ? 'Errore nel caricamento' : 'Nessun piano caricato';
+      dataEl.textContent = pianoLoadError || '—';
+      linkEl.style.display = 'none';
+    }
+    const storicoEl = document.getElementById('piano-storico');
+    if(!currentPlanHistory.length){
+      storicoEl.innerHTML = '<p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>';
+      return;
+    }
+    storicoEl.innerHTML = currentPlanHistory.map((v,i) => `
+      <div class="version-item ${i===0?'latest':''}">
+        <div class="version-dot"></div>
+        <div class="version-date">${fmtDateShort(new Date(v.Data))}</div>
+        <div class="version-desc"><b>${v.NomeFile}</b></div>
+      </div>`).join('');
+  }
+
+  function handlePianoFile(evt){
+    const file = evt.target.files[0];
+    if(!file) return;
+    const errEl = document.getElementById('piano-upload-error');
+    const labelEl = document.getElementById('piano-upload-label');
+    errEl.textContent = '';
+    if(file.size > 9*1024*1024){ errEl.textContent = 'Il file è troppo grande (limite consigliato circa 8MB).'; evt.target.value=''; return; }
+    labelEl.textContent = 'Caricamento in corso…';
+    const reader = new FileReader();
+    reader.onload = async function(){
+      const base64 = reader.result.split(',')[1];
+      try{
+        const res = await apiPost('caricaPiano', { codice: SESSION.codice, paziente: currentPatientCode, filename: file.name, mime: file.type || 'application/pdf', fileBase64: base64 });
+        if(res.ok){
+          await loadPiano(currentPatientCode);
+          renderPanoramica();
+          if(res.warning){
+            errEl.style.color = 'var(--accent-warm)';
+            errEl.textContent = res.warning;
+          }
+        } else {
+          errEl.style.color = '';
+          errEl.textContent = res.error || 'Errore durante il caricamento.';
+        }
+      } catch(err){
+        errEl.style.color = '';
+        errEl.textContent = 'Errore di connessione: ' + err.message;
+      }
+      labelEl.textContent = 'Clicca per scegliere il PDF del piano';
+    };
+    reader.readAsDataURL(file);
+    evt.target.value = '';
+  }
+
+  /* ================= TOAST DI CONFERMA ================= */
+  let toastTimer = null;
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  /* ================= MISURAZIONI: salvataggio ================= */
+  const MISURAZIONE_FIELD_IDS = {
+    Peso:'f-peso', Petto:'f-petto', Vita:'f-vita', Ombelico:'f-ombelico', Fianchi:'f-fianchi',
+    'Coscia dx':'f-cosciaDx', 'Interno Coscia dx':'f-internoCosciaDx', 'Coscia sx':'f-cosciaSx', 'Interno Coscia sx':'f-internoCosciaSx',
+    Spalle:'f-spalle', 'Braccio dx':'f-braccioDx', 'Braccio sx':'f-braccioSx',
+    'Plica pettorale':'f-plicaPettorale', 'Plica addominale':'f-plicaAddominale', 'Plica ascellare':'f-plicaAscellare',
+    'Plica sovrailiaca':'f-plicaSovrailiaca', 'Plica coscia':'f-plicaCoscia', 'Plica tricipitale':'f-plicaTricipitale', 'Plica sottoscapolare':'f-plicaSottoscapolare',
+    'Acqua totale':'f-acquaTotale', 'Acqua Extracellulare':'f-acquaExtra', 'Acqua intracellulare':'f-acquaIntra',
+    'Massa magra':'f-massaMagra', 'Massa grassa':'f-massaGrassa',
+  };
+
+  async function saveMisurazione(){
+    const errEl = document.getElementById('misurazione-error');
+    errEl.textContent = '';
+    const dataVal = document.getElementById('f-data').value;
+    if(!dataVal){ errEl.textContent = 'Inserisci la data del controllo.'; return; }
+    const body = { codice: SESSION.codice, paziente: currentPatientCode, data: dataVal };
+    Object.keys(MISURAZIONE_FIELD_IDS).forEach(field => {
+      body[field] = parseNum(document.getElementById(MISURAZIONE_FIELD_IDS[field]).value);
+    });
+    const btn = document.getElementById('btn-save-misurazione');
+    btn.disabled = true;
+    try{
+      const res = await apiPost('aggiungiMisurazione', body);
+      if(res.ok){
+        Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
+        await loadMisurazioni(currentPatientCode);
+        renderChips(); renderBigChart(); renderSparkGrid(); renderPanoramica();
+        showToast('Rilevazione salvata correttamente');
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    btn.disabled = false;
+  }
+
+  /* ================= CARICAMENTO DATI PAZIENTE ================= */
+  async function loadMisurazioni(codice){
+    try{
+      const res = await apiGet('misurazioni', { codice: SESSION.codice, paziente: codice });
+      currentRows = res.ok ? res.misurazioni : [];
+    } catch(err){
+      currentRows = [];
+    }
+    METRICS = buildMetricsFromRows(currentRows);
+    populateCompareSelects();
+  }
+  let pianoLoadError = null;
+  async function loadPiano(codice){
+    try{
+      const res = await apiGet('piano', { codice: SESSION.codice, paziente: codice });
+      currentPlan = res.ok ? res.attivo : null;
+      currentPlanHistory = res.ok ? res.storico : [];
+      pianoLoadError = res.ok ? null : (res.error || 'Errore nel caricamento del piano.');
+    } catch(err){
+      currentPlan = null; currentPlanHistory = [];
+      pianoLoadError = 'Errore di connessione: ' + err.message;
+    }
+  }
+
+  /* ================= VISTA NUTRIZIONISTA ================= */
+  async function loadPazienti(keepCodice){
+    const res = await apiGet('pazienti', { codice: SESSION.codice });
+    if(!res.ok){ document.getElementById('patient-list').innerHTML = '<p style="font-size:12.8px;color:var(--critical);">'+(res.error||'Errore nel caricare i pazienti.')+'</p>'; return; }
+    PATIENTS = res.pazienti;
+    renderPatientList();
+    if(!PATIENTS.length) return;
+    const toSelect = (keepCodice && PATIENTS.some(p => p.Codice === keepCodice)) ? keepCodice : PATIENTS[0].Codice;
+    await selectPatientByCode(toSelect);
+  }
+
+  /* ================= AGGIUNGI PAZIENTE ================= */
+  const MESI_IT = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  function formatDateInputToItalian(dateStr){
+    const parts = dateStr.split('-');
+    const y = +parts[0], m = +parts[1], d = +parts[2];
+    return `${d} ${MESI_IT[m-1]} ${y}`;
+  }
+  function openAddPatientModal(){
+    ['np-nome','np-codice','np-eta','np-obiettivo','np-data-controllo','np-ora-controllo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('np-statoTipo').value = 'good';
+    document.getElementById('add-patient-error').textContent = '';
+    document.getElementById('add-patient-overlay').style.display = 'flex';
+    document.getElementById('np-nome').focus();
+  }
+  function closeAddPatientModal(){
+    document.getElementById('add-patient-overlay').style.display = 'none';
+  }
+  async function saveNewPatient(){
+    const errEl = document.getElementById('add-patient-error');
+    errEl.textContent = '';
+    const nome = document.getElementById('np-nome').value.trim();
+    const codice = document.getElementById('np-codice').value.trim();
+    if(!nome){ errEl.textContent = 'Inserisci il nome del paziente.'; return; }
+    if(!codice){ errEl.textContent = 'Inserisci un codice di accesso per il paziente.'; return; }
+
+    const eta = document.getElementById('np-eta').value.trim();
+    const obiettivo = document.getElementById('np-obiettivo').value.trim();
+    const dataControllo = document.getElementById('np-data-controllo').value;
+    const oraControllo = document.getElementById('np-ora-controllo').value;
+    const statoTipo = document.getElementById('np-statoTipo').value;
+    const statoTesto = STATUS_LABEL[statoTipo];
+
+    let prossimoControllo = '';
+    if(dataControllo){
+      prossimoControllo = formatDateInputToItalian(dataControllo);
+      if(oraControllo) prossimoControllo += ' · ' + oraControllo;
+    }
+
+    const paziente = {
+      Codice: codice, Nome: nome,
+      Eta: eta ? (parseNum(eta) ?? eta) : '',
+      Obiettivo: obiettivo, ProssimoControllo: prossimoControllo,
+      StatoTesto: statoTesto, StatoTipo: statoTipo,
+    };
+
+    const btn = document.getElementById('btn-add-patient-save');
+    btn.disabled = true;
+    try{
+      const res = await apiPost('aggiungiPaziente', { codice: SESSION.codice, paziente });
+      if(res.ok){
+        closeAddPatientModal();
+        await loadPazienti(codice);
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    btn.disabled = false;
+  }
+
+  async function selectPatientByCode(codice){
+    currentPatientCode = codice;
+    currentPatientMeta = PATIENTS.find(p => p.Codice === codice) || null;
+    document.querySelectorAll('.patient').forEach(el => el.classList.toggle('active', el.dataset.codice === codice));
+    if(currentPatientMeta){
+      document.getElementById('patient-name').textContent = currentPatientMeta.Nome || '—';
+      document.getElementById('patient-goal').textContent = (currentPatientMeta.Eta ? currentPatientMeta.Eta+' anni · ' : '') + 'Obiettivo: ' + (currentPatientMeta.Obiettivo || '—');
+      document.getElementById('patient-next-visit').textContent = conOra_(currentPatientMeta.ProssimoControllo);
+      const stato = currentPatientMeta.StatoTipo || 'good';
+      document.getElementById('patient-status-led').className = 'status-led ' + stato;
+      document.getElementById('patient-status-select').value = stato;
+    }
+    currentMetric = 'peso';
+    await Promise.all([loadMisurazioni(codice), loadPiano(codice)]);
+    const activeTab = document.querySelector('#view-nutri .tab-btn.active');
+    setNutriTab(activeTab ? activeTab.dataset.tab : 'panoramica');
+  }
+
+  async function updatePatientStatus(){
+    if(!currentPatientMeta) return;
+    const statoTipo = document.getElementById('patient-status-select').value;
+    const statoTesto = STATUS_LABEL[statoTipo] || '';
+    document.getElementById('patient-status-led').className = 'status-led ' + statoTipo;
+    // Aggiorna subito in locale, poi conferma con il foglio Google in background.
+    currentPatientMeta.StatoTipo = statoTipo;
+    currentPatientMeta.StatoTesto = statoTesto;
+    const p = PATIENTS.find(p => p.Codice === currentPatientCode);
+    if(p){ p.StatoTipo = statoTipo; p.StatoTesto = statoTesto; }
+    try{
+      const res = await apiPost('aggiornaStatoPaziente', { codice: SESSION.codice, paziente: currentPatientCode, statoTipo, statoTesto });
+      if(!res.ok) showToast(res.error || 'Errore nel salvataggio dello stato.');
+    } catch(err){
+      showToast('Errore di connessione: ' + err.message);
+    }
+  }
+
+  /* ================= VISTA PAZIENTE ================= */
+  function renderPatientHomeCards(){
+    const badge = document.getElementById('p-home-piano-badge');
+    const dataEl = document.getElementById('p-home-piano-data');
+    const linkEl = document.getElementById('p-piano-link');
+    const emptyEl = document.getElementById('p-piano-empty');
+    const subEl = document.getElementById('p-piano-sub');
+    if(currentPlan && currentPlan.Url){
+      dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(currentPlan.Data));
+      badge.style.display = '';
+      linkEl.href = currentPlan.Url; linkEl.style.display = 'flex';
+      emptyEl.style.display = 'none';
+      subEl.textContent = 'Versione aggiornata al ' + fmtDateFull(new Date(currentPlan.Data)) + " · sempre l'ultima caricata dalla tua nutrizionista";
+    } else {
+      dataEl.textContent = 'Nessun piano caricato ancora.';
+      badge.style.display = 'none';
+      linkEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      subEl.textContent = pianoLoadError ? '' : 'In attesa del primo piano alimentare.';
+      emptyEl.textContent = pianoLoadError
+        ? 'Non riusciamo a caricare il piano: ' + pianoLoadError
+        : 'Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.';
+    }
+  }
+
+  function renderPatientCharts(){
+    const m = METRICS.peso || { values:[], labels:[] };
+    drawChart(document.getElementById('chart-home-preview'), m.values, { w:340, h:64, color:'var(--accent)' });
+    renderPatientChips();
+  }
+  function renderPatientChips(){
+    const row = document.getElementById('chip-row-paziente');
+    row.innerHTML = PATIENT_METRIC_KEYS.map(k => `<button class="chip ${k===patientMetric?'active':''}" onclick="selectPatientMetric('${k}')">${METRICS[k].label}</button>`).join('');
+    const m = METRICS[patientMetric];
+    drawChart(document.getElementById('chart-paziente'), m.values, { big:true, showAxis:true, unit:m.unit, title:m.label, color:'var(--accent)', w:340, h:200, labels:m.labels });
+    updateAndamentoSub();
+  }
+  function selectPatientMetric(k){ patientMetric = k; renderPatientChips(); }
+
+  function updateAndamentoSub(){
+    const subEl = document.getElementById('p-andamento-sub');
+    const m = METRICS[patientMetric];
+    if(!subEl || !m) return;
+    if(!m.values.length){
+      subEl.textContent = 'Nessun controllo registrato ancora.';
+      return;
+    }
+    if(m.values.length < 2){
+      subEl.textContent = 'Primo controllo registrato il ' + fmtDateFull(m.dates[0]) + '.';
+      return;
+    }
+    const first = m.values[0], last = m.values[m.values.length-1];
+    const delta = Math.round((last-first)*10)/10;
+    const meseLabel = m.dates[0].toLocaleDateString('it-IT', {month:'long'});
+    if(delta === 0){
+      subEl.textContent = 'Invariato rispetto al primo controllo di ' + meseLabel + '.';
+    } else {
+      subEl.textContent = (delta<0?'−':'+') + fmt(Math.abs(delta)) + ' ' + m.unit + ' rispetto al primo controllo di ' + meseLabel + '.';
+    }
+  }
+
+  function renderCheckinList(){
+    const el = document.getElementById('p-checkin-list');
+    if(!currentRows.length){ el.innerHTML = '<p style="padding:10px 0; color:var(--ink-faint); font-size:12.8px;">Nessun controllo registrato ancora.</p>'; return; }
+    el.innerHTML = currentRows.slice().reverse().map(r => {
+      const vita = parseNum(r.Vita), grassa = parseNum(r['Massa grassa']), peso = parseNum(r.Peso);
+      return `<div class="p-checkin-row">
+        <div>
+          <div class="p-checkin-date">${fmtDateFull(new Date(r.Data))}</div>
+          <div class="p-checkin-sub">Vita ${vita!==null?fmt(vita)+' cm':'—'} · Massa grassa ${grassa!==null?fmt(grassa)+'%':'—'}</div>
+        </div>
+        <div class="p-checkin-val">${peso!==null?fmt(peso)+' kg':'—'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  async function enterPazienteView(){
+    const p = SESSION.paziente;
+    document.getElementById('p-home-greeting').textContent = 'Ciao' + (p.Nome ? ' '+p.Nome.split(' ')[0] : '');
+    const oggi = new Date();
+    document.getElementById('p-home-sub').textContent = 'Ecco il punto della situazione di oggi, ' + oggi.toLocaleDateString('it-IT',{day:'numeric', month:'long'}) + '.';
+    document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
+    document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
+    currentMetric = 'peso'; patientMetric = 'peso';
+    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice)]);
+    renderPatientHomeCards();
+    renderPatientCharts();
+    renderCheckinList();
+    setPatientScreen('home');
+  }
+
+  function setPatientScreen(name){
+    document.querySelectorAll('.p-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('p-'+name).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen===name));
+  }
+
+  /* ================= TAB SWITCHING (nutrizionista) ================= */
+  function setNutriTab(name){
+    document.querySelectorAll('#view-nutri .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
+    document.querySelectorAll('#view-nutri .tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    if(name==='panoramica') renderPanoramica();
+    if(name==='piano') renderPianoTab();
+    if(name==='misurazioni'){ renderChips(); renderBigChart(); renderSparkGrid(); }
+    if(name==='confronto') renderCompareTable();
+  }
+
+  /* ================= LOGIN / LOGOUT ================= */
+  async function handleLogin(evt){
+    evt.preventDefault();
+    const codeInput = document.getElementById('login-code');
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
+    const code = codeInput.value.trim();
+    if(!code){ errEl.textContent = 'Inserisci un codice.'; return false; }
+    if(!apiConfigured()){
+      errEl.textContent = 'Il sito non è ancora collegato al Google Sheet: segui il file LEGGIMI-DATI.md.';
+      return false;
+    }
+    try{
+      const res = await apiGet('login', { codice: code });
+      if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
+      SESSION = { role: res.role, codice: code, paziente: res.paziente || null };
+      saveSavedCode(code);
+      await enterApp(res.pazienti);
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    return false;
+  }
+
+  async function enterApp(preloadedPazienti){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'flex';
+    if(SESSION.role === 'nutrizionista'){
+      document.getElementById('view-nutri').style.display = 'grid';
+      document.getElementById('view-paziente').style.display = 'none';
+      if(preloadedPazienti){
+        PATIENTS = preloadedPazienti;
+        renderPatientList();
+        if(PATIENTS.length) await selectPatientByCode(PATIENTS[0].Codice);
+      } else {
+        await loadPazienti();
+      }
+    } else {
+      document.getElementById('view-paziente').style.display = 'block';
+      document.getElementById('view-nutri').style.display = 'none';
+      await enterPazienteView();
+    }
+  }
+
+  function logout(){
+    SESSION = null; currentPatientCode = null; currentPatientMeta = null;
+    currentRows = []; METRICS = {}; currentPlan = null; currentPlanHistory = [];
+    clearSavedCode();
+    document.getElementById('view-nutri').style.display = 'none';
+    document.getElementById('view-paziente').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'none';
+    document.getElementById('login-code').value = '';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  /* ================= ACCESSO RICORDATO ================= */
+  const SAVED_CODE_KEY = 'percorso_codice';
+  function saveSavedCode(code){
+    try{ localStorage.setItem(SAVED_CODE_KEY, code); }catch(e){}
+  }
+  function readSavedCode(){
+    try{ return localStorage.getItem(SAVED_CODE_KEY) || ''; }catch(e){ return ''; }
+  }
+  function clearSavedCode(){
+    try{ localStorage.removeItem(SAVED_CODE_KEY); }catch(e){}
+  }
+
+  async function tryAutoLogin(){
+    const saved = readSavedCode();
+    if(!saved || !apiConfigured()) return;
+    const promptEl = document.getElementById('login-prompt');
+    const inputEl = document.getElementById('login-code');
+    const btnEl = document.getElementById('login-submit-btn');
+    const noteEl = document.getElementById('login-note');
+    const promptOriginal = promptEl.textContent;
+    const noteOriginal = noteEl.innerHTML;
+    // Nasconde subito il modulo interattivo: niente "richiesta di codice" visibile durante l'accesso automatico.
+    promptEl.textContent = 'Accesso in corso…';
+    inputEl.style.display = 'none';
+    btnEl.style.display = 'none';
+    noteEl.textContent = '';
+    try{
+      const res = await apiGet('login', { codice: saved });
+      if(res.ok){
+        SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
+        await enterApp(res.pazienti);
+        return;
+      } else {
+        clearSavedCode();
+      }
+    } catch(err){
+      // niente connessione: ripristina semplicemente la schermata di accesso normale
+    }
+    promptEl.textContent = promptOriginal;
+    inputEl.style.display = '';
+    btnEl.style.display = '';
+    noteEl.innerHTML = noteOriginal;
+  }
+
+  /* ================= INIT ================= */
+  if(!apiConfigured()){
+    document.getElementById('login-note').innerHTML = 'Il sito non è ancora collegato al Google Sheet.<br>Segui il file <b>LEGGIMI-DATI.md</b> per completare il collegamento.';
+  } else {
+    tryAutoLogin();
+  }
+</script>
+
 </body>
 </html>
