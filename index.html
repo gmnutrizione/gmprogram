@@ -549,9 +549,9 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
       </div>
       <h1>Percorso</h1>
-      <p>Inserisci il tuo codice di accesso per continuare.</p>
+      <p id="login-prompt">Inserisci il tuo codice di accesso per continuare.</p>
       <input type="text" id="login-code" placeholder="CODICE DI ACCESSO" autocomplete="off" autocapitalize="characters">
-      <button type="submit" class="btn primary" style="width:100%; justify-content:center;">Accedi</button>
+      <button type="submit" class="btn primary" id="login-submit-btn" style="width:100%; justify-content:center;">Accedi</button>
       <div class="login-error" id="login-error"></div>
       <div class="login-note" id="login-note">Il codice ti è stato fornito dal tuo o dalla tua nutrizionista.</div>
     </form>
@@ -1682,20 +1682,26 @@
       if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
       SESSION = { role: res.role, codice: code, paziente: res.paziente || null };
       saveSavedCode(code);
-      await enterApp();
+      await enterApp(res.pazienti);
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
     }
     return false;
   }
 
-  async function enterApp(){
+  async function enterApp(preloadedPazienti){
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('btn-logout').style.display = 'flex';
     if(SESSION.role === 'nutrizionista'){
       document.getElementById('view-nutri').style.display = 'grid';
       document.getElementById('view-paziente').style.display = 'none';
-      await loadPazienti();
+      if(preloadedPazienti){
+        PATIENTS = preloadedPazienti;
+        renderPatientList();
+        if(PATIENTS.length) await selectPatientByCode(PATIENTS[0].Codice);
+      } else {
+        await loadPazienti();
+      }
     } else {
       document.getElementById('view-paziente').style.display = 'flex';
       document.getElementById('view-nutri').style.display = 'none';
@@ -1730,22 +1736,33 @@
   async function tryAutoLogin(){
     const saved = readSavedCode();
     if(!saved || !apiConfigured()) return;
+    const promptEl = document.getElementById('login-prompt');
+    const inputEl = document.getElementById('login-code');
+    const btnEl = document.getElementById('login-submit-btn');
     const noteEl = document.getElementById('login-note');
+    const promptOriginal = promptEl.textContent;
     const noteOriginal = noteEl.innerHTML;
-    noteEl.textContent = 'Accesso in corso…';
+    // Nasconde subito il modulo interattivo: niente "richiesta di codice" visibile durante l'accesso automatico.
+    promptEl.textContent = 'Accesso in corso…';
+    inputEl.style.display = 'none';
+    btnEl.style.display = 'none';
+    noteEl.textContent = '';
     try{
       const res = await apiGet('login', { codice: saved });
       if(res.ok){
         SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
-        await enterApp();
+        await enterApp(res.pazienti);
+        return;
       } else {
         clearSavedCode();
-        noteEl.innerHTML = noteOriginal;
       }
     } catch(err){
-      // niente connessione: lascia semplicemente la schermata di accesso normale
-      noteEl.innerHTML = noteOriginal;
+      // niente connessione: ripristina semplicemente la schermata di accesso normale
     }
+    promptEl.textContent = promptOriginal;
+    inputEl.style.display = '';
+    btnEl.style.display = '';
+    noteEl.innerHTML = noteOriginal;
   }
 
   /* ================= INIT ================= */
