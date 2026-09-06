@@ -266,6 +266,27 @@
   .btn.ghost{ background:transparent; }
   .btn.small{ padding:6px 12px; font-size:12.5px; }
 
+  /* ---------- Modale nuovo paziente ---------- */
+  .sidebar-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .sidebar-head h2{ margin-bottom:0; }
+  .btn-add{
+    display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:999px;
+    background:var(--accent-soft); color:var(--accent-ink); border:none; cursor:pointer; flex:none;
+    transition:background .15s ease, color .15s ease;
+  }
+  .btn-add:hover{ background:var(--accent); color:#fff; }
+  .btn-add svg{ width:14px; height:14px; }
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(23,34,29,.45); display:flex; align-items:center; justify-content:center;
+    padding:20px; z-index:80;
+  }
+  .modal-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m); box-shadow:var(--shadow-1);
+    padding:26px; width:100%; max-width:580px; max-height:88vh; overflow:auto;
+  }
+  .modal-card h3{ font-size:18px; margin-bottom:4px; }
+  .modal-card > p{ font-size:13px; color:var(--ink-faint); margin-bottom:18px; }
+
   /* ---------- Upload zone ---------- */
   .dropzone{
     border:1.5px dashed var(--border); border-radius:var(--radius-m); padding:30px 20px;
@@ -539,10 +560,15 @@
   <!-- =========================================================== -->
   <!-- VISTA NUTRIZIONISTA                                           -->
   <!-- =========================================================== -->
-  <div id="view-nutri" style="display:none;"
+  <div id="view-nutri" style="display:none;">
 
     <aside class="panel sidebar">
-      <h2>I miei pazienti</h2>
+      <div class="sidebar-head">
+        <h2>I miei pazienti</h2>
+        <button class="btn-add" type="button" onclick="openAddPatientModal()" title="Aggiungi paziente">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Cerca paziente…
@@ -551,6 +577,38 @@
         <!-- filled by JS -->
       </div>
     </aside>
+
+    <div class="modal-overlay" id="add-patient-overlay" style="display:none;" onclick="if(event.target===this) closeAddPatientModal();">
+      <div class="modal-card">
+        <h3>Nuovo paziente</h3>
+        <p>Aggiungilo qui: comparirà subito nella lista e potrà accedere con il proprio codice.</p>
+        <div class="field-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="field"><label>Nome e cognome</label><input type="text" id="np-nome" placeholder="Es. Anna Rossi"></div>
+          <div class="field"><label>Codice di accesso paziente</label><input type="text" id="np-codice" placeholder="Es. AR04"></div>
+          <div class="field"><label>Età</label><input type="text" id="np-eta" placeholder="Es. 29"></div>
+          <div class="field"><label>Obiettivo</label><input type="text" id="np-obiettivo" placeholder="Es. Definizione muscolare"></div>
+          <div class="field"><label>Prossimo controllo — data</label><input type="date" id="np-data-controllo"></div>
+          <div class="field"><label>Prossimo controllo — ora (facoltativa)</label><input type="time" id="np-ora-controllo"></div>
+          <div class="field">
+            <label>Stato iniziale</label>
+            <select id="np-statoTipo" onchange="onNewPatientStatoChange()">
+              <option value="good">Va bene (verde)</option>
+              <option value="warning">Da monitorare (giallo)</option>
+              <option value="critical">Da ricontattare (rosso)</option>
+            </select>
+          </div>
+          <div class="field"><label>Testo dello stato (modificabile)</label><input type="text" id="np-statoTesto" oninput="onNewPatientStatoTestoInput()"></div>
+        </div>
+        <div class="login-error" id="add-patient-error"></div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn ghost" type="button" onclick="closeAddPatientModal()">Annulla</button>
+          <button class="btn primary" type="button" id="btn-add-patient-save" onclick="saveNewPatient()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salva paziente
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="main">
       <div class="patient-header">
@@ -1431,12 +1489,83 @@
   }
 
   /* ================= VISTA NUTRIZIONISTA ================= */
-  async function loadPazienti(){
+  async function loadPazienti(keepCodice){
     const res = await apiGet('pazienti', { codice: SESSION.codice });
     if(!res.ok){ document.getElementById('patient-list').innerHTML = '<p style="font-size:12.8px;color:var(--critical);">'+(res.error||'Errore nel caricare i pazienti.')+'</p>'; return; }
     PATIENTS = res.pazienti;
     renderPatientList();
-    if(PATIENTS.length) await selectPatientByCode(PATIENTS[0].Codice);
+    if(!PATIENTS.length) return;
+    const toSelect = (keepCodice && PATIENTS.some(p => p.Codice === keepCodice)) ? keepCodice : PATIENTS[0].Codice;
+    await selectPatientByCode(toSelect);
+  }
+
+  /* ================= AGGIUNGI PAZIENTE ================= */
+  const MESI_IT = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  function formatDateInputToItalian(dateStr){
+    const parts = dateStr.split('-');
+    const y = +parts[0], m = +parts[1], d = +parts[2];
+    return `${d} ${MESI_IT[m-1]} ${y}`;
+  }
+  let npStatoTestoTouched = false;
+  function onNewPatientStatoTestoInput(){ npStatoTestoTouched = true; }
+  function onNewPatientStatoChange(){
+    if(npStatoTestoTouched) return;
+    document.getElementById('np-statoTesto').value = STATUS_LABEL[document.getElementById('np-statoTipo').value] || '';
+  }
+  function openAddPatientModal(){
+    ['np-nome','np-codice','np-eta','np-obiettivo','np-data-controllo','np-ora-controllo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('np-statoTipo').value = 'good';
+    npStatoTestoTouched = false;
+    onNewPatientStatoChange();
+    document.getElementById('add-patient-error').textContent = '';
+    document.getElementById('add-patient-overlay').style.display = 'flex';
+    document.getElementById('np-nome').focus();
+  }
+  function closeAddPatientModal(){
+    document.getElementById('add-patient-overlay').style.display = 'none';
+  }
+  async function saveNewPatient(){
+    const errEl = document.getElementById('add-patient-error');
+    errEl.textContent = '';
+    const nome = document.getElementById('np-nome').value.trim();
+    const codice = document.getElementById('np-codice').value.trim();
+    if(!nome){ errEl.textContent = 'Inserisci il nome del paziente.'; return; }
+    if(!codice){ errEl.textContent = 'Inserisci un codice di accesso per il paziente.'; return; }
+
+    const eta = document.getElementById('np-eta').value.trim();
+    const obiettivo = document.getElementById('np-obiettivo').value.trim();
+    const dataControllo = document.getElementById('np-data-controllo').value;
+    const oraControllo = document.getElementById('np-ora-controllo').value;
+    const statoTipo = document.getElementById('np-statoTipo').value;
+    const statoTesto = document.getElementById('np-statoTesto').value.trim() || STATUS_LABEL[statoTipo];
+
+    let prossimoControllo = '';
+    if(dataControllo){
+      prossimoControllo = formatDateInputToItalian(dataControllo);
+      if(oraControllo) prossimoControllo += ' · ' + oraControllo;
+    }
+
+    const paziente = {
+      Codice: codice, Nome: nome,
+      Eta: eta ? (parseNum(eta) ?? eta) : '',
+      Obiettivo: obiettivo, ProssimoControllo: prossimoControllo,
+      StatoTesto: statoTesto, StatoTipo: statoTipo,
+    };
+
+    const btn = document.getElementById('btn-add-patient-save');
+    btn.disabled = true;
+    try{
+      const res = await apiPost('aggiungiPaziente', { codice: SESSION.codice, paziente });
+      if(res.ok){
+        closeAddPatientModal();
+        await loadPazienti(codice);
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    btn.disabled = false;
   }
 
   async function selectPatientByCode(codice){
@@ -1552,6 +1681,7 @@
       const res = await apiGet('login', { codice: code });
       if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
       SESSION = { role: res.role, codice: code, paziente: res.paziente || null };
+      saveSavedCode(code);
       await enterApp();
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
@@ -1576,6 +1706,7 @@
   function logout(){
     SESSION = null; currentPatientCode = null; currentPatientMeta = null;
     currentRows = []; METRICS = {}; currentPlan = null; currentPlanHistory = [];
+    clearSavedCode();
     document.getElementById('view-nutri').style.display = 'none';
     document.getElementById('view-paziente').style.display = 'none';
     document.getElementById('btn-logout').style.display = 'none';
@@ -1584,9 +1715,44 @@
     document.getElementById('login-screen').style.display = 'flex';
   }
 
+  /* ================= ACCESSO RICORDATO ================= */
+  const SAVED_CODE_KEY = 'percorso_codice';
+  function saveSavedCode(code){
+    try{ localStorage.setItem(SAVED_CODE_KEY, code); }catch(e){}
+  }
+  function readSavedCode(){
+    try{ return localStorage.getItem(SAVED_CODE_KEY) || ''; }catch(e){ return ''; }
+  }
+  function clearSavedCode(){
+    try{ localStorage.removeItem(SAVED_CODE_KEY); }catch(e){}
+  }
+
+  async function tryAutoLogin(){
+    const saved = readSavedCode();
+    if(!saved || !apiConfigured()) return;
+    const noteEl = document.getElementById('login-note');
+    const noteOriginal = noteEl.innerHTML;
+    noteEl.textContent = 'Accesso in corso…';
+    try{
+      const res = await apiGet('login', { codice: saved });
+      if(res.ok){
+        SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
+        await enterApp();
+      } else {
+        clearSavedCode();
+        noteEl.innerHTML = noteOriginal;
+      }
+    } catch(err){
+      // niente connessione: lascia semplicemente la schermata di accesso normale
+      noteEl.innerHTML = noteOriginal;
+    }
+  }
+
   /* ================= INIT ================= */
   if(!apiConfigured()){
     document.getElementById('login-note').innerHTML = 'Il sito non è ancora collegato al Google Sheet.<br>Segui il file <b>LEGGIMI-DATI.md</b> per completare il collegamento.';
+  } else {
+    tryAutoLogin();
   }
 </script>
 
