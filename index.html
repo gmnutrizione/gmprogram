@@ -701,33 +701,41 @@
           <fieldset>
             <legend>Circonferenze (cm)</legend>
             <div class="field-grid">
+              <div class="field"><label>Petto</label><input type="text" id="f-petto" placeholder="90"></div>
               <div class="field"><label>Vita</label><input type="text" id="f-vita" placeholder="78"></div>
+              <div class="field"><label>Ombelico</label><input type="text" id="f-ombelico" placeholder="82"></div>
               <div class="field"><label>Fianchi</label><input type="text" id="f-fianchi" placeholder="98"></div>
-              <div class="field"><label>Torace</label><input type="text" id="f-torace" placeholder="90"></div>
-              <div class="field"><label>Braccio</label><input type="text" id="f-braccio" placeholder="26,6"></div>
-              <div class="field"><label>Coscia</label><input type="text" id="f-cosciaCirc" placeholder="55"></div>
+              <div class="field"><label>Spalle</label><input type="text" id="f-spalle" placeholder="110"></div>
+              <div class="field"><label>Coscia dx</label><input type="text" id="f-cosciaDx" placeholder="55"></div>
+              <div class="field"><label>Coscia sx</label><input type="text" id="f-cosciaSx" placeholder="55"></div>
+              <div class="field"><label>Interno coscia dx</label><input type="text" id="f-internoCosciaDx" placeholder="40"></div>
+              <div class="field"><label>Interno coscia sx</label><input type="text" id="f-internoCosciaSx" placeholder="40"></div>
+              <div class="field"><label>Braccio dx</label><input type="text" id="f-braccioDx" placeholder="26,6"></div>
+              <div class="field"><label>Braccio sx</label><input type="text" id="f-braccioSx" placeholder="26,6"></div>
             </div>
           </fieldset>
 
           <fieldset>
             <legend>Plicometria (mm)</legend>
             <div class="field-grid">
-              <div class="field"><label>Tricipite</label><input type="text" id="f-plicaTricipite" placeholder="13"></div>
-              <div class="field"><label>Sottoscapolare</label><input type="text" id="f-plicaSottoscapolare" placeholder="12"></div>
-              <div class="field"><label>Sovrailiaca</label><input type="text" id="f-plicaSovrailiaca" placeholder="13"></div>
+              <div class="field"><label>Pettorale</label><input type="text" id="f-plicaPettorale" placeholder="10"></div>
               <div class="field"><label>Addominale</label><input type="text" id="f-plicaAddominale" placeholder="14"></div>
+              <div class="field"><label>Ascellare</label><input type="text" id="f-plicaAscellare" placeholder="12"></div>
+              <div class="field"><label>Sovrailiaca</label><input type="text" id="f-plicaSovrailiaca" placeholder="13"></div>
               <div class="field"><label>Coscia</label><input type="text" id="f-plicaCoscia" placeholder="15"></div>
+              <div class="field"><label>Tricipitale</label><input type="text" id="f-plicaTricipitale" placeholder="13"></div>
+              <div class="field"><label>Sottoscapolare</label><input type="text" id="f-plicaSottoscapolare" placeholder="12"></div>
             </div>
           </fieldset>
 
           <fieldset style="margin-bottom:6px;">
             <legend>Bioimpedenziometria (BIA)</legend>
             <div class="field-grid">
-              <div class="field"><label>Massa grassa (%)</label><input type="text" id="f-massaGrassa" placeholder="24,1"></div>
+              <div class="field"><label>Acqua totale (%)</label><input type="text" id="f-acquaTotale" placeholder="53,8"></div>
+              <div class="field"><label>Acqua extracellulare (%)</label><input type="text" id="f-acquaExtra" placeholder="22,5"></div>
+              <div class="field"><label>Acqua intracellulare (%)</label><input type="text" id="f-acquaIntra" placeholder="31,3"></div>
               <div class="field"><label>Massa magra (kg)</label><input type="text" id="f-massaMagra" placeholder="46,9"></div>
-              <div class="field"><label>Acqua corporea (%)</label><input type="text" id="f-acqua" placeholder="53,8"></div>
-              <div class="field"><label>Massa ossea (kg)</label><input type="text" id="f-massaOssea" placeholder="2,9"></div>
-              <div class="field"><label>Metabolismo basale (kcal)</label><input type="text" id="f-metabolismo" placeholder="1410"></div>
+              <div class="field"><label>Massa grassa (%)</label><input type="text" id="f-massaGrassa" placeholder="24,1"></div>
             </div>
           </fieldset>
 
@@ -923,34 +931,36 @@
   /* ================= CONFIGURAZIONE ================= */
   // Incolla qui, tra virgolette, l'indirizzo dell'app web di Google Apps Script
   // (vedi LEGGIMI-DATI.md). Finché resta vuoto, il sito mostra solo la schermata di accesso.
-  let API_URL = "";
+  let API_URL = "https://script.google.com/macros/s/AKfycbywb34p18kQ3iTdTiwCKgTWegRzITJ48MiRRJgxpmW2kWRksNnErNIUP1RsRYGrddL36g/exec";
 
   /* ================= METRICHE ================= */
   const METRIC_DEFS = [
-    { key:'peso',        field:'Peso',                label:'Peso corporeo',        unit:'kg', good:'down' },
-    { key:'vita',        field:'Vita',                label:'Circonferenza vita',   unit:'cm', good:'down' },
-    { key:'fianchi',     field:'Fianchi',             label:'Circonferenza fianchi',unit:'cm', good:'down' },
-    { key:'plicaAddome', field:'PlicaAddominale',     label:'Plica addominale',     unit:'mm', good:'down' },
-    { key:'plicaTric',   field:'PlicaTricipite',      label:'Plica tricipite',      unit:'mm', good:'down' },
-    { key:'massaGrassa', field:'MassaGrassa',         label:'Massa grassa (BIA)',   unit:'%',  good:'down' },
-    { key:'massaMagra',  field:'MassaMagra',          label:'Massa magra (BIA)',    unit:'kg', good:'up'   },
-    { key:'acqua',       field:'AcquaCorporea',       label:'Acqua corporea (BIA)', unit:'%',  good:'up'   },
+    { key:'peso',              field:'Peso',                    label:'Peso corporeo',         unit:'kg', good:'down' },
+    { key:'petto',             field:'Petto',                   label:'Circonferenza petto',   unit:'cm', good:'down' },
+    { key:'vita',              field:'Vita',                    label:'Circonferenza vita',    unit:'cm', good:'down' },
+    { key:'ombelico',          field:'Ombelico',                label:'Circonferenza ombelico',unit:'cm', good:'down' },
+    { key:'fianchi',           field:'Fianchi',                 label:'Circonferenza fianchi', unit:'cm', good:'down' },
+    { key:'cosciaDx',          field:'Coscia dx',               label:'Coscia dx',             unit:'cm', good:'down' },
+    { key:'internoCosciaDx',   field:'Interno Coscia dx',       label:'Interno coscia dx',     unit:'cm', good:'down' },
+    { key:'cosciaSx',          field:'Coscia sx',               label:'Coscia sx',             unit:'cm', good:'down' },
+    { key:'internoCosciaSx',   field:'Interno Coscia sx',       label:'Interno coscia sx',     unit:'cm', good:'down' },
+    { key:'spalle',            field:'Spalle',                  label:'Circonferenza spalle',  unit:'cm', good:'down' },
+    { key:'braccioDx',         field:'Braccio dx',              label:'Braccio dx',            unit:'cm', good:'down' },
+    { key:'braccioSx',         field:'Braccio sx',              label:'Braccio sx',            unit:'cm', good:'down' },
+    { key:'plicaPettorale',    field:'Plica pettorale',         label:'Plica pettorale',       unit:'mm', good:'down' },
+    { key:'plicaAddominale',   field:'Plica addominale',        label:'Plica addominale',      unit:'mm', good:'down' },
+    { key:'plicaAscellare',    field:'Plica ascellare',         label:'Plica ascellare',       unit:'mm', good:'down' },
+    { key:'plicaSovrailiaca',  field:'Plica sovrailiaca',       label:'Plica sovrailiaca',     unit:'mm', good:'down' },
+    { key:'plicaCoscia',       field:'Plica coscia',            label:'Plica coscia',          unit:'mm', good:'down' },
+    { key:'plicaTricipitale',  field:'Plica tricipitale',       label:'Plica tricipitale',     unit:'mm', good:'down' },
+    { key:'plicaSottoscapolare', field:'Plica sottoscapolare',  label:'Plica sottoscapolare',  unit:'mm', good:'down' },
+    { key:'acquaTotale',       field:'Acqua totale',            label:'Acqua corporea totale', unit:'%',  good:'up'   },
+    { key:'acquaExtra',        field:'Acqua Extracellulare',    label:'Acqua extracellulare',  unit:'%',  good:'down' },
+    { key:'acquaIntra',        field:'Acqua intracellulare',    label:'Acqua intracellulare',  unit:'%',  good:'up'   },
+    { key:'massaMagra',        field:'Massa magra',             label:'Massa magra',           unit:'kg', good:'up'   },
+    { key:'massaGrassa',       field:'Massa grassa',            label:'Massa grassa',          unit:'%',  good:'down' },
   ];
-  const COMPARE_DEFS = [
-    { field:'Peso', label:'Peso corporeo', unit:'kg', good:'down' },
-    { field:'Vita', label:'Circonferenza vita', unit:'cm', good:'down' },
-    { field:'Fianchi', label:'Circonferenza fianchi', unit:'cm', good:'down' },
-    { field:'Torace', label:'Circonferenza torace', unit:'cm', good:'down' },
-    { field:'PlicaTricipite', label:'Plica tricipite', unit:'mm', good:'down' },
-    { field:'PlicaSottoscapolare', label:'Plica sottoscapolare', unit:'mm', good:'down' },
-    { field:'PlicaSovrailiaca', label:'Plica sovrailiaca', unit:'mm', good:'down' },
-    { field:'PlicaAddominale', label:'Plica addominale', unit:'mm', good:'down' },
-    { field:'PlicaCoscia', label:'Plica coscia', unit:'mm', good:'down' },
-    { field:'MassaGrassa', label:'Massa grassa (BIA)', unit:'%', good:'down' },
-    { field:'MassaMagra', label:'Massa magra (BIA)', unit:'kg', good:'up' },
-    { field:'AcquaCorporea', label:'Acqua corporea (BIA)', unit:'%', good:'up' },
-    { field:'Metabolismo', label:'Metabolismo basale', unit:'kcal', good:'up' },
-  ];
+  const COMPARE_DEFS = METRIC_DEFS.map(d => ({ field:d.field, label:d.label, unit:d.unit, good:d.good }));
   const PATIENT_METRIC_KEYS = ['peso','vita','massaGrassa'];
 
   /* ================= STATO ================= */
@@ -1251,8 +1261,8 @@
     const headlineDefs = [
       { field:'Peso', label:'variazione peso', unit:'kg' },
       { field:'Vita', label:'circonferenza vita', unit:'cm' },
-      { field:'MassaGrassa', label:'massa grassa', unit:'%' },
-      { field:'MassaMagra', label:'massa magra', unit:'kg' },
+      { field:'Massa grassa', label:'massa grassa', unit:'%' },
+      { field:'Massa magra', label:'massa magra', unit:'kg' },
     ];
     headline.innerHTML = headlineDefs.map(d => {
       const oldV = parseNum(oldRow[d.field]), newV = parseNum(newRow[d.field]);
@@ -1372,10 +1382,13 @@
 
   /* ================= MISURAZIONI: salvataggio ================= */
   const MISURAZIONE_FIELD_IDS = {
-    Peso:'f-peso', Vita:'f-vita', Fianchi:'f-fianchi', Torace:'f-torace', Braccio:'f-braccio', CosciaCirc:'f-cosciaCirc',
-    PlicaTricipite:'f-plicaTricipite', PlicaSottoscapolare:'f-plicaSottoscapolare', PlicaSovrailiaca:'f-plicaSovrailiaca',
-    PlicaAddominale:'f-plicaAddominale', PlicaCoscia:'f-plicaCoscia',
-    MassaGrassa:'f-massaGrassa', MassaMagra:'f-massaMagra', AcquaCorporea:'f-acqua', MassaOssea:'f-massaOssea', Metabolismo:'f-metabolismo',
+    Peso:'f-peso', Petto:'f-petto', Vita:'f-vita', Ombelico:'f-ombelico', Fianchi:'f-fianchi',
+    'Coscia dx':'f-cosciaDx', 'Interno Coscia dx':'f-internoCosciaDx', 'Coscia sx':'f-cosciaSx', 'Interno Coscia sx':'f-internoCosciaSx',
+    Spalle:'f-spalle', 'Braccio dx':'f-braccioDx', 'Braccio sx':'f-braccioSx',
+    'Plica pettorale':'f-plicaPettorale', 'Plica addominale':'f-plicaAddominale', 'Plica ascellare':'f-plicaAscellare',
+    'Plica sovrailiaca':'f-plicaSovrailiaca', 'Plica coscia':'f-plicaCoscia', 'Plica tricipitale':'f-plicaTricipitale', 'Plica sottoscapolare':'f-plicaSottoscapolare',
+    'Acqua totale':'f-acquaTotale', 'Acqua Extracellulare':'f-acquaExtra', 'Acqua intracellulare':'f-acquaIntra',
+    'Massa magra':'f-massaMagra', 'Massa grassa':'f-massaGrassa',
   };
 
   async function saveMisurazione(){
