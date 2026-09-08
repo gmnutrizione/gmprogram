@@ -548,6 +548,144 @@
     .p-card{ padding:14px 12px; border-radius:14px; }
     .bottom-nav{ padding:8px 4px calc(10px + env(safe-area-inset-bottom)); }
   }
+
+  /* =========================================================== */
+  /* CREA PIANO (costruttore piani alimentari)                    */
+  /* =========================================================== */
+  .cp-day-tabs{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .cp-day-tab{
+    font-family:var(--font-body); font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:999px;
+    border:1px solid var(--border); background:var(--surface-raised); color:var(--ink-soft); cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .cp-day-tab:hover{ color:var(--ink); }
+  .cp-day-tab.active{ background:var(--accent); color:#fff; border-color:transparent; }
+  .cp-day-tab .cp-dot{ display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--accent-warm); margin-left:6px; vertical-align:middle; }
+  .cp-day-tab.active .cp-dot{ background:#fff; opacity:.8; }
+
+  .cp-meal-list{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; align-items:start; }
+  @media (max-width:1300px){ .cp-meal-list{ grid-template-columns:1fr; } }
+  .cp-meal-card{
+    border:1.5px solid var(--border-soft); border-radius:var(--radius-s); padding:13px 14px;
+    background:var(--surface-raised); transition:border-color .15s ease;
+  }
+  .cp-meal-card:focus-within{ border-color:var(--accent); }
+  .cp-meal-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:9px; }
+  .cp-meal-name{ font-size:13.3px; font-weight:600; }
+  .cp-meal-head-right{ display:flex; align-items:center; gap:8px; }
+  .cp-meal-kcal{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); }
+  .cp-btn-dup-meal{
+    display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px;
+    border:1px solid var(--border); background:transparent; color:var(--ink-faint); cursor:pointer; flex:none;
+  }
+  .cp-btn-dup-meal:hover{ border-color:var(--accent); color:var(--accent-ink); background:var(--accent-soft); }
+  .cp-btn-dup-meal svg{ width:13px; height:13px; }
+  .cp-meal-items{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+  .cp-meal-item{ display:flex; align-items:center; gap:8px; font-size:12.8px; }
+  .cp-meal-item-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cp-grams-field{
+    width:56px; font-family:var(--font-mono); font-size:12.3px; text-align:right; padding:4px 6px;
+    border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--ink);
+  }
+  .cp-grams-field:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .cp-meal-item-kcal{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); width:52px; text-align:right; flex:none; }
+  .cp-btn-remove{ display:flex; align-items:center; justify-content:center; width:18px; height:18px; border:none; background:none; color:var(--ink-faint); cursor:pointer; flex:none; }
+  .cp-btn-remove:hover{ color:var(--critical); }
+  .cp-btn-remove svg{ width:11px; height:11px; }
+  .cp-meal-empty{ font-size:12px; color:var(--ink-faint); padding:4px 0; }
+  .cp-meal-search{ position:relative; }
+  .cp-meal-search-input{
+    width:100%; font-size:12.8px; padding:7px 9px; border:1px solid var(--border); border-radius:7px;
+    background:var(--surface); color:var(--ink);
+  }
+  .cp-meal-search-input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .cp-meal-suggestions{
+    position:absolute; left:0; right:0; top:calc(100% + 3px); background:var(--surface-raised); border:1px solid var(--border);
+    border-radius:var(--radius-s); box-shadow:var(--shadow-2); max-height:220px; overflow:auto; z-index:20;
+  }
+  .cp-suggestion-item{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 10px; font-size:12.5px; cursor:pointer; }
+  .cp-suggestion-item:hover{ background:var(--accent-soft); }
+  .cp-suggestion-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cp-suggestion-name b{ color:var(--accent-ink); }
+  .cp-suggestion-kcal{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); flex:none; white-space:nowrap; }
+  .cp-suggestion-empty{ padding:10px; font-size:12px; color:var(--ink-faint); }
+  .cp-meal-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px 4px; padding-top:8px; border-top:1px solid var(--border-soft); }
+  .cp-meal-stat{ text-align:center; }
+  .cp-meal-stat .cp-ms-label{ font-size:8.8px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.02em; line-height:1.25; }
+  .cp-meal-stat .cp-ms-val{ font-family:var(--font-mono); font-size:12px; font-weight:600; margin-top:2px; }
+
+  .cp-kcal-hero{ display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+  .cp-donut-wrap{ position:relative; flex:none; width:104px; height:104px; }
+  .cp-donut-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cp-donut-center b{ font-family:var(--font-mono); font-size:18px; }
+  .cp-donut-center span{ font-size:9.5px; color:var(--ink-faint); }
+  .cp-macro-legend{ display:flex; flex-direction:column; gap:6px; min-width:0; flex:1; }
+  .cp-legend-item{ display:flex; align-items:center; gap:7px; font-size:12px; }
+  .cp-legend-dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .cp-legend-label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-soft); }
+  .cp-legend-value{ font-family:var(--font-mono); font-weight:600; white-space:nowrap; margin-left:auto; }
+  .cp-legend-pct{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); white-space:nowrap; }
+
+  .cp-target-bars{ display:flex; flex-direction:column; gap:9px; margin-bottom:18px; }
+  .cp-bar-row-head{ display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:3px; }
+  .cp-bar-row-head b{ color:var(--ink-soft); font-weight:600; }
+  .cp-bar-track{ height:6px; border-radius:4px; background:var(--border-soft); }
+  .cp-bar-fill{ height:100%; border-radius:4px; }
+  .cp-bar-fill.good{ background:var(--good); }
+  .cp-bar-fill.warning{ background:var(--warning); }
+  .cp-bar-fill.critical{ background:var(--critical); }
+
+  .cp-week-strip{ padding-top:14px; border-top:1px solid var(--border-soft); }
+  .cp-week-chart{ display:flex; gap:6px; align-items:flex-end; height:96px; margin:10px 0 12px; }
+  .cp-week-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; height:100%; }
+  .cp-week-bar-val{ font-size:9.5px; color:var(--ink-faint); }
+  .cp-week-bar-track{ position:relative; flex:1; width:100%; display:flex; align-items:flex-end; }
+  .cp-week-target-line{ position:absolute; left:-2px; right:-2px; border-top:1.5px dashed var(--accent-warm); }
+  .cp-week-target-label{ position:absolute; right:0; bottom:2px; font-size:8px; color:var(--accent-warm); white-space:nowrap; }
+  .cp-week-bar{ width:100%; border-radius:3px 3px 0 0; background:var(--sage); }
+  .cp-week-col.current .cp-week-bar{ background:var(--accent); }
+  .cp-week-bar-day{ font-size:9.5px; color:var(--ink-faint); font-weight:600; }
+  .cp-week-range-table{ display:flex; flex-direction:column; gap:5px; }
+  .cp-wr-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12.5px; }
+  .cp-wr-row .cp-wr-label{ color:var(--ink-soft); font-weight:500; flex:none; }
+  .cp-wr-row .cp-wr-val{ font-family:var(--font-mono); color:var(--ink); text-align:right; }
+  .cp-wr-row .cp-wr-val b{ font-weight:700; }
+  .cp-wr-row .cp-wr-val .cp-wr-avg{ font-family:var(--font-body); color:var(--ink-faint); font-size:11.5px; }
+
+  .cp-history-list{ display:flex; flex-direction:column; }
+  .cp-history-item{ display:flex; gap:16px; align-items:flex-start; padding:14px 2px; border-bottom:1px solid var(--border-soft); }
+  .cp-history-item:last-child{ border-bottom:none; }
+  .cp-history-dot{ width:8px; height:8px; border-radius:50%; background:var(--border); margin-top:5px; flex:none; }
+  .cp-history-item.latest .cp-history-dot{ background:var(--accent); }
+  .cp-history-date{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); white-space:nowrap; flex:none; width:92px; }
+  .cp-history-main{ min-width:0; flex:1; }
+  .cp-history-values{ font-size:13px; color:var(--ink); }
+  .cp-history-values .num{ font-weight:600; }
+  .cp-history-delta{ font-size:11.5px; color:var(--ink-faint); margin-top:3px; }
+  .cp-hd-tag{ font-weight:600; }
+  .cp-hd-tag.up{ color:var(--accent-warm); }
+  .cp-hd-tag.down{ color:var(--accent); }
+
+  .cp-template-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:6px; }
+  .cp-template-card{ border:1.5px solid var(--border-soft); border-radius:var(--radius-s); padding:13px 14px; }
+  .cp-template-card-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .cp-template-name{ font-size:14px; font-weight:600; }
+  .cp-template-kcal{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-faint); flex:none; }
+  .cp-template-desc{ font-size:12.5px; color:var(--ink-soft); margin:4px 0 9px; }
+  .cp-template-macros{ font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); margin-bottom:10px; }
+
+  .cp-day-picker-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }
+  @media (max-width:480px){ .cp-day-picker-grid{ grid-template-columns:repeat(2,1fr); } }
+  .cp-day-picker-btn{
+    display:flex; flex-direction:column; align-items:center; gap:2px; padding:12px 8px; border-radius:var(--radius-s);
+    border:1.5px solid var(--border); background:var(--surface-raised); cursor:pointer; font-family:var(--font-body);
+    color:var(--ink); transition:border-color .15s ease, background .15s ease;
+  }
+  .cp-day-picker-btn:hover{ border-color:var(--accent); background:var(--accent-soft); }
+  .cp-day-picker-btn b{ font-size:13px; font-weight:700; }
+  .cp-day-picker-btn .cp-dp-kcal{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+
+  .cp-empty-note{ font-size:12.5px; color:var(--ink-faint); padding:6px 0; }
 </style>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -642,6 +780,61 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="cp-modal-overlay" style="display:none;" onclick="if(event.target===this) cpCloseModal();">
+      <div class="modal-card">
+        <!-- Import modello -->
+        <div id="cp-modal-import-view">
+          <h3>Importa un modello</h3>
+          <p>Sostituisce tutta la settimana con la struttura del modello scelto.</p>
+          <div class="cp-template-list" id="cp-template-list"></div>
+          <div style="display:flex; justify-content:flex-end;"><button class="btn ghost" type="button" onclick="cpCloseModal()">Chiudi</button></div>
+        </div>
+
+        <!-- Salva come modello -->
+        <div id="cp-modal-save-view" style="display:none;">
+          <h3>Salva come modello</h3>
+          <p id="cp-save-hint">—</p>
+          <div class="field-grid" style="grid-template-columns:1fr;">
+            <div class="field"><label>Nome del modello</label><input type="text" id="cp-tpl-name" placeholder="Es. Ricomposizione corporea"></div>
+            <div class="field"><label>Descrizione (facoltativa)</label><input type="text" id="cp-tpl-desc" placeholder="Poche parole su quando usarlo"></div>
+          </div>
+          <div class="login-error" id="cp-save-error"></div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+            <button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button>
+            <button class="btn primary" type="button" onclick="cpSalvaModello()">Salva modello</button>
+          </div>
+        </div>
+
+        <!-- Duplica pasto/giorno -->
+        <div id="cp-modal-duplicate-view" style="display:none;">
+          <h3 id="cp-dup-title">Duplica pasto</h3>
+          <p id="cp-dup-sub">—</p>
+          <div class="cp-day-picker-grid" id="cp-day-picker-grid"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:14px;"><button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button></div>
+        </div>
+
+        <!-- Obiettivo -->
+        <div id="cp-modal-target-view" style="display:none;">
+          <h3>Obiettivo giornaliero</h3>
+          <p>Usato per le barre di riferimento e per l'andamento settimanale.</p>
+          <div class="field-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="field"><label>Kcal</label><input type="number" id="cp-tgt-kcal" min="0"></div>
+            <div class="field"><label>Proteine (g)</label><input type="number" id="cp-tgt-prot" min="0"></div>
+            <div class="field"><label>Carboidrati (g)</label><input type="number" id="cp-tgt-carb" min="0"></div>
+            <div class="field"><label>di cui Zuccheri (g)</label><input type="number" id="cp-tgt-zuccheri" min="0"></div>
+            <div class="field"><label>Grassi (g)</label><input type="number" id="cp-tgt-grassi" min="0"></div>
+            <div class="field"><label>di cui Grassi saturi (g)</label><input type="number" id="cp-tgt-grassiSaturi" min="0"></div>
+            <div class="field"><label>Fibre (g)</label><input type="number" id="cp-tgt-fibra" min="0"></div>
+            <div class="field"><label>Sale (g)</label><input type="number" id="cp-tgt-sale" min="0"></div>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+            <button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button>
+            <button class="btn primary" type="button" onclick="cpSalvaTarget()">Applica</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="main">
       <div class="patient-header">
         <div>
@@ -665,6 +858,7 @@
       <div class="tabs">
         <button class="tab-btn active" data-tab="panoramica" onclick="setNutriTab('panoramica')">Panoramica</button>
         <button class="tab-btn" data-tab="piano" onclick="setNutriTab('piano')">Piano alimentare</button>
+        <button class="tab-btn" data-tab="creapiano" onclick="setNutriTab('creapiano')">Crea piano</button>
         <button class="tab-btn" data-tab="misurazioni" onclick="setNutriTab('misurazioni')">Misurazioni</button>
         <button class="tab-btn" data-tab="confronto" onclick="setNutriTab('confronto')">Confronto controlli</button>
       </div>
@@ -766,6 +960,69 @@
           <div class="card-head"><h3>Storico versioni</h3></div>
           <div class="version-history" id="piano-storico">
             <p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- CREA PIANO ---- -->
+      <div class="tab-panel" id="tab-creapiano">
+        <div class="note-strip">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8V13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16" r="0.9" fill="currentColor"/></svg>
+          <div>Il piano composto qui si affianca al PDF caricato sopra: il paziente vede in app quello dei due aggiornato più di recente. Gli alimenti arrivano dal foglio Guida alla Spesa.</div>
+        </div>
+
+        <div class="card" id="cp-config-warning" style="display:none; border-color:var(--warning);">
+          <div class="card-head" style="margin-bottom:0;">
+            <div>
+              <h3 style="color:var(--warning);">Database alimenti non ancora collegato</h3>
+              <p id="cp-config-warning-text">—</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="cp-body" style="display:none;">
+          <div class="card-head" style="margin-bottom:14px;">
+            <div>
+              <h3 style="font-size:14.5px;">Obiettivo: <span id="cp-target-summary" class="num">—</span></h3>
+              <p>Il piano di questo paziente, giorno per giorno.</p>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn small ghost" type="button" onclick="cpOpenModal('target')">Obiettivo</button>
+              <button class="btn small ghost" type="button" onclick="cpOpenModal('import')">Importa modello</button>
+              <button class="btn small ghost" type="button" onclick="cpOpenDuplicateModal('day')">Duplica giorno</button>
+              <button class="btn small ghost" type="button" onclick="cpOpenModal('save')">Salva come modello</button>
+              <button class="btn small primary" type="button" onclick="cpSalvaPiano()" id="cp-btn-salva">Salva piano</button>
+            </div>
+          </div>
+
+          <div class="cp-day-tabs" id="cp-day-tabs"></div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head">
+                <h3 id="cp-day-title">Lunedì</h3>
+                <span class="num" style="font-size:12.5px; color:var(--ink-faint);" id="cp-day-kcal">0 kcal</span>
+              </div>
+              <div class="cp-meal-list" id="cp-meal-list"></div>
+            </div>
+
+            <div class="card">
+              <div class="cp-kcal-hero">
+                <div class="cp-donut-wrap" id="cp-donut-wrap"></div>
+                <div class="cp-macro-legend" id="cp-macro-legend"></div>
+              </div>
+              <div class="cp-target-bars" id="cp-target-bars"></div>
+              <div class="cp-week-strip">
+                <span style="font-size:11.5px; color:var(--ink-faint); font-weight:500;">Andamento settimana (kcal/giorno)</span>
+                <div class="cp-week-chart" id="cp-week-chart"></div>
+                <div class="cp-week-range-table" id="cp-week-range-table"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Storico piani</h3><p>Media settimanale, registrata ad ogni salvataggio</p></div>
+            <div class="cp-history-list" id="cp-history-list"></div>
           </div>
         </div>
       </div>
@@ -947,6 +1204,14 @@
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 4V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               Apri il PDF del piano
             </a>
+            <div id="p-piano-struct" style="display:none;">
+              <div class="chip-row" id="p-piano-day-chips"></div>
+              <div class="p-card" id="p-piano-day-card"></div>
+              <div class="p-card">
+                <div class="p-card-top"><h4>Media settimanale</h4></div>
+                <div id="p-piano-week-range" style="font-size:12.8px; color:var(--ink-soft);"></div>
+              </div>
+            </div>
           </div>
 
           <!-- ANDAMENTO -->
@@ -1503,6 +1768,580 @@
     evt.target.value = '';
   }
 
+  /* ================= CREA PIANO ================= */
+  const CP_MEALS = ['Colazione','Spuntino mattina','Pranzo','Spuntino pomeriggio','Cena','Dopo cena'];
+  const CP_GIORNI = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+  const CP_GIORNI_SHORT = {'Lunedì':'LUN','Martedì':'MAR','Mercoledì':'MER','Giovedì':'GIO','Venerdì':'VEN','Sabato':'SAB','Domenica':'DOM'};
+  const CP_MACRO_COLORS = { prot:'var(--accent)', carb:'var(--accent-warm)', grassi:'var(--sage)' };
+  const CP_ICON_X = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const CP_ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  const CP_ICON_DUP = '<svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6C16 4.9 15.1 4 14 4H6C4.9 4 4 4.9 4 6V14C4 15.1 4.9 16 6 16H8" stroke="currentColor" stroke-width="1.7"/></svg>';
+
+  let CP_FOODS = null;
+  let CP_FOODS_BY_ID = {};
+  let CP_FOODS_ERROR = null;
+  let CP_FOODS_LOADING = null;
+  let CP_PLAN = {};
+  let CP_TARGET = { kcal:0, prot:0, carb:0, grassi:0, fibra:0 };
+  let CP_HISTORY = [];
+  let CP_ATTIVO_DATA = null;
+  let CP_TEMPLATES = null;
+  let cpState = { day:'Lunedì' };
+  let cpDupState = { mode:null, meal:null };
+  let cpPianoLoadError = null;
+
+  function cpFmt(n){ return Math.round(n||0).toLocaleString('it-IT'); }
+  function cpEsc(s){ const d = document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
+  function cpEmptyPlan(){
+    const p = {};
+    CP_GIORNI.forEach(g => { p[g] = {}; CP_MEALS.forEach(m => p[g][m] = []); });
+    return p;
+  }
+  // Elenco unico dei valori nutrizionali usati in "Crea piano" — aggiungere un nutriente qui
+  // (e nella mappa GUIDA_SPESA_COLONNE in Codice.gs) basta a farlo comparire ovunque nel programma.
+  const CP_NUTRIENTI = [
+    { key:'kcal', label:'Kcal', unit:'' },
+    { key:'prot', label:'Proteine', unit:'g' },
+    { key:'carb', label:'Carboidrati', unit:'g' },
+    { key:'zuccheri', label:'di cui Zuccheri', unit:'g' },
+    { key:'grassi', label:'Grassi', unit:'g' },
+    { key:'grassiSaturi', label:'di cui Grassi saturi', unit:'g' },
+    { key:'fibra', label:'Fibre', unit:'g' },
+    { key:'sale', label:'Sale', unit:'g' },
+  ];
+  function cpZeroNutrienti(){ const o = {}; CP_NUTRIENTI.forEach(n => o[n.key] = 0); return o; }
+  function cpEmptyTarget(){ return cpZeroNutrienti(); }
+  // Nomi delle colonne dello storico (PianiStrutturati) corrispondenti a ciascun nutriente.
+  const CP_HISTORY_FIELD = { kcal:'Kcal', prot:'Proteine', carb:'Carboidrati', zuccheri:'Zuccheri', grassi:'Grassi', grassiSaturi:'GrassiSaturi', fibra:'Fibre', sale:'Sale' };
+
+  async function cpLoadFoods(){
+    if(CP_FOODS) return;
+    if(CP_FOODS_LOADING) return CP_FOODS_LOADING;
+    CP_FOODS_LOADING = (async () => {
+      try{
+        const res = await apiGet('alimenti', { codice: SESSION.codice });
+        if(res.ok){
+          CP_FOODS = res.alimenti || [];
+          CP_FOODS_BY_ID = Object.fromEntries(CP_FOODS.map(f => [f.id, f]));
+          CP_FOODS_ERROR = null;
+        } else {
+          CP_FOODS = [];
+          CP_FOODS_ERROR = res.error || 'Errore nel caricamento del database alimenti.';
+        }
+      } catch(err){
+        CP_FOODS = [];
+        CP_FOODS_ERROR = 'Errore di connessione: ' + err.message;
+      }
+    })();
+    await CP_FOODS_LOADING;
+  }
+
+  function cpComputeItem(item){
+    const f = CP_FOODS_BY_ID[item.id];
+    const out = cpZeroNutrienti();
+    if(!f) return out;
+    const r = item.g/100;
+    CP_NUTRIENTI.forEach(n => { out[n.key] = (f[n.key]||0) * r; });
+    return out;
+  }
+  function cpComputeMeal(day, meal){
+    return (CP_PLAN[day][meal]||[]).reduce((acc,item)=>{
+      const c = cpComputeItem(item);
+      CP_NUTRIENTI.forEach(n => { acc[n.key] += c[n.key]; });
+      return acc;
+    }, cpZeroNutrienti());
+  }
+  function cpComputeDay(day){
+    return CP_MEALS.reduce((acc,m)=>{
+      const c = cpComputeMeal(day,m);
+      CP_NUTRIENTI.forEach(n => { acc[n.key] += c[n.key]; });
+      return acc;
+    }, cpZeroNutrienti());
+  }
+  function cpComputeWeekAverage(){
+    const totals = CP_GIORNI.map(g => cpComputeDay(g));
+    const n = totals.length;
+    const out = cpZeroNutrienti();
+    CP_NUTRIENTI.forEach(nut => { out[nut.key] = totals.reduce((a,t)=>a+t[nut.key],0)/n; });
+    return out;
+  }
+
+  async function loadPianoStrutturato(codice){
+    try{
+      const res = await apiGet('pianoStrutturato', { codice: SESSION.codice, paziente: codice });
+      if(res.ok && res.attivo && res.attivo.Plan){
+        CP_PLAN = res.attivo.Plan;
+        CP_GIORNI.forEach(g => { if(!CP_PLAN[g]) CP_PLAN[g] = {}; CP_MEALS.forEach(m => { if(!CP_PLAN[g][m]) CP_PLAN[g][m] = []; }); });
+        CP_TARGET = Object.assign(cpEmptyTarget(), res.attivo.Target||{});
+        CP_ATTIVO_DATA = res.attivo.Data || null;
+      } else {
+        CP_PLAN = cpEmptyPlan();
+        CP_TARGET = cpEmptyTarget();
+        CP_ATTIVO_DATA = null;
+      }
+      CP_HISTORY = (res.ok && res.storico) ? res.storico : [];
+      cpPianoLoadError = res.ok ? null : (res.error || 'Errore nel caricamento del piano.');
+    } catch(err){
+      CP_PLAN = cpEmptyPlan();
+      CP_TARGET = cpEmptyTarget();
+      CP_HISTORY = [];
+      cpPianoLoadError = 'Errore di connessione: ' + err.message;
+    }
+    cpState.day = 'Lunedì';
+  }
+
+  async function renderCreaPianoTab(){
+    await cpLoadFoods();
+    const warnEl = document.getElementById('cp-config-warning');
+    const bodyEl = document.getElementById('cp-body');
+    if(CP_FOODS_ERROR){
+      warnEl.style.display = '';
+      document.getElementById('cp-config-warning-text').textContent = CP_FOODS_ERROR;
+    } else {
+      warnEl.style.display = 'none';
+    }
+    bodyEl.style.display = '';
+    cpRenderAll();
+  }
+
+  function cpRenderAll(){
+    document.getElementById('cp-target-summary').textContent = cpFmt(CP_TARGET.kcal) + ' kcal';
+    cpRenderDayTabs();
+    cpRenderMealList();
+    cpRenderSummary();
+    cpRenderHistory();
+  }
+
+  /* ---- giorni ---- */
+  function cpRenderDayTabs(){
+    const el = document.getElementById('cp-day-tabs');
+    el.innerHTML = CP_GIORNI.map(g => {
+      const hasData = CP_MEALS.some(m => (CP_PLAN[g][m]||[]).length>0);
+      return `<button type="button" class="cp-day-tab ${g===cpState.day?'active':''}" data-day="${g}">${CP_GIORNI_SHORT[g]}${hasData?'<span class="cp-dot"></span>':''}</button>`;
+    }).join('');
+    el.querySelectorAll('.cp-day-tab').forEach(btn => {
+      btn.addEventListener('click', () => { cpState.day = btn.dataset.day; cpRenderAll(); });
+    });
+  }
+
+  /* ---- pasti ---- */
+  function cpRenderMealList(){
+    document.getElementById('cp-day-title').textContent = cpState.day;
+    const dayTotals = cpComputeDay(cpState.day);
+    document.getElementById('cp-day-kcal').textContent = cpFmt(dayTotals.kcal) + ' kcal';
+
+    const el = document.getElementById('cp-meal-list');
+    const searchDisabled = !CP_FOODS || CP_FOODS.length === 0;
+    el.innerHTML = CP_MEALS.map(m => {
+      const items = CP_PLAN[cpState.day][m] || [];
+      const totals = cpComputeMeal(cpState.day, m);
+      const rows = items.length === 0
+        ? `<div class="cp-meal-empty">Nessun alimento — cerca un alimento qui sotto per aggiungerlo.</div>`
+        : items.map((item, idx) => {
+            const f = CP_FOODS_BY_ID[item.id];
+            const c = cpComputeItem(item);
+            return `
+              <div class="cp-meal-item">
+                <div class="cp-meal-item-name">${cpEsc(f ? f.nome : 'Alimento non più nel database')}</div>
+                <div class="cp-grams-field-wrap" style="display:flex; align-items:center; gap:3px;">
+                  <input type="number" class="cp-grams-field" min="0" step="5" value="${item.g}" data-meal="${cpEsc(m)}" data-idx="${idx}">
+                  <span style="font-size:11px; color:var(--ink-faint);">g</span>
+                </div>
+                <div class="cp-meal-item-kcal">${cpFmt(c.kcal)}</div>
+                <button type="button" class="cp-btn-remove" data-meal="${cpEsc(m)}" data-idx="${idx}" title="Rimuovi">${CP_ICON_X}</button>
+              </div>`;
+          }).join('');
+      return `
+        <div class="cp-meal-card" data-meal="${cpEsc(m)}">
+          <div class="cp-meal-head">
+            <div class="cp-meal-name">${m}</div>
+            <div class="cp-meal-head-right">
+              <div class="cp-meal-kcal num">${cpFmt(totals.kcal)} kcal</div>
+              <button type="button" class="cp-btn-dup-meal" data-meal="${cpEsc(m)}" title="Duplica questo pasto su un altro giorno">${CP_ICON_DUP}</button>
+            </div>
+          </div>
+          <div class="cp-meal-items">${rows}</div>
+          <div class="cp-meal-search">
+            ${searchDisabled
+              ? `<div class="cp-empty-note">Ricerca alimenti non disponibile — database non collegato.</div>`
+              : `<div class="cp-meal-search-input-wrap" style="position:relative;">
+                  <input type="text" class="cp-meal-search-input" placeholder="Cerca alimento da aggiungere…" data-meal="${cpEsc(m)}" autocomplete="off">
+                </div>
+                <div class="cp-meal-suggestions" data-meal="${cpEsc(m)}" hidden></div>`}
+          </div>
+          <div class="cp-meal-stats">
+            ${CP_NUTRIENTI.map(n => `<div class="cp-meal-stat"><div class="cp-ms-val num" data-key="${n.key}">${cpFmt(totals[n.key])}</div><div class="cp-ms-label">${n.label}</div></div>`).join('')}
+          </div>
+        </div>`;
+    }).join('');
+
+    el.querySelectorAll('.cp-grams-field').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const m = inp.dataset.meal, idx = +inp.dataset.idx;
+        const v = Math.max(0, +inp.value || 0);
+        CP_PLAN[cpState.day][m][idx].g = v;
+        const c = cpComputeItem(CP_PLAN[cpState.day][m][idx]);
+        const card = inp.closest('.cp-meal-card');
+        inp.closest('.cp-meal-item').querySelector('.cp-meal-item-kcal').textContent = cpFmt(c.kcal);
+        const mealTotals = cpComputeMeal(cpState.day, m);
+        card.querySelector('.cp-meal-kcal').textContent = cpFmt(mealTotals.kcal) + ' kcal';
+        CP_NUTRIENTI.forEach(n => {
+          card.querySelector(`.cp-ms-val[data-key="${n.key}"]`).textContent = cpFmt(mealTotals[n.key]);
+        });
+        const dayTotals2 = cpComputeDay(cpState.day);
+        document.getElementById('cp-day-kcal').textContent = cpFmt(dayTotals2.kcal) + ' kcal';
+        cpRenderSummary();
+      });
+    });
+    el.querySelectorAll('.cp-btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = btn.dataset.meal, idx = +btn.dataset.idx;
+        CP_PLAN[cpState.day][m].splice(idx, 1);
+        cpRenderMealList(); cpRenderSummary(); cpRenderDayTabs();
+      });
+    });
+    el.querySelectorAll('.cp-btn-dup-meal').forEach(btn => {
+      btn.addEventListener('click', () => cpOpenDuplicateModal('meal', btn.dataset.meal));
+    });
+
+    el.querySelectorAll('.cp-meal-search-input').forEach(inp => {
+      const meal = inp.dataset.meal;
+      const box = el.querySelector(`.cp-meal-suggestions[data-meal="${CSS.escape(meal)}"]`);
+      const renderSuggestions = () => {
+        const term = inp.value.trim().toLowerCase();
+        if(term === ''){ box.hidden = true; box.innerHTML = ''; return; }
+        const matches = (CP_FOODS||[]).filter(f => f.nome.toLowerCase().startsWith(term)).slice(0, 7);
+        if(matches.length === 0){
+          box.innerHTML = `<div class="cp-suggestion-empty">Nessun alimento trovato per "${cpEsc(inp.value.trim())}"</div>`;
+        } else {
+          box.innerHTML = matches.map(f => `
+            <div class="cp-suggestion-item" data-id="${cpEsc(f.id)}">
+              <span class="cp-suggestion-name"><b>${cpEsc(f.nome.slice(0, term.length))}</b>${cpEsc(f.nome.slice(term.length))}</span>
+              <span class="cp-suggestion-kcal">porzione rif. ${cpFmt(f.porzione)} g · ${cpFmt(f.kcal*f.porzione/100)} kcal</span>
+            </div>`).join('');
+          box.querySelectorAll('.cp-suggestion-item').forEach(row => {
+            row.addEventListener('mousedown', (e) => {
+              e.preventDefault();
+              const f = CP_FOODS_BY_ID[row.dataset.id];
+              CP_PLAN[cpState.day][meal].push({ id:f.id, g:f.porzione });
+              cpRenderMealList(); cpRenderSummary(); cpRenderDayTabs();
+            });
+          });
+        }
+        box.hidden = false;
+      };
+      inp.addEventListener('input', renderSuggestions);
+      inp.addEventListener('focus', () => { if(inp.value.trim() !== '') renderSuggestions(); });
+      inp.addEventListener('blur', () => { setTimeout(() => { box.hidden = true; }, 120); });
+    });
+  }
+
+  /* ---- riepilogo (donut, barre, settimana) ---- */
+  function cpRenderDonut(totals){
+    const pKcal = totals.prot*4, cKcal = totals.carb*4, gKcal = totals.grassi*9;
+    const total = pKcal + cKcal + gKcal;
+    const r = 42, C = 2*Math.PI*r;
+    const segs = total > 0
+      ? [ {v:pKcal, c:CP_MACRO_COLORS.prot}, {v:cKcal, c:CP_MACRO_COLORS.carb}, {v:gKcal, c:CP_MACRO_COLORS.grassi} ]
+      : [ {v:1, c:'var(--border-soft)'} ];
+    let offset = 0;
+    const circles = segs.map(s => {
+      const len = (s.v/(total||1)) * C;
+      const dash = `${len} ${C - len}`;
+      const dashoffset = -offset;
+      offset += len;
+      return `<circle cx="50" cy="50" r="${r}" fill="none" stroke="${s.c}" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${dashoffset}" />`;
+    }).join('');
+    document.getElementById('cp-donut-wrap').innerHTML = `
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--border-soft)" stroke-width="13" />
+        <g transform="rotate(-90 50 50)">${circles}</g>
+      </svg>
+      <div class="cp-donut-center">
+        <b class="num">${cpFmt(totals.kcal)}</b>
+        <span>kcal</span>
+      </div>`;
+
+    const legendRows = [
+      { label:'Proteine', val:totals.prot, color:CP_MACRO_COLORS.prot, kcal:pKcal },
+      { label:'Carboidrati', val:totals.carb, color:CP_MACRO_COLORS.carb, kcal:cKcal },
+      { label:'Grassi', val:totals.grassi, color:CP_MACRO_COLORS.grassi, kcal:gKcal },
+    ];
+    document.getElementById('cp-macro-legend').innerHTML = legendRows.map(r => `
+      <div class="cp-legend-item">
+        <span class="cp-legend-dot" style="background:${r.color}"></span>
+        <span class="cp-legend-label">${r.label}</span>
+        <span class="cp-legend-value num">${cpFmt(r.val)} g</span>
+        <span class="cp-legend-pct">${total>0 ? Math.round(r.kcal/total*100) : 0}%</span>
+      </div>
+    `).join('');
+  }
+  function cpDeviationClass(actual, target){
+    if(!target) return 'good';
+    const diff = Math.abs(actual - target) / target;
+    if(diff <= 0.07) return 'good';
+    if(diff <= 0.15) return 'warning';
+    return 'critical';
+  }
+  function cpRenderTargetBars(totals){
+    document.getElementById('cp-target-bars').innerHTML = CP_NUTRIENTI.map(n => {
+      const actual = totals[n.key], target = CP_TARGET[n.key];
+      const unit = n.key==='kcal' ? 'kcal' : n.unit;
+      const cls = cpDeviationClass(actual, target);
+      const pct = target ? Math.min(100, (actual / target) * 100) : 0;
+      return `
+        <div class="cp-bar-row">
+          <div class="cp-bar-row-head">
+            <span class="label">${n.label}</span>
+            <span class="vals num"><b>${cpFmt(actual)}</b> / ${cpFmt(target)} ${unit}</span>
+          </div>
+          <div class="cp-bar-track"><div class="cp-bar-fill ${cls}" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+  }
+  function cpRenderWeekChart(){
+    const weekTotals = CP_GIORNI.map(g => cpComputeDay(g));
+    const maxScale = Math.max(2300, CP_TARGET.kcal * 1.15, ...weekTotals.map(t => t.kcal * 1.1));
+    const el = document.getElementById('cp-week-chart');
+    const targetPct = Math.min(100, (CP_TARGET.kcal / maxScale) * 100);
+    const bars = CP_GIORNI.map((g, i) => {
+      const kcal = weekTotals[i].kcal;
+      const hpct = kcal > 0 ? Math.max(2, Math.min(100, (kcal / maxScale) * 100)) : 0;
+      const targetLine = i === CP_GIORNI.length - 1
+        ? `<div class="cp-week-target-line" style="bottom:${targetPct}%"><span class="cp-week-target-label">target ${cpFmt(CP_TARGET.kcal)}</span></div>`
+        : `<div class="cp-week-target-line" style="bottom:${targetPct}%"></div>`;
+      return `
+        <div class="cp-week-col ${g===cpState.day?'current':''}">
+          <div class="cp-week-bar-val num">${cpFmt(kcal)}</div>
+          <div class="cp-week-bar-track">${targetLine}<div class="cp-week-bar" style="height:${hpct}%"></div></div>
+          <div class="cp-week-bar-day">${CP_GIORNI_SHORT[g]}</div>
+        </div>`;
+    }).join('');
+    el.innerHTML = bars;
+
+    const tableEl = document.getElementById('cp-week-range-table');
+    tableEl.innerHTML = CP_NUTRIENTI.map(n => {
+      const unit = n.key==='kcal' ? '' : n.unit;
+      const vals = weekTotals.map(t => t[n.key]);
+      const min = Math.min(...vals), max = Math.max(...vals);
+      const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+      const range = min === max ? `${cpFmt(min)}${unit}` : `${cpFmt(min)}–${cpFmt(max)}${unit}`;
+      return `
+        <div class="cp-wr-row">
+          <span class="cp-wr-label">${n.label}</span>
+          <span class="cp-wr-val"><b>${range}</b> <span class="cp-wr-avg">(media ${cpFmt(avg)}${unit})</span></span>
+        </div>`;
+    }).join('');
+  }
+  function cpRenderSummary(){
+    const totals = cpComputeDay(cpState.day);
+    cpRenderDonut(totals);
+    cpRenderTargetBars(totals);
+    cpRenderWeekChart();
+  }
+
+  /* ---- storico piani ---- */
+  function cpRenderHistory(){
+    const el = document.getElementById('cp-history-list');
+    if(!CP_HISTORY.length){
+      el.innerHTML = `<p class="cp-empty-note">Nessuna versione salvata ancora — usa "Salva piano" per registrare quella attuale.</p>`;
+      return;
+    }
+    el.innerHTML = CP_HISTORY.map((h, i) => {
+      const isLatest = i === 0;
+      const prev = CP_HISTORY[i+1];
+      let deltaHtml = '';
+      if(prev){
+        const rows = CP_NUTRIENTI.map(n => {
+          const campo = CP_HISTORY_FIELD[n.key];
+          return { label:n.label, d:(h[campo]||0) - (prev[campo]||0), unit:n.key==='kcal'?'':n.unit };
+        }).filter(r => Math.round(r.d*10) !== 0);
+        if(rows.length){
+          const tags = rows.map(r => `<span class="cp-hd-tag ${r.d>0?'up':'down'}">${r.d>0?'▲':'▼'} ${r.label} ${r.d>0?'+':''}${cpFmt(r.d)}${r.unit}</span>`).join(' ');
+          deltaHtml = `<div class="cp-history-delta">${tags} <span>rispetto alla versione precedente</span></div>`;
+        } else {
+          deltaHtml = `<div class="cp-history-delta"><span>Nessuna variazione rispetto alla versione precedente</span></div>`;
+        }
+      }
+      return `
+        <div class="cp-history-item ${isLatest?'latest':''}">
+          <div class="cp-history-dot"></div>
+          <div class="cp-history-date">${fmtDateShort(new Date(h.Data))}</div>
+          <div class="cp-history-main">
+            <div class="cp-history-values"><span class="num">${cpFmt(h.Kcal)}</span> kcal · <span class="num">${cpFmt(h.Proteine)}</span> g proteine · <span class="num">${cpFmt(h.Carboidrati)}</span> g carboidrati · <span class="num">${cpFmt(h.Grassi)}</span> g grassi · <span class="num">${cpFmt(h.Fibre)}</span> g fibre</div>
+            <div class="cp-history-values" style="color:var(--ink-faint); font-size:11.8px;">di cui <span class="num">${cpFmt(h.Zuccheri)}</span> g zuccheri · <span class="num">${cpFmt(h.GrassiSaturi)}</span> g grassi saturi · <span class="num">${cpFmt(h.Sale)}</span> g sale</div>
+            ${deltaHtml}
+          </div>
+          ${isLatest ? '<span class="badge-current">Versione attuale</span>' : ''}
+        </div>`;
+    }).join('');
+  }
+
+  /* ---- salva piano ---- */
+  async function cpSalvaPiano(){
+    const btn = document.getElementById('cp-btn-salva');
+    btn.disabled = true;
+    const testoOriginale = btn.textContent;
+    btn.textContent = 'Salvataggio…';
+    try{
+      const avg = cpComputeWeekAverage();
+      const res = await apiPost('salvaPianoStrutturato', {
+        codice: SESSION.codice, paziente: currentPatientCode,
+        target: CP_TARGET, plan: CP_PLAN,
+        kcal: avg.kcal, prot: avg.prot, carb: avg.carb, zuccheri: avg.zuccheri,
+        grassi: avg.grassi, grassiSaturi: avg.grassiSaturi, fibra: avg.fibra, sale: avg.sale,
+      });
+      if(res.ok){
+        await loadPianoStrutturato(currentPatientCode);
+        cpRenderAll();
+        showToast('Piano salvato — aggiunto allo storico');
+      } else {
+        showToast(res.error || 'Errore durante il salvataggio del piano.');
+      }
+    } catch(err){
+      showToast('Errore di connessione: ' + err.message);
+    }
+    btn.disabled = false;
+    btn.textContent = testoOriginale;
+  }
+
+  /* ---- modali: import / salva modello / duplica / obiettivo ---- */
+  function cpOpenModal(mode){
+    document.getElementById('cp-modal-import-view').style.display = mode==='import' ? '' : 'none';
+    document.getElementById('cp-modal-save-view').style.display = mode==='save' ? '' : 'none';
+    document.getElementById('cp-modal-duplicate-view').style.display = 'none';
+    document.getElementById('cp-modal-target-view').style.display = mode==='target' ? '' : 'none';
+    if(mode === 'import') cpRenderTemplateList();
+    if(mode === 'save'){
+      document.getElementById('cp-save-hint').textContent = `Salva la struttura di ${cpState.day} (${cpFmt(cpComputeDay(cpState.day).kcal)} kcal) come modello riutilizzabile su qualsiasi paziente.`;
+      document.getElementById('cp-tpl-name').value = '';
+      document.getElementById('cp-tpl-desc').value = '';
+      document.getElementById('cp-save-error').textContent = '';
+    }
+    if(mode === 'target'){
+      CP_NUTRIENTI.forEach(n => {
+        document.getElementById('cp-tgt-'+n.key).value = Math.round(CP_TARGET[n.key]) || '';
+      });
+    }
+    document.getElementById('cp-modal-overlay').style.display = 'flex';
+  }
+  function cpCloseModal(){ document.getElementById('cp-modal-overlay').style.display = 'none'; }
+
+  function cpSalvaTarget(){
+    const nuovo = cpZeroNutrienti();
+    CP_NUTRIENTI.forEach(n => {
+      nuovo[n.key] = Math.max(0, +document.getElementById('cp-tgt-'+n.key).value || 0);
+    });
+    CP_TARGET = nuovo;
+    cpCloseModal();
+    cpRenderAll();
+    showToast('Obiettivo aggiornato — ricordati di salvare il piano per renderlo definitivo');
+  }
+
+  async function cpRenderTemplateList(){
+    const el = document.getElementById('cp-template-list');
+    el.innerHTML = `<p class="cp-empty-note">Caricamento modelli…</p>`;
+    if(CP_TEMPLATES === null){
+      try{
+        const res = await apiGet('modelli', { codice: SESSION.codice });
+        CP_TEMPLATES = res.ok ? res.modelli : [];
+        if(!res.ok) showToast(res.error || 'Errore nel caricamento dei modelli.');
+      } catch(err){
+        CP_TEMPLATES = [];
+        showToast('Errore di connessione: ' + err.message);
+      }
+    }
+    if(!CP_TEMPLATES.length){
+      el.innerHTML = `<p class="cp-empty-note">Nessun modello salvato ancora. Componi un giorno qui sopra e usa "Salva come modello".</p>`;
+      return;
+    }
+    el.innerHTML = CP_TEMPLATES.map((t, i) => `
+      <div class="cp-template-card">
+        <div class="cp-template-card-head">
+          <div class="cp-template-name">${cpEsc(t.nome)}</div>
+          <div class="cp-template-kcal num">${cpFmt(t.target ? t.target.kcal : t.kcal)} kcal</div>
+        </div>
+        <div class="cp-template-desc">${cpEsc(t.descrizione || '')}</div>
+        ${t.target ? `<div class="cp-template-macros">P ${cpFmt(t.target.prot)}g · C ${cpFmt(t.target.carb)}g · G ${cpFmt(t.target.grassi)}g · Fibre ${cpFmt(t.target.fibra)}g</div>` : ''}
+        <button type="button" class="btn small primary" data-idx="${i}">Usa questo modello</button>
+      </div>
+    `).join('');
+    el.querySelectorAll('button[data-idx]').forEach(btn => {
+      btn.addEventListener('click', () => cpImportTemplate(+btn.dataset.idx));
+    });
+  }
+  function cpImportTemplate(idx){
+    const tpl = CP_TEMPLATES[idx];
+    if(!tpl || !tpl.day || !tpl.target) return;
+    CP_GIORNI.forEach(g => {
+      CP_MEALS.forEach(m => {
+        const src = tpl.day[m] || [];
+        CP_PLAN[g][m] = src.map(item => ({ id:item.id, g:item.g }));
+      });
+    });
+    CP_TARGET = Object.assign(cpEmptyTarget(), tpl.target);
+    cpState.day = 'Lunedì';
+    cpCloseModal();
+    cpRenderAll();
+    showToast('Modello "' + tpl.nome + '" importato su tutta la settimana — ricordati di salvare il piano');
+  }
+
+  async function cpSalvaModello(){
+    const nome = document.getElementById('cp-tpl-name').value.trim();
+    const errEl = document.getElementById('cp-save-error');
+    if(!nome){ errEl.textContent = 'Dai un nome al modello.'; document.getElementById('cp-tpl-name').focus(); return; }
+    const descrizione = document.getElementById('cp-tpl-desc').value.trim();
+    const day = {};
+    CP_MEALS.forEach(m => { day[m] = (CP_PLAN[cpState.day][m]||[]).map(item => ({ id:item.id, g:item.g })); });
+    try{
+      const res = await apiPost('salvaModello', { codice: SESSION.codice, nome, descrizione, target: CP_TARGET, day });
+      if(res.ok){
+        if(CP_TEMPLATES) CP_TEMPLATES.push({ nome, descrizione, target: CP_TARGET, day });
+        cpCloseModal();
+        showToast('Modello "' + nome + '" salvato — ora disponibile per tutti i pazienti');
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+  }
+
+  function cpOpenDuplicateModal(mode, meal){
+    cpDupState = { mode, meal };
+    const isMeal = mode === 'meal';
+    document.getElementById('cp-dup-title').textContent = isMeal ? 'Duplica pasto' : 'Duplica giorno';
+    document.getElementById('cp-dup-sub').textContent = isMeal
+      ? `Duplica "${meal}" di ${cpState.day} su quale giorno? Il pasto del giorno scelto verrà sostituito.`
+      : `Duplica tutti i pasti di ${cpState.day} su quale giorno? Tutti i pasti del giorno scelto verranno sostituiti.`;
+    const grid = document.getElementById('cp-day-picker-grid');
+    grid.innerHTML = CP_GIORNI.filter(g => g !== cpState.day).map(g => `
+      <button type="button" class="cp-day-picker-btn" data-day="${g}">
+        <b>${g}</b>
+        <span class="cp-dp-kcal num">${cpFmt(cpComputeDay(g).kcal)} kcal</span>
+      </button>
+    `).join('');
+    grid.querySelectorAll('.cp-day-picker-btn').forEach(btn => {
+      btn.addEventListener('click', () => cpConfirmDuplicate(btn.dataset.day));
+    });
+    document.getElementById('cp-modal-import-view').style.display = 'none';
+    document.getElementById('cp-modal-save-view').style.display = 'none';
+    document.getElementById('cp-modal-target-view').style.display = 'none';
+    document.getElementById('cp-modal-duplicate-view').style.display = '';
+    document.getElementById('cp-modal-overlay').style.display = 'flex';
+  }
+  function cpConfirmDuplicate(destDay){
+    if(cpDupState.mode === 'meal'){
+      CP_PLAN[destDay][cpDupState.meal] = CP_PLAN[cpState.day][cpDupState.meal].map(item => ({ id:item.id, g:item.g }));
+    } else {
+      CP_MEALS.forEach(m => { CP_PLAN[destDay][m] = CP_PLAN[cpState.day][m].map(item => ({ id:item.id, g:item.g })); });
+    }
+    cpCloseModal();
+    cpRenderDayTabs();
+    cpRenderSummary();
+    showToast(cpDupState.mode === 'meal' ? `"${cpDupState.meal}" duplicato su ${destDay}` : `Giorno duplicato su ${destDay}`);
+  }
+
   /* ================= TOAST DI CONFERMA ================= */
   let toastTimer = null;
   function showToast(msg){
@@ -1660,7 +2499,7 @@
       document.getElementById('patient-status-select').value = stato;
     }
     currentMetric = 'peso';
-    await Promise.all([loadMisurazioni(codice), loadPiano(codice)]);
+    await Promise.all([loadMisurazioni(codice), loadPiano(codice), loadPianoStrutturato(codice)]);
     const activeTab = document.querySelector('#view-nutri .tab-btn.active');
     setNutriTab(activeTab ? activeTab.dataset.tab : 'panoramica');
   }
@@ -1684,19 +2523,38 @@
   }
 
   /* ================= VISTA PAZIENTE ================= */
+  // Decide quale dei due piani mostrare al paziente — il PDF caricato a mano oppure il piano
+  // composto con "Crea piano" — confrontando semplicemente le date: vince il più recente.
   function renderPatientHomeCards(){
     const badge = document.getElementById('p-home-piano-badge');
     const dataEl = document.getElementById('p-home-piano-data');
     const linkEl = document.getElementById('p-piano-link');
     const emptyEl = document.getElementById('p-piano-empty');
     const subEl = document.getElementById('p-piano-sub');
-    if(currentPlan && currentPlan.Url){
+    const structEl = document.getElementById('p-piano-struct');
+
+    const hasPdf = !!(currentPlan && currentPlan.Url);
+    const hasStruct = !!(CP_ATTIVO_DATA && CP_GIORNI.some(g => CP_MEALS.some(m => (CP_PLAN[g][m]||[]).length > 0)));
+    const useStruct = hasStruct && (!hasPdf || new Date(CP_ATTIVO_DATA) > new Date(currentPlan.Data));
+
+    if(useStruct){
+      dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(CP_ATTIVO_DATA));
+      badge.style.display = '';
+      linkEl.style.display = 'none';
+      emptyEl.style.display = 'none';
+      structEl.style.display = '';
+      subEl.textContent = 'Versione aggiornata al ' + fmtDateFull(new Date(CP_ATTIVO_DATA)) + " · sempre l'ultima composta dalla tua nutrizionista";
+      cpState.day = 'Lunedì';
+      renderPatientPianoStruct();
+    } else if(hasPdf){
+      structEl.style.display = 'none';
       dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(currentPlan.Data));
       badge.style.display = '';
       linkEl.href = currentPlan.Url; linkEl.style.display = 'flex';
       emptyEl.style.display = 'none';
       subEl.textContent = 'Versione aggiornata al ' + fmtDateFull(new Date(currentPlan.Data)) + " · sempre l'ultima caricata dalla tua nutrizionista";
     } else {
+      structEl.style.display = 'none';
       dataEl.textContent = 'Nessun piano caricato ancora.';
       badge.style.display = 'none';
       linkEl.style.display = 'none';
@@ -1704,8 +2562,45 @@
       subEl.textContent = pianoLoadError ? '' : 'In attesa del primo piano alimentare.';
       emptyEl.textContent = pianoLoadError
         ? 'Non riusciamo a caricare il piano: ' + pianoLoadError
-        : 'Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.';
+        : 'Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà preparato.';
     }
+  }
+
+  function renderPatientPianoStruct(){
+    const chipsEl = document.getElementById('p-piano-day-chips');
+    chipsEl.innerHTML = CP_GIORNI.map(g => `<button type="button" class="chip ${g===cpState.day?'active':''}" data-day="${g}">${CP_GIORNI_SHORT[g]}</button>`).join('');
+    chipsEl.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => { cpState.day = btn.dataset.day; renderPatientPianoStruct(); }));
+
+    const dayTotals = cpComputeDay(cpState.day);
+    const cardEl = document.getElementById('p-piano-day-card');
+    const mealsHtml = CP_MEALS.map(m => {
+      const items = CP_PLAN[cpState.day][m] || [];
+      if(!items.length) return '';
+      const totals = cpComputeMeal(cpState.day, m);
+      const rows = items.map(item => {
+        const f = CP_FOODS_BY_ID[item.id];
+        const c = cpComputeItem(item);
+        return `<div style="display:flex; justify-content:space-between; gap:8px; font-size:12.5px; padding:3px 0;">
+          <span>${cpEsc(f ? f.nome : 'Alimento')} <span style="color:var(--ink-faint);">· ${cpFmt(item.g)} g</span></span>
+          <span class="num" style="color:var(--ink-faint); flex:none;">${cpFmt(c.kcal)} kcal</span>
+        </div>`;
+      }).join('');
+      return `<div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:3px;"><span>${m}</span><span class="num">${cpFmt(totals.kcal)} kcal</span></div>
+        ${rows}
+      </div>`;
+    }).join('');
+    cardEl.innerHTML = `
+      <div class="p-card-top"><h4>${cpState.day}</h4><span class="num" style="font-size:13px; color:var(--ink-faint);">${cpFmt(dayTotals.kcal)} kcal</span></div>
+      ${mealsHtml || '<p style="font-size:12.5px; color:var(--ink-faint);">Nessun pasto compilato per questo giorno.</p>'}
+    `;
+
+    const weekTotals = CP_GIORNI.map(g => cpComputeDay(g));
+    const avg = cpComputeWeekAverage();
+    const kcals = weekTotals.map(t => t.kcal);
+    const min = Math.min(...kcals), max = Math.max(...kcals);
+    document.getElementById('p-piano-week-range').innerHTML =
+      `${cpFmt(min)}–${cpFmt(max)} kcal al giorno (media ${cpFmt(avg.kcal)})` + (CP_TARGET.kcal ? ' · obiettivo ' + cpFmt(CP_TARGET.kcal) + ' kcal' : '');
   }
 
   function renderPatientCharts(){
@@ -1767,7 +2662,7 @@
     document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
     document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
     currentMetric = 'peso'; patientMetric = 'peso';
-    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice)]);
+    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice), loadPianoStrutturato(p.Codice), cpLoadFoods()]);
     renderPatientHomeCards();
     renderPatientCharts();
     renderCheckinList();
@@ -1787,6 +2682,7 @@
     document.getElementById('tab-'+name).classList.add('active');
     if(name==='panoramica') renderPanoramica();
     if(name==='piano') renderPianoTab();
+    if(name==='creapiano') renderCreaPianoTab();
     if(name==='misurazioni'){ renderChips(); renderBigChart(); renderSparkGrid(); }
     if(name==='confronto') renderCompareTable();
   }
@@ -1821,6 +2717,7 @@
     if(SESSION.role === 'nutrizionista'){
       document.getElementById('view-nutri').style.display = 'grid';
       document.getElementById('view-paziente').style.display = 'none';
+      cpLoadFoods(); // in background: pronto per quando si apre il tab "Crea piano"
       if(preloadedPazienti){
         PATIENTS = preloadedPazienti;
         renderPatientList();
