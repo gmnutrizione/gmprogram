@@ -609,10 +609,14 @@
   .cp-suggestion-name b{ color:var(--accent-ink); }
   .cp-suggestion-kcal{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); flex:none; white-space:nowrap; }
   .cp-suggestion-empty{ padding:10px; font-size:12px; color:var(--ink-faint); }
-  .cp-meal-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px 4px; padding-top:8px; border-top:1px solid var(--border-soft); }
-  .cp-meal-stat{ text-align:center; }
-  .cp-meal-stat .cp-ms-label{ font-size:8.8px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.02em; line-height:1.25; }
-  .cp-meal-stat .cp-ms-val{ font-family:var(--font-mono); font-size:12px; font-weight:600; margin-top:2px; }
+  /* Su una card di pasto stretta (2 per riga) 8 valori con etichette per intero non ci stanno mai
+     tutti fianco a fianco senza sovrapporsi: teniamo la riga singola richiesta ma, se non basta lo
+     spazio, scorre in orizzontale invece di accavallare il testo — ogni valore ha una sua larghezza
+     minima fissa (flex:0 0 auto), non si schiaccia. */
+  .cp-meal-stats{ display:flex; justify-content:space-between; gap:9px; padding-top:8px; margin-top:9px; border-top:1px solid var(--border-soft); overflow-x:auto; scrollbar-width:thin; }
+  .cp-meal-stat{ text-align:center; flex:0 0 auto; min-width:40px; }
+  .cp-meal-stat .cp-ms-label{ font-size:7.6px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
+  .cp-meal-stat .cp-ms-val{ font-family:var(--font-mono); font-size:11.3px; font-weight:700; margin-top:1px; white-space:nowrap; }
 
   .cp-kcal-hero{ display:flex; align-items:center; gap:16px; margin-bottom:16px; }
   .cp-donut-wrap{ position:relative; flex:none; width:104px; height:104px; }
@@ -625,6 +629,17 @@
   .cp-legend-label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-soft); }
   .cp-legend-value{ font-family:var(--font-mono); font-weight:600; white-space:nowrap; margin-left:auto; }
   .cp-legend-pct{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); white-space:nowrap; }
+
+  .cp-badge-auto, .cp-badge-manual{ display:inline-flex; align-items:center; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:8px; letter-spacing:.01em; vertical-align:middle; }
+  .cp-badge-auto{ background:var(--accent-soft); color:var(--accent-ink); }
+  .cp-badge-manual{ background:var(--border-soft); color:var(--ink-soft); }
+  .cp-tgt-info{ font-size:12px; line-height:1.55; color:var(--ink-soft); background:var(--accent-soft); border-radius:var(--radius-s); padding:10px 12px; margin-bottom:14px; }
+  .cp-tgt-info b{ color:var(--ink); }
+
+  .andamento-cat-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .andamento-cat-btn{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; border:1.5px solid var(--border); background:var(--surface-raised); color:var(--ink-soft); cursor:pointer; transition:all .15s ease; }
+  .andamento-cat-btn:hover{ border-color:var(--accent); color:var(--accent-ink); }
+  .andamento-cat-btn.active{ background:var(--accent); color:#fff; border-color:transparent; }
 
   .cp-target-bars{ display:flex; flex-direction:column; gap:9px; margin-bottom:18px; }
   .cp-bar-row-head{ display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:3px; }
@@ -757,6 +772,15 @@
           <div class="field"><label>Nome e cognome</label><input type="text" id="np-nome" placeholder="Es. Anna Rossi"></div>
           <div class="field"><label>Codice di accesso paziente</label><input type="text" id="np-codice" placeholder="Es. AR04"></div>
           <div class="field"><label>Età</label><input type="text" id="np-eta" placeholder="Es. 29"></div>
+          <div class="field">
+            <label>Sesso</label>
+            <select id="np-sesso">
+              <option value="">—</option>
+              <option value="M">Maschio</option>
+              <option value="F">Femmina</option>
+            </select>
+          </div>
+          <div class="field"><label>Altezza (cm)</label><input type="text" id="np-altezza" placeholder="Es. 172"></div>
           <div class="field"><label>Obiettivo</label><input type="text" id="np-obiettivo" placeholder="Es. Definizione muscolare"></div>
           <div class="field"><label>Prossimo controllo — data</label><input type="date" id="np-data-controllo"></div>
           <div class="field"><label>Prossimo controllo — ora (facoltativa)</label><input type="time" id="np-ora-controllo"></div>
@@ -817,17 +841,11 @@
         <div id="cp-modal-target-view" style="display:none;">
           <h3>Obiettivo giornaliero</h3>
           <p>Usato per le barre di riferimento e per l'andamento settimanale.</p>
-          <div class="field-grid" style="grid-template-columns:repeat(2,1fr);">
-            <div class="field"><label>Kcal</label><input type="number" id="cp-tgt-kcal" min="0"></div>
-            <div class="field"><label>Proteine (g)</label><input type="number" id="cp-tgt-prot" min="0"></div>
-            <div class="field"><label>Carboidrati (g)</label><input type="number" id="cp-tgt-carb" min="0"></div>
-            <div class="field"><label>di cui Zuccheri (g)</label><input type="number" id="cp-tgt-zuccheri" min="0"></div>
-            <div class="field"><label>Grassi (g)</label><input type="number" id="cp-tgt-grassi" min="0"></div>
-            <div class="field"><label>di cui Grassi saturi (g)</label><input type="number" id="cp-tgt-grassiSaturi" min="0"></div>
-            <div class="field"><label>Fibre (g)</label><input type="number" id="cp-tgt-fibra" min="0"></div>
-            <div class="field"><label>Sale (g)</label><input type="number" id="cp-tgt-sale" min="0"></div>
-          </div>
-          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+          <div class="cp-tgt-info" id="cp-tgt-info">—</div>
+          <div class="field-grid" style="grid-template-columns:repeat(2,1fr);" id="cp-tgt-fields"></div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px; flex-wrap:wrap;">
+            <button class="btn ghost" type="button" id="cp-tgt-recalc-btn" style="display:none;" onclick="cpRicalcolaTarget()">Ricalcola dai dati del paziente</button>
+            <div style="flex:1;"></div>
             <button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button>
             <button class="btn primary" type="button" onclick="cpSalvaTarget()">Applica</button>
           </div>
@@ -956,6 +974,19 @@
           </div>
         </div>
 
+        <div class="card" id="piano-struct-section" style="display:none;">
+          <div class="card-head">
+            <div>
+              <h3>Piano composto con "Crea piano"</h3>
+              <p id="piano-struct-sub">—</p>
+            </div>
+            <button class="btn small ghost" type="button" onclick="setNutriTab('creapiano')">Apri in Crea piano →</button>
+          </div>
+          <div class="cp-day-tabs" id="piano-struct-day-tabs"></div>
+          <div id="piano-struct-day-card"></div>
+          <div class="cp-week-range-table" id="piano-struct-week-summary" style="margin-top:16px;"></div>
+        </div>
+
         <div class="card">
           <div class="card-head"><h3>Storico versioni</h3></div>
           <div class="version-history" id="piano-storico">
@@ -983,7 +1014,7 @@
         <div id="cp-body" style="display:none;">
           <div class="card-head" style="margin-bottom:14px;">
             <div>
-              <h3 style="font-size:14.5px;">Obiettivo: <span id="cp-target-summary" class="num">—</span></h3>
+              <h3 style="font-size:14.5px;">Obiettivo: <span id="cp-target-summary" class="num">—</span><span id="cp-target-badge"></span></h3>
               <p>Il piano di questo paziente, giorno per giorno.</p>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -1099,11 +1130,12 @@
         <div class="card">
           <div class="card-head">
             <div>
-              <h3 id="big-chart-title">Peso corporeo</h3>
-              <p>Seleziona un parametro per vedere l'andamento nel tempo</p>
+              <h3 id="big-chart-title">Andamento — Peso corporeo</h3>
+              <p>Seleziona una categoria per vedere l'andamento nel tempo</p>
             </div>
           </div>
-          <div class="chip-row" id="chip-row-nutri"></div>
+          <div class="andamento-cat-row" id="mis-cat-row"></div>
+          <div class="chip-row" id="chip-row-nutri" style="display:none;"></div>
           <div class="chart-wrap" id="chart-main"></div>
         </div>
 
@@ -1434,6 +1466,27 @@
   }
 
   /* ================= CHART ENGINE ================= */
+  // Calcola dove mettere le righe orizzontali di riferimento e le relative etichette, scegliendo
+  // uno step "pulito" (1/2/5/10 x una potenza di 10) in base ai valori reali, invece di dividere
+  // sempre lo spazio in 3 parti uguali: così per un peso che va da 91,8 a 77,4 kg le righe cadono
+  // su valori leggibili (90/85/80/75) invece che su numeri arbitrari.
+  function niceTicks_(min, max, targetCount){
+    if(min === max){ min -= 1; max += 1; }
+    const span = max - min;
+    const rawStep = span / targetCount;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    let step;
+    if(norm < 1.5) step = 1; else if(norm < 3) step = 2; else if(norm < 7) step = 5; else step = 10;
+    step *= mag;
+    const niceMin = Math.floor(min/step) * step;
+    const niceMax = Math.ceil(max/step) * step;
+    const ticks = [];
+    for(let v = niceMin; v <= niceMax + 1e-9; v += step) ticks.push(Math.round(v*1000)/1000);
+    return { ticks, niceMin, niceMax };
+  }
+  function fmtTick_(v){ return (Math.round(v*10)/10).toLocaleString('it-IT'); }
+
   // viewBox: 0 0 W H. Renders a line+area chart with hover tooltip + crosshair.
   function drawChart(container, values, opts){
     opts = opts || {};
@@ -1443,16 +1496,32 @@
       return;
     }
     const W = opts.w || 600, H = opts.h || 220;
-    const padL = opts.padL !== undefined ? opts.padL : 6;
-    const padR = opts.padR !== undefined ? opts.padR : 6;
-    const padT = opts.big ? 34 : 10;
-    const padB = opts.showAxis ? 22 : 6;
-    const min = Math.min(...values), max = Math.max(...values);
-    const span = (max - min) || 1;
-    const lo = min - span*0.22, hi = max + span*0.28;
     const n = values.length;
+    const min = Math.min(...values), max = Math.max(...values);
+
+    let ticks = null, lo, hi, padL, padR, padT, padB;
+    if(opts.showAxis){
+      // grafico "grande": righe di riferimento con valori sull'asse y, più margine intorno ai dati
+      // così i punti non restano mai a ridosso dei bordi del grafico.
+      const span = (max - min) || 1;
+      const nt = niceTicks_(min - span*0.08, max + span*0.08, opts.tickCount || 4);
+      ticks = nt.ticks; lo = nt.niceMin; hi = nt.niceMax;
+      const yLabelChars = Math.max(...ticks.map(t => fmtTick_(t).length));
+      padL = opts.padL !== undefined ? opts.padL : (16 + yLabelChars*6.4);
+      padR = opts.padR !== undefined ? opts.padR : 20;
+      padT = opts.big ? 34 : 20;
+      padB = 26;
+    } else {
+      padL = opts.padL !== undefined ? opts.padL : 6;
+      padR = opts.padR !== undefined ? opts.padR : 6;
+      padT = opts.big ? 34 : 10;
+      padB = 6;
+      const span = (max - min) || 1;
+      lo = min - span*0.22; hi = max + span*0.28;
+    }
+
     const x = i => n===1 ? (padL + (W-padL-padR)/2) : padL + (i/(n-1)) * (W - padL - padR);
-    const y = v => padT + (1 - (v-lo)/(hi-lo)) * (H - padT - padB);
+    const y = v => padT + (1 - (v-lo)/((hi-lo)||1)) * (H - padT - padB);
 
     const pts = values.map((v,i) => [x(i), y(v)]);
 
@@ -1474,16 +1543,17 @@
 
     let gridSvg = '';
     if(opts.showAxis){
-      for(let gy=0; gy<=2; gy++){
-        const yy = padT + gy*(H-padT-padB)/2;
+      ticks.forEach(t => {
+        const yy = y(t);
         gridSvg += `<line class="grid-line" x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}"/>`;
-      }
+        gridSvg += `<text class="axis-label" x="${padL-8}" y="${yy+3}" text-anchor="end">${fmtTick_(t)}</text>`;
+      });
     }
 
     let axisLabels = '';
     if(opts.showAxis){
       labels.forEach((lbl,i) => {
-        axisLabels += `<text class="axis-label" x="${x(i)}" y="${H-4}" text-anchor="${i===0?'start':(i===n-1?'end':'middle')}">${lbl}</text>`;
+        axisLabels += `<text class="axis-label" x="${x(i)}" y="${H-8}" text-anchor="${i===0?'start':(i===n-1?'end':'middle')}">${lbl}</text>`;
       });
     }
 
@@ -1494,7 +1564,7 @@
     }
 
     const dots = pts.map((p,i) => `
-      <circle class="chart-pt" cx="${p[0]}" cy="${p[1]}" r="${opts.big?4:3}" fill="var(--surface)" stroke="${color}" stroke-width="2"/>
+      <circle class="chart-pt" cx="${p[0]}" cy="${p[1]}" r="${opts.big?3.5:3}" fill="var(--surface)" stroke="${color}" stroke-width="1.8"/>
       <circle class="chart-pt-hit" data-date="${labels[i]||''}" data-val="${fmt(values[i])} ${opts.unit||''}" data-cx="${p[0]}" cx="${p[0]}" cy="${p[1]}" r="14"/>
     `).join('');
 
@@ -1502,14 +1572,14 @@
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-uid="${uid}">
         <defs>
           <linearGradient id="fade-${uid}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${color}" stop-opacity="0.55"/>
+            <stop offset="0%" stop-color="${color}" stop-opacity="0.5"/>
             <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
           </linearGradient>
         </defs>
         ${gridSvg}
         ${head}
         <path class="chart-area" d="${areaPath}" fill="url(#fade-${uid})"/>
-        <path class="chart-line" d="${linePath}" stroke="${color}" stroke-width="${opts.big?2.4:2}"/>
+        <path class="chart-line" d="${linePath}" stroke="${color}" stroke-width="${opts.big?1.8:2}"/>
         <line class="crosshair" x1="0" y1="${padT}" x2="0" y2="${H-padB}"/>
         ${dots}
         ${axisLabels}
@@ -1544,21 +1614,63 @@
     });
   }
 
-  /* ================= NUTRI: big chart + chips + sparklines ================= */
+  /* ================= NUTRI: big chart + categorie + sparklines ================= */
+  // Al posto dell'elenco piatto di tutti i 24 parametri, la scheda Misurazioni si naviga per
+  // categoria: "Peso corporeo" mostra subito il grafico (è un solo dato), le altre 3 categorie
+  // aprono sotto una riga di scelta con le singole voci di quella categoria.
+  const MIS_CATEGORIE = [
+    { key:'peso', label:'Peso corporeo', metriche:['peso'] },
+    { key:'circonferenze', label:'Circonferenze', metriche:['petto','vita','ombelico','fianchi','spalle','cosciaDx','internoCosciaDx','cosciaSx','internoCosciaSx','braccioDx','braccioSx'] },
+    { key:'plicometria', label:'Plicometria', metriche:['plicaPettorale','plicaAddominale','plicaAscellare','plicaSovrailiaca','plicaCoscia','plicaTricipitale','plicaSottoscapolare'] },
+    { key:'bia', label:'BIA', metriche:['acquaTotale','acquaExtra','acquaIntra','massaMagra','massaGrassa'] },
+  ];
+  let misCategoriaAttiva = 'peso';
+
   function renderBigChart(){
     const m = METRICS[currentMetric];
-    document.getElementById('big-chart-title').textContent = m.label;
-    drawChart(document.getElementById('chart-main'), m.values, { big:true, showAxis:true, unit:m.unit, color:'var(--accent)', h:230, labels:m.labels });
+    document.getElementById('big-chart-title').textContent = 'Andamento — ' + m.label;
+    drawChart(document.getElementById('chart-main'), m.values, { big:true, showAxis:true, unit:m.unit, color:'var(--accent)', h:230, labels:m.labels, tickCount:4 });
   }
 
-  function renderChips(){
-    const row = document.getElementById('chip-row-nutri');
-    row.innerHTML = Object.keys(METRICS).map(k => `<button class="chip ${k===currentMetric?'active':''}" data-k="${k}" onclick="selectMetric('${k}')">${METRICS[k].label}</button>`).join('');
+  function renderMisCategorie(){
+    const catRow = document.getElementById('mis-cat-row');
+    catRow.innerHTML = MIS_CATEGORIE.map(c => `<button type="button" class="andamento-cat-btn ${c.key===misCategoriaAttiva?'active':''}" data-cat="${c.key}">${c.label}</button>`).join('');
+    catRow.querySelectorAll('.andamento-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => selectMisCategoria(btn.dataset.cat));
+    });
+
+    const cat = MIS_CATEGORIE.find(c => c.key===misCategoriaAttiva);
+    const subRow = document.getElementById('chip-row-nutri');
+    if(cat.metriche.length > 1){
+      subRow.style.display = '';
+      subRow.innerHTML = cat.metriche.map(k => `<button class="chip ${k===currentMetric?'active':''}" data-k="${k}" onclick="selectMetric('${k}')">${METRICS[k].label}</button>`).join('');
+    } else {
+      subRow.style.display = 'none';
+      subRow.innerHTML = '';
+    }
   }
 
+  function selectMisCategoria(catKey){
+    misCategoriaAttiva = catKey;
+    const cat = MIS_CATEGORIE.find(c => c.key===catKey);
+    currentMetric = cat.metriche.includes(currentMetric) ? currentMetric : cat.metriche[0];
+    renderMisCategorie();
+    renderBigChart();
+    document.querySelectorAll('.spark-card').forEach(c => c.classList.toggle('selected', c.dataset.k===currentMetric));
+  }
+
+  // Richiamata sia dai chip di sottocategoria sia dal riquadro "Tutti i parametri": se il parametro
+  // scelto appartiene a un'altra categoria (es. click su una plica dal riquadro sotto), passa anche
+  // lì la categoria attiva, così i bottoni sopra il grafico restano coerenti con quello che si vede.
   function selectMetric(k){
     currentMetric = k;
-    renderChips();
+    const catDiQuestoParametro = MIS_CATEGORIE.find(c => c.metriche.includes(k));
+    if(catDiQuestoParametro && catDiQuestoParametro.key !== misCategoriaAttiva){
+      misCategoriaAttiva = catDiQuestoParametro.key;
+      renderMisCategorie();
+    } else {
+      document.getElementById('chip-row-nutri').querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.dataset.k===k));
+    }
     renderBigChart();
     document.querySelectorAll('.spark-card').forEach(c => c.classList.toggle('selected', c.dataset.k===k));
   }
@@ -1721,6 +1833,7 @@
       dataEl.textContent = pianoLoadError || '—';
       linkEl.style.display = 'none';
     }
+    renderNutriPianoStruct();
     const storicoEl = document.getElementById('piano-storico');
     if(!currentPlanHistory.length){
       storicoEl.innerHTML = '<p style="font-size:12.8px; color:var(--ink-faint);">Nessuna versione ancora caricata.</p>';
@@ -1792,6 +1905,9 @@
 
   function cpFmt(n){ return Math.round(n||0).toLocaleString('it-IT'); }
   function cpEsc(s){ const d = document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
+  // Nell'app paziente il nome alimento va mostrato senza la marca tra parentesi (es. "Petto di
+  // pollo (Fileni)" -> "Petto di pollo"); nel programma lato nutrizionista resta invariato.
+  function cpNomeSenzaMarca(nome){ return String(nome||'').replace(/\s*\([^)]*\)\s*$/, ''); }
   function cpEmptyPlan(){
     const p = {};
     CP_GIORNI.forEach(g => { p[g] = {}; CP_MEALS.forEach(m => p[g][m] = []); });
@@ -1801,18 +1917,72 @@
   // (e nella mappa GUIDA_SPESA_COLONNE in Codice.gs) basta a farlo comparire ovunque nel programma.
   const CP_NUTRIENTI = [
     { key:'kcal', label:'Kcal', unit:'' },
-    { key:'prot', label:'Proteine', unit:'g' },
-    { key:'carb', label:'Carboidrati', unit:'g' },
-    { key:'zuccheri', label:'di cui Zuccheri', unit:'g' },
     { key:'grassi', label:'Grassi', unit:'g' },
-    { key:'grassiSaturi', label:'di cui Grassi saturi', unit:'g' },
+    { key:'grassiSaturi', label:'G Saturi', unit:'g' },
+    { key:'carb', label:'Carboidrati', unit:'g' },
+    { key:'zuccheri', label:'Zuccheri', unit:'g' },
     { key:'fibra', label:'Fibre', unit:'g' },
+    { key:'prot', label:'Proteine', unit:'g' },
     { key:'sale', label:'Sale', unit:'g' },
   ];
   function cpZeroNutrienti(){ const o = {}; CP_NUTRIENTI.forEach(n => o[n.key] = 0); return o; }
   function cpEmptyTarget(){ return cpZeroNutrienti(); }
   // Nomi delle colonne dello storico (PianiStrutturati) corrispondenti a ciascun nutriente.
   const CP_HISTORY_FIELD = { kcal:'Kcal', prot:'Proteine', carb:'Carboidrati', zuccheri:'Zuccheri', grassi:'Grassi', grassiSaturi:'GrassiSaturi', fibra:'Fibre', sale:'Sale' };
+  function cpTargetVuoto_(t){ return CP_NUTRIENTI.every(n => !t[n.key]); }
+
+  // ---- Obiettivo calcolato automaticamente da età/sesso/altezza/peso del paziente ----
+  // Formula di partenza (Mifflin-St Jeor per il metabolismo basale, poi fattore attività e un
+  // deficit percentuale) — valori tipici usati come punto di partenza, sempre modificabili a mano
+  // dal riquadro "Obiettivo". eta/altezzaCm vengono dalla scheda Pazienti, pesoKg dall'ultima
+  // misurazione registrata.
+  function cpCalcolaObiettivo_(eta, sesso, altezzaCm, pesoKg, opts){
+    opts = opts || {};
+    const fattoreAttivita = opts.fattoreAttivita || 1.55; // attività moderata
+    const deficitPct = opts.deficitPct != null ? opts.deficitPct : 0.15; // -15% kcal
+    const bmr = 10*pesoKg + 6.25*altezzaCm - 5*eta + (sesso === 'M' ? 5 : -161);
+    const tdee = bmr * fattoreAttivita;
+    const kcal = tdee * (1 - deficitPct);
+    const prot = pesoKg * 1.8;               // g/kg peso corporeo
+    const grassi = (kcal*0.25) / 9;           // 25% delle kcal
+    const carb = Math.max(0, kcal - prot*4 - grassi*9) / 4;
+    const fibra = (kcal/1000) * 14;           // 14g ogni 1000 kcal
+    const zuccheri = (kcal*0.10) / 4;         // entro il 10% delle kcal
+    const grassiSaturi = (kcal*0.10) / 9;     // entro il 10% delle kcal
+    const sale = 5;                           // limite OMS
+    return { bmr, tdee, kcal, prot, carb, zuccheri, grassi, grassiSaturi, fibra, sale };
+  }
+  // Restituisce { eta, sesso, altezzaCm, pesoKg } se il paziente ha tutti i dati necessari per il
+  // calcolo automatico, altrimenti null (mancano Sesso/Altezza in scheda paziente o un peso in Misurazioni).
+  function cpDatiObiettivoDisponibili_(){
+    if(!currentPatientMeta) return null;
+    const eta = parseNum(currentPatientMeta.Eta);
+    const sesso = String(currentPatientMeta.Sesso||'').trim().toUpperCase();
+    const altezzaCm = parseNum(currentPatientMeta.Altezza);
+    const pesoValues = (METRICS.peso && METRICS.peso.values) || [];
+    const pesoKg = pesoValues.length ? pesoValues[pesoValues.length-1] : null;
+    if(eta==null || (sesso!=='M' && sesso!=='F') || altezzaCm==null || pesoKg==null) return null;
+    return { eta, sesso, altezzaCm, pesoKg };
+  }
+  let CP_TARGET_AUTO_DATA = null;   // dati paziente usati per il calcolo (null se mancano dati)
+  let CP_TARGET_CALCOLATO = null;   // risultato del calcolo con i dati attuali del paziente
+  let CP_TARGET_ORIGINE = null;     // 'auto' | 'manuale' | null
+  // Da chiamare ogni volta che si entra in "Crea piano": se il paziente non ha ancora nessun
+  // obiettivo impostato lo calcola e lo applica subito; se ne ha già uno, verifica solo se
+  // corrisponde ancora al calcolo automatico (per mostrare il badge giusto), senza toccarlo.
+  function cpAggiornaObiettivoAutomatico_(){
+    CP_TARGET_AUTO_DATA = cpDatiObiettivoDisponibili_();
+    if(!CP_TARGET_AUTO_DATA){ CP_TARGET_CALCOLATO = null; CP_TARGET_ORIGINE = null; return; }
+    CP_TARGET_CALCOLATO = cpCalcolaObiettivo_(CP_TARGET_AUTO_DATA.eta, CP_TARGET_AUTO_DATA.sesso, CP_TARGET_AUTO_DATA.altezzaCm, CP_TARGET_AUTO_DATA.pesoKg);
+    if(cpTargetVuoto_(CP_TARGET)){
+      CP_TARGET = cpZeroNutrienti();
+      CP_NUTRIENTI.forEach(n => { CP_TARGET[n.key] = CP_TARGET_CALCOLATO[n.key]; });
+      CP_TARGET_ORIGINE = 'auto';
+    } else {
+      const combacia = CP_NUTRIENTI.every(n => Math.round(CP_TARGET[n.key]) === Math.round(CP_TARGET_CALCOLATO[n.key]));
+      CP_TARGET_ORIGINE = combacia ? 'auto' : 'manuale';
+    }
+  }
 
   async function cpLoadFoods(){
     if(CP_FOODS) return;
@@ -1901,11 +2071,15 @@
       warnEl.style.display = 'none';
     }
     bodyEl.style.display = '';
+    cpAggiornaObiettivoAutomatico_();
     cpRenderAll();
   }
 
   function cpRenderAll(){
     document.getElementById('cp-target-summary').textContent = cpFmt(CP_TARGET.kcal) + ' kcal';
+    const badgeEl = document.getElementById('cp-target-badge');
+    badgeEl.innerHTML = CP_TARGET_ORIGINE === 'auto' ? '<span class="cp-badge-auto">calcolato automaticamente</span>'
+      : CP_TARGET_ORIGINE === 'manuale' ? '<span class="cp-badge-manual">modificato manualmente</span>' : '';
     cpRenderDayTabs();
     cpRenderMealList();
     cpRenderSummary();
@@ -2172,9 +2346,35 @@
             <div class="cp-history-values" style="color:var(--ink-faint); font-size:11.8px;">di cui <span class="num">${cpFmt(h.Zuccheri)}</span> g zuccheri · <span class="num">${cpFmt(h.GrassiSaturi)}</span> g grassi saturi · <span class="num">${cpFmt(h.Sale)}</span> g sale</div>
             ${deltaHtml}
           </div>
-          ${isLatest ? '<span class="badge-current">Versione attuale</span>' : ''}
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex:none;">
+            ${isLatest ? '<span class="badge-current">Versione attuale</span>' : ''}
+            <button type="button" class="cp-btn-remove" data-riga="${h.Riga||''}" title="Elimina questa versione">${CP_ICON_X}</button>
+          </div>
         </div>`;
     }).join('');
+    el.querySelectorAll('.cp-btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => cpEliminaPiano(btn.dataset.riga));
+    });
+  }
+
+  // Elimina definitivamente una versione salvata: toglie la riga sia dall'app sia dal Google Sheet
+  // (scheda PianiStrutturati). Se era la versione attiva, dopo il ricaricamento diventa attiva in
+  // automatico la più recente rimasta (stessa logica già usata quando nessuna riga è segnata Attivo).
+  async function cpEliminaPiano(riga){
+    if(!riga) return;
+    if(!confirm('Eliminare definitivamente questa versione del piano? Verrà tolta anche dal Google Sheet e non si potrà recuperare.')) return;
+    try{
+      const res = await apiPost('eliminaPianoStrutturato', { codice: SESSION.codice, paziente: currentPatientCode, riga });
+      if(res.ok){
+        await loadPianoStrutturato(currentPatientCode);
+        cpRenderAll();
+        showToast('Piano eliminato');
+      } else {
+        showToast(res.error || "Errore durante l'eliminazione.");
+      }
+    } catch(err){
+      showToast('Errore di connessione: ' + err.message);
+    }
   }
 
   /* ---- salva piano ---- */
@@ -2219,13 +2419,36 @@
       document.getElementById('cp-save-error').textContent = '';
     }
     if(mode === 'target'){
+      document.getElementById('cp-tgt-fields').innerHTML = CP_NUTRIENTI.map(n => `
+        <div class="field"><label>${n.label}${n.unit ? ' ('+n.unit+')' : ''}</label><input type="number" id="cp-tgt-${n.key}" min="0"></div>
+      `).join('');
       CP_NUTRIENTI.forEach(n => {
         document.getElementById('cp-tgt-'+n.key).value = Math.round(CP_TARGET[n.key]) || '';
       });
+      const infoEl = document.getElementById('cp-tgt-info');
+      const recalcBtn = document.getElementById('cp-tgt-recalc-btn');
+      if(CP_TARGET_AUTO_DATA && CP_TARGET_CALCOLATO){
+        const d = CP_TARGET_AUTO_DATA, c = CP_TARGET_CALCOLATO;
+        infoEl.innerHTML = `<b>Come lo calcoliamo</b> — dati di ${cpEsc(currentPatientMeta.Nome||'questo paziente')}: ${d.eta} anni, ${d.sesso==='M'?'uomo':'donna'}, ${cpFmt(d.altezzaCm)} cm, ${cpFmt(d.pesoKg)} kg (ultimo peso registrato in Misurazioni).<br>
+          Metabolismo basale (Mifflin-St Jeor) → ${cpFmt(c.bmr)} kcal · × attività moderata (1,55) → ${cpFmt(c.tdee)} kcal · − 15% di deficit → <b class="num">${cpFmt(c.kcal)} kcal</b><br>
+          Proteine 1,8 g/kg peso · grassi 25% delle kcal · fibre 14g ogni 1000kcal · zuccheri e grassi saturi entro il 10% delle kcal ciascuno · sale 5g (limite OMS).<br>
+          <span style="color:var(--ink-faint);">Sono valori di partenza tipici, da confermare insieme: puoi modificare ogni campo qui sotto, restano così finché non premi "Ricalcola".</span>`;
+        recalcBtn.style.display = '';
+      } else {
+        infoEl.innerHTML = `Per calcolare l'obiettivo automaticamente servono <b>età, sesso e altezza</b> nella scheda di questo paziente, più almeno <b>un peso registrato in Misurazioni</b>. Finché mancano questi dati, imposta i valori a mano qui sotto.`;
+        recalcBtn.style.display = 'none';
+      }
     }
     document.getElementById('cp-modal-overlay').style.display = 'flex';
   }
   function cpCloseModal(){ document.getElementById('cp-modal-overlay').style.display = 'none'; }
+
+  function cpRicalcolaTarget(){
+    if(!CP_TARGET_CALCOLATO) return;
+    CP_NUTRIENTI.forEach(n => {
+      document.getElementById('cp-tgt-'+n.key).value = Math.round(CP_TARGET_CALCOLATO[n.key]);
+    });
+  }
 
   function cpSalvaTarget(){
     const nuovo = cpZeroNutrienti();
@@ -2233,6 +2456,9 @@
       nuovo[n.key] = Math.max(0, +document.getElementById('cp-tgt-'+n.key).value || 0);
     });
     CP_TARGET = nuovo;
+    CP_TARGET_ORIGINE = CP_TARGET_CALCOLATO
+      ? (CP_NUTRIENTI.every(n => Math.round(CP_TARGET[n.key]) === Math.round(CP_TARGET_CALCOLATO[n.key])) ? 'auto' : 'manuale')
+      : null;
     cpCloseModal();
     cpRenderAll();
     showToast('Obiettivo aggiornato — ricordati di salvare il piano per renderlo definitivo');
@@ -2379,7 +2605,7 @@
       if(res.ok){
         Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
         await loadMisurazioni(currentPatientCode);
-        renderChips(); renderBigChart(); renderSparkGrid(); renderPanoramica();
+        renderMisCategorie(); renderBigChart(); renderSparkGrid(); renderPanoramica();
         showToast('Rilevazione salvata correttamente');
       } else {
         errEl.textContent = res.error || 'Errore durante il salvataggio.';
@@ -2433,7 +2659,7 @@
     return `${d} ${MESI_IT[m-1]} ${y}`;
   }
   function openAddPatientModal(){
-    ['np-nome','np-codice','np-eta','np-obiettivo','np-data-controllo','np-ora-controllo'].forEach(id => document.getElementById(id).value = '');
+    ['np-nome','np-codice','np-eta','np-sesso','np-altezza','np-obiettivo','np-data-controllo','np-ora-controllo'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('np-statoTipo').value = 'good';
     document.getElementById('add-patient-error').textContent = '';
     document.getElementById('add-patient-overlay').style.display = 'flex';
@@ -2451,6 +2677,8 @@
     if(!codice){ errEl.textContent = 'Inserisci un codice di accesso per il paziente.'; return; }
 
     const eta = document.getElementById('np-eta').value.trim();
+    const sesso = document.getElementById('np-sesso').value;
+    const altezza = document.getElementById('np-altezza').value.trim();
     const obiettivo = document.getElementById('np-obiettivo').value.trim();
     const dataControllo = document.getElementById('np-data-controllo').value;
     const oraControllo = document.getElementById('np-ora-controllo').value;
@@ -2466,6 +2694,7 @@
     const paziente = {
       Codice: codice, Nome: nome,
       Eta: eta ? (parseNum(eta) ?? eta) : '',
+      Sesso: sesso, Altezza: altezza ? (parseNum(altezza) ?? altezza) : '',
       Obiettivo: obiettivo, ProssimoControllo: prossimoControllo,
       StatoTesto: statoTesto, StatoTipo: statoTipo,
     };
@@ -2498,7 +2727,7 @@
       document.getElementById('patient-status-led').className = 'status-led ' + stato;
       document.getElementById('patient-status-select').value = stato;
     }
-    currentMetric = 'peso';
+    currentMetric = 'peso'; misCategoriaAttiva = 'peso';
     await Promise.all([loadMisurazioni(codice), loadPiano(codice), loadPianoStrutturato(codice)]);
     const activeTab = document.querySelector('#view-nutri .tab-btn.active');
     setNutriTab(activeTab ? activeTab.dataset.tab : 'panoramica');
@@ -2522,9 +2751,18 @@
     }
   }
 
+  // Decide quale dei due piani è quello "attuale" — il PDF caricato a mano oppure il piano composto
+  // con "Crea piano" — confrontando semplicemente le date: vince il più recente. Usata sia dalla
+  // vista paziente sia dalla scheda "Piano alimentare" lato nutrizionista, così la stessa scelta
+  // vale ovunque nel programma.
+  function cpDecidePianoAttivo(){
+    const hasPdf = !!(currentPlan && currentPlan.Url);
+    const hasStruct = !!(CP_ATTIVO_DATA && CP_GIORNI.some(g => CP_MEALS.some(m => (CP_PLAN[g][m]||[]).length > 0)));
+    const useStruct = hasStruct && (!hasPdf || new Date(CP_ATTIVO_DATA) > new Date(currentPlan.Data));
+    return { hasPdf, hasStruct, useStruct };
+  }
+
   /* ================= VISTA PAZIENTE ================= */
-  // Decide quale dei due piani mostrare al paziente — il PDF caricato a mano oppure il piano
-  // composto con "Crea piano" — confrontando semplicemente le date: vince il più recente.
   function renderPatientHomeCards(){
     const badge = document.getElementById('p-home-piano-badge');
     const dataEl = document.getElementById('p-home-piano-data');
@@ -2533,9 +2771,7 @@
     const subEl = document.getElementById('p-piano-sub');
     const structEl = document.getElementById('p-piano-struct');
 
-    const hasPdf = !!(currentPlan && currentPlan.Url);
-    const hasStruct = !!(CP_ATTIVO_DATA && CP_GIORNI.some(g => CP_MEALS.some(m => (CP_PLAN[g][m]||[]).length > 0)));
-    const useStruct = hasStruct && (!hasPdf || new Date(CP_ATTIVO_DATA) > new Date(currentPlan.Data));
+    const { hasPdf, useStruct } = cpDecidePianoAttivo();
 
     if(useStruct){
       dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(CP_ATTIVO_DATA));
@@ -2577,6 +2813,63 @@
       const items = CP_PLAN[cpState.day][m] || [];
       if(!items.length) return '';
       const totals = cpComputeMeal(cpState.day, m);
+      // Nell'app paziente: solo nome alimento (senza marca) a sinistra, quantità a destra —
+      // niente kcal per singolo alimento (restano comunque nel totale del pasto, sopra).
+      const rows = items.map(item => {
+        const f = CP_FOODS_BY_ID[item.id];
+        return `<div style="display:flex; justify-content:space-between; gap:8px; font-size:12.5px; padding:3px 0;">
+          <span>${cpEsc(f ? cpNomeSenzaMarca(f.nome) : 'Alimento')}</span>
+          <span class="num" style="color:var(--ink-faint); flex:none;">${cpFmt(item.g)} g</span>
+        </div>`;
+      }).join('');
+      return `<div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:3px;"><span>${m}</span><span class="num">${cpFmt(totals.kcal)} kcal</span></div>
+        ${rows}
+      </div>`;
+    }).join('');
+    cardEl.innerHTML = `
+      <div class="p-card-top"><h4>${cpState.day}</h4><span class="num" style="font-size:13px; color:var(--ink-faint);">${cpFmt(dayTotals.kcal)} kcal</span></div>
+      ${mealsHtml || '<p style="font-size:12.5px; color:var(--ink-faint);">Nessun pasto compilato per questo giorno.</p>'}
+    `;
+
+    // Solo la media settimanale (niente minimi/massimi): kcal, carboidrati, proteine, grassi.
+    const avg = cpComputeWeekAverage();
+    document.getElementById('p-piano-week-range').innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:7px;">
+        <div style="display:flex; justify-content:space-between;"><span>Kcal</span><span class="num" style="font-weight:600;">${cpFmt(avg.kcal)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Carboidrati</span><span class="num" style="font-weight:600;">${cpFmt(avg.carb)} g</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Proteine</span><span class="num" style="font-weight:600;">${cpFmt(avg.prot)} g</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Grassi</span><span class="num" style="font-weight:600;">${cpFmt(avg.grassi)} g</span></div>
+      </div>`;
+  }
+
+  // Stessa lettura del piano composto con "Crea piano", ma mostrata nella scheda "Piano alimentare"
+  // lato nutrizionista (utile soprattutto quando per un paziente non è mai stato caricato un PDF:
+  // prima quella scheda restava vuota anche se un piano composto in app esisteva già).
+  function renderNutriPianoStruct(){
+    const sectionEl = document.getElementById('piano-struct-section');
+    const { hasStruct, useStruct } = cpDecidePianoAttivo();
+    if(!hasStruct){ sectionEl.style.display = 'none'; return; }
+    sectionEl.style.display = '';
+
+    document.getElementById('piano-struct-sub').textContent =
+      'Ultimo aggiornamento: ' + fmtDateFull(new Date(CP_ATTIVO_DATA)) +
+      (useStruct ? ' · è il piano che vede il paziente' : ' · superato da un PDF più recente, il paziente vede quello');
+
+    const dayTabsEl = document.getElementById('piano-struct-day-tabs');
+    dayTabsEl.innerHTML = CP_GIORNI.map(g => {
+      const hasData = CP_MEALS.some(m => (CP_PLAN[g][m]||[]).length>0);
+      return `<button type="button" class="cp-day-tab ${g===cpState.day?'active':''}" data-day="${g}">${CP_GIORNI_SHORT[g]}${hasData?'<span class="cp-dot"></span>':''}</button>`;
+    }).join('');
+    dayTabsEl.querySelectorAll('.cp-day-tab').forEach(btn => {
+      btn.addEventListener('click', () => { cpState.day = btn.dataset.day; renderNutriPianoStruct(); });
+    });
+
+    const dayTotals = cpComputeDay(cpState.day);
+    const mealsHtml = CP_MEALS.map(m => {
+      const items = CP_PLAN[cpState.day][m] || [];
+      if(!items.length) return '';
+      const totals = cpComputeMeal(cpState.day, m);
       const rows = items.map(item => {
         const f = CP_FOODS_BY_ID[item.id];
         const c = cpComputeItem(item);
@@ -2590,17 +2883,16 @@
         ${rows}
       </div>`;
     }).join('');
-    cardEl.innerHTML = `
-      <div class="p-card-top"><h4>${cpState.day}</h4><span class="num" style="font-size:13px; color:var(--ink-faint);">${cpFmt(dayTotals.kcal)} kcal</span></div>
+    document.getElementById('piano-struct-day-card').innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin:12px 0 10px;"><h4 style="font-size:14px;">${cpState.day}</h4><span class="num" style="font-size:13px; color:var(--ink-faint);">${cpFmt(dayTotals.kcal)} kcal</span></div>
       ${mealsHtml || '<p style="font-size:12.5px; color:var(--ink-faint);">Nessun pasto compilato per questo giorno.</p>'}
     `;
 
-    const weekTotals = CP_GIORNI.map(g => cpComputeDay(g));
     const avg = cpComputeWeekAverage();
-    const kcals = weekTotals.map(t => t.kcal);
-    const min = Math.min(...kcals), max = Math.max(...kcals);
-    document.getElementById('p-piano-week-range').innerHTML =
-      `${cpFmt(min)}–${cpFmt(max)} kcal al giorno (media ${cpFmt(avg.kcal)})` + (CP_TARGET.kcal ? ' · obiettivo ' + cpFmt(CP_TARGET.kcal) + ' kcal' : '');
+    document.getElementById('piano-struct-week-summary').innerHTML = CP_NUTRIENTI.map(n => {
+      const unit = n.key==='kcal' ? '' : n.unit;
+      return `<div class="cp-wr-row"><span class="cp-wr-label">${n.label}</span><span class="cp-wr-val"><b>${cpFmt(avg[n.key])}${unit}</b></span></div>`;
+    }).join('');
   }
 
   function renderPatientCharts(){
@@ -2683,7 +2975,7 @@
     if(name==='panoramica') renderPanoramica();
     if(name==='piano') renderPianoTab();
     if(name==='creapiano') renderCreaPianoTab();
-    if(name==='misurazioni'){ renderChips(); renderBigChart(); renderSparkGrid(); }
+    if(name==='misurazioni'){ renderMisCategorie(); renderBigChart(); renderSparkGrid(); }
     if(name==='confronto') renderCompareTable();
   }
 
