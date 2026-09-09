@@ -573,13 +573,13 @@
   .cp-meal-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:9px; }
   .cp-meal-name{ font-size:13.3px; font-weight:600; }
   .cp-meal-head-right{ display:flex; align-items:center; gap:8px; }
-  .cp-meal-kcal{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); }
   .cp-btn-dup-meal{
-    display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px;
+    display:flex; align-items:center; gap:5px; height:24px; padding:0 9px; border-radius:6px;
     border:1px solid var(--border); background:transparent; color:var(--ink-faint); cursor:pointer; flex:none;
+    font-size:11px; font-weight:600;
   }
   .cp-btn-dup-meal:hover{ border-color:var(--accent); color:var(--accent-ink); background:var(--accent-soft); }
-  .cp-btn-dup-meal svg{ width:13px; height:13px; }
+  .cp-btn-dup-meal svg{ width:13px; height:13px; flex:none; }
   .cp-meal-items{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
   .cp-meal-item{ display:flex; align-items:center; gap:8px; font-size:12.8px; }
   .cp-meal-item-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -614,9 +614,9 @@
      spazio, scorre in orizzontale invece di accavallare il testo — ogni valore ha una sua larghezza
      minima fissa (flex:0 0 auto), non si schiaccia. */
   .cp-meal-stats{ display:flex; justify-content:space-between; gap:9px; padding-top:8px; margin-top:9px; border-top:1px solid var(--border-soft); overflow-x:auto; scrollbar-width:thin; }
-  .cp-meal-stat{ text-align:center; flex:0 0 auto; min-width:40px; }
-  .cp-meal-stat .cp-ms-label{ font-size:7.6px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
-  .cp-meal-stat .cp-ms-val{ font-family:var(--font-mono); font-size:11.3px; font-weight:700; margin-top:1px; white-space:nowrap; }
+  .cp-meal-stat{ text-align:center; flex:0 0 auto; min-width:48px; }
+  .cp-meal-stat .cp-ms-label{ font-size:10px; color:var(--ink); font-weight:500; line-height:1.25; white-space:nowrap; }
+  .cp-meal-stat .cp-ms-val{ font-family:var(--font-mono); font-size:11.8px; font-weight:700; margin-top:1px; white-space:nowrap; }
 
   .cp-kcal-hero{ display:flex; align-items:center; gap:16px; margin-bottom:16px; }
   .cp-donut-wrap{ position:relative; flex:none; width:104px; height:104px; }
@@ -804,6 +804,46 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="edit-patient-overlay" style="display:none;" onclick="if(event.target===this) closeEditPatientModal();">
+      <div class="modal-card">
+        <h3>Modifica paziente</h3>
+        <p>Aggiorna i dati di questo paziente — restano collegati allo stesso codice di accesso, a meno che tu non lo cambi qui sotto.</p>
+        <div class="field-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="field"><label>Nome e cognome</label><input type="text" id="ep-nome" placeholder="Es. Anna Rossi"></div>
+          <div class="field"><label>Codice di accesso paziente</label><input type="text" id="ep-codice" placeholder="Es. AR04"></div>
+          <div class="field"><label>Età</label><input type="text" id="ep-eta" placeholder="Es. 29"></div>
+          <div class="field">
+            <label>Sesso</label>
+            <select id="ep-sesso">
+              <option value="">—</option>
+              <option value="M">Maschio</option>
+              <option value="F">Femmina</option>
+            </select>
+          </div>
+          <div class="field"><label>Altezza (cm)</label><input type="text" id="ep-altezza" placeholder="Es. 172"></div>
+          <div class="field"><label>Obiettivo</label><input type="text" id="ep-obiettivo" placeholder="Es. Definizione muscolare"></div>
+          <div class="field"><label>Prossimo controllo — data</label><input type="date" id="ep-data-controllo"></div>
+          <div class="field"><label>Prossimo controllo — ora (facoltativa)</label><input type="time" id="ep-ora-controllo"></div>
+          <div class="field">
+            <label>Stato paziente</label>
+            <select id="ep-statoTipo">
+              <option value="good">Attivo (verde)</option>
+              <option value="warning">Sospeso (giallo)</option>
+              <option value="critical">Inattivo (rosso)</option>
+            </select>
+          </div>
+        </div>
+        <div class="login-error" id="edit-patient-error"></div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn ghost" type="button" onclick="closeEditPatientModal()">Annulla</button>
+          <button class="btn primary" type="button" id="btn-edit-patient-save" onclick="saveEditPatient()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salva modifiche
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-overlay" id="cp-modal-overlay" style="display:none;" onclick="if(event.target===this) cpCloseModal();">
       <div class="modal-card">
         <!-- Import modello -->
@@ -864,6 +904,10 @@
               <option value="warning">Sospeso</option>
               <option value="critical">Inattivo</option>
             </select>
+            <button class="btn small ghost" type="button" onclick="openEditPatientModal()" title="Modifica dati paziente" style="margin-left:6px; vertical-align:middle;">
+              <svg viewBox="0 0 24 24" fill="none" style="width:12px; height:12px;"><path d="M16.5 3.5C17.33 2.67 18.67 2.67 19.5 3.5C20.33 4.33 20.33 5.67 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Modifica
+            </button>
           </h1>
           <div class="goal" id="patient-goal">—</div>
         </div>
@@ -2130,8 +2174,7 @@
           <div class="cp-meal-head">
             <div class="cp-meal-name">${m}</div>
             <div class="cp-meal-head-right">
-              <div class="cp-meal-kcal num">${cpFmt(totals.kcal)} kcal</div>
-              <button type="button" class="cp-btn-dup-meal" data-meal="${cpEsc(m)}" title="Duplica questo pasto su un altro giorno">${CP_ICON_DUP}</button>
+              <button type="button" class="cp-btn-dup-meal" data-meal="${cpEsc(m)}" title="Duplica questo pasto su un altro giorno">Duplica ${CP_ICON_DUP}</button>
             </div>
           </div>
           <div class="cp-meal-items">${rows}</div>
@@ -2158,7 +2201,6 @@
         const card = inp.closest('.cp-meal-card');
         inp.closest('.cp-meal-item').querySelector('.cp-meal-item-kcal').textContent = cpFmt(c.kcal);
         const mealTotals = cpComputeMeal(cpState.day, m);
-        card.querySelector('.cp-meal-kcal').textContent = cpFmt(mealTotals.kcal) + ' kcal';
         CP_NUTRIENTI.forEach(n => {
           card.querySelector(`.cp-ms-val[data-key="${n.key}"]`).textContent = cpFmt(mealTotals[n.key]);
         });
@@ -2706,6 +2748,92 @@
       if(res.ok){
         closeAddPatientModal();
         await loadPazienti(codice);
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+    btn.disabled = false;
+  }
+
+  /* ================= MODIFICA PAZIENTE ================= */
+  // "Prossimo controllo" è salvato come testo italiano ("15 settembre 2026 · 17:30"): per
+  // ripopolare i campi <input type="date"> / <input type="time"> del modulo di modifica bisogna
+  // fare il percorso inverso di formatDateInputToItalian(). Se il testo non è nel formato atteso
+  // (es. paziente senza prossimo controllo, o scritto a mano diversamente) lascia i campi vuoti:
+  // il nutrizionista può comunque impostarlo di nuovo da qui.
+  function parseProssimoControlloAInput_(testo){
+    if(!testo) return { data:'', ora:'' };
+    const normalizzato = normalizzaProssimoControllo_(testo);
+    const parti = normalizzato.split(' · ');
+    const oraParte = parti[1] ? parti[1].trim() : '';
+    const m = parti[0].trim().match(/^(\d{1,2})\s+([a-zàèéìòù]+)\s+(\d{4})$/i);
+    if(!m) return { data:'', ora: oraParte };
+    const meseIdx = MESI_IT.findIndex(mm => mm.toLowerCase() === m[2].toLowerCase());
+    if(meseIdx === -1) return { data:'', ora: oraParte };
+    const dataInput = `${m[3]}-${String(meseIdx+1).padStart(2,'0')}-${String(+m[1]).padStart(2,'0')}`;
+    return { data: dataInput, ora: oraParte };
+  }
+
+  function openEditPatientModal(){
+    if(!currentPatientMeta) return;
+    const p = currentPatientMeta;
+    document.getElementById('ep-nome').value = p.Nome || '';
+    document.getElementById('ep-codice').value = p.Codice || '';
+    document.getElementById('ep-eta').value = p.Eta || '';
+    document.getElementById('ep-sesso').value = (p.Sesso === 'M' || p.Sesso === 'F') ? p.Sesso : '';
+    document.getElementById('ep-altezza').value = p.Altezza || '';
+    document.getElementById('ep-obiettivo').value = p.Obiettivo || '';
+    const pc = parseProssimoControlloAInput_(p.ProssimoControllo || '');
+    document.getElementById('ep-data-controllo').value = pc.data;
+    document.getElementById('ep-ora-controllo').value = pc.ora;
+    document.getElementById('ep-statoTipo').value = p.StatoTipo || 'good';
+    document.getElementById('edit-patient-error').textContent = '';
+    document.getElementById('edit-patient-overlay').style.display = 'flex';
+  }
+  function closeEditPatientModal(){
+    document.getElementById('edit-patient-overlay').style.display = 'none';
+  }
+  async function saveEditPatient(){
+    const errEl = document.getElementById('edit-patient-error');
+    errEl.textContent = '';
+    const nome = document.getElementById('ep-nome').value.trim();
+    const codice = document.getElementById('ep-codice').value.trim();
+    if(!nome){ errEl.textContent = 'Inserisci il nome del paziente.'; return; }
+    if(!codice){ errEl.textContent = 'Inserisci un codice di accesso per il paziente.'; return; }
+
+    const eta = document.getElementById('ep-eta').value.trim();
+    const sesso = document.getElementById('ep-sesso').value;
+    const altezza = document.getElementById('ep-altezza').value.trim();
+    const obiettivo = document.getElementById('ep-obiettivo').value.trim();
+    const dataControllo = document.getElementById('ep-data-controllo').value;
+    const oraControllo = document.getElementById('ep-ora-controllo').value;
+    const statoTipo = document.getElementById('ep-statoTipo').value;
+    const statoTesto = STATUS_LABEL[statoTipo];
+
+    let prossimoControllo = '';
+    if(dataControllo){
+      prossimoControllo = formatDateInputToItalian(dataControllo);
+      if(oraControllo) prossimoControllo += ' · ' + oraControllo;
+    }
+
+    const paziente = {
+      Codice: codice, Nome: nome,
+      Eta: eta ? (parseNum(eta) ?? eta) : '',
+      Sesso: sesso, Altezza: altezza ? (parseNum(altezza) ?? altezza) : '',
+      Obiettivo: obiettivo, ProssimoControllo: prossimoControllo,
+      StatoTesto: statoTesto, StatoTipo: statoTipo,
+    };
+
+    const btn = document.getElementById('btn-edit-patient-save');
+    btn.disabled = true;
+    try{
+      const res = await apiPost('modificaPaziente', { codice: SESSION.codice, codiceAttuale: currentPatientCode, paziente });
+      if(res.ok){
+        closeEditPatientModal();
+        await loadPazienti(codice);
+        showToast('Dati paziente aggiornati');
       } else {
         errEl.textContent = res.error || 'Errore durante il salvataggio.';
       }
