@@ -1423,6 +1423,13 @@
   let currentPlan = null;
   let currentPlanHistory = [];
 
+  // Il codice di un paziente può arrivare dal foglio Google come testo ("MF01") o, se scritto
+  // com'era un numero puro (es. "12345"), Google Sheets lo può salvare come valore numerico: in tal
+  // caso il confronto stretto p.Codice === codice fallisce (numero !== stringa) anche se rappresentano
+  // lo stesso codice, e il riquadro del paziente selezionato può restare bloccato su quello precedente.
+  // Normalizziamo sempre a stringa (e togliamo spazi) prima di confrontare due codici.
+  function codiceStr_(v){ return (v===null || v===undefined) ? '' : String(v).trim(); }
+
   function fmt(v){
     if(v === null || v === undefined || v === '') return '—';
     let s = (Math.round(v*10)/10).toString().replace('.', ',');
@@ -1519,14 +1526,14 @@
     }
     const term = patientSearchTerm.trim().toLowerCase();
     const filtered = term === '' ? PATIENTS : PATIENTS.filter(p =>
-      (p.Nome||'').toLowerCase().includes(term) || (p.Codice||'').toLowerCase().includes(term)
+      (p.Nome||'').toLowerCase().includes(term) || codiceStr_(p.Codice).toLowerCase().includes(term)
     );
     if(!filtered.length){
       el.innerHTML = `<p style="font-size:12.8px; color:var(--ink-faint);">Nessun paziente trovato per "${cpEsc(patientSearchTerm.trim())}"</p>`;
       return;
     }
     el.innerHTML = filtered.map(p => `
-      <div class="patient ${p.Codice===currentPatientCode?'active':''}" data-codice="${p.Codice}" onclick="selectPatientByCode('${p.Codice}')">
+      <div class="patient ${codiceStr_(p.Codice)===currentPatientCode?'active':''}" data-codice="${cpEsc(codiceStr_(p.Codice))}" onclick="selectPatientByCode('${codiceStr_(p.Codice).replace(/'/g,"\\'")}')">
         <div class="avatar">${(p.Nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
         <div class="patient-info">
           <div class="patient-name">${p.Nome||'—'}</div>
@@ -1544,7 +1551,7 @@
     const rows = () => Array.from(document.querySelectorAll('#patient-list .patient'));
     const updateHighlight = () => {
       rows().forEach((row, i) => {
-        const isOn = highlighted >= 0 ? (i === highlighted) : (row.dataset.codice === currentPatientCode);
+        const isOn = highlighted >= 0 ? (i === highlighted) : (codiceStr_(row.dataset.codice) === currentPatientCode);
         row.classList.toggle('active', isOn);
         if(i === highlighted) row.scrollIntoView({ block:'nearest' });
       });
@@ -2858,7 +2865,7 @@
     PATIENTS = res.pazienti;
     renderPatientList();
     if(!PATIENTS.length) return;
-    const toSelect = (keepCodice && PATIENTS.some(p => p.Codice === keepCodice)) ? keepCodice : PATIENTS[0].Codice;
+    const toSelect = (keepCodice && PATIENTS.some(p => codiceStr_(p.Codice) === codiceStr_(keepCodice))) ? keepCodice : PATIENTS[0].Codice;
     await selectPatientByCode(toSelect);
   }
 
@@ -3013,9 +3020,10 @@
   }
 
   async function selectPatientByCode(codice){
+    codice = codiceStr_(codice);
     currentPatientCode = codice;
-    currentPatientMeta = PATIENTS.find(p => p.Codice === codice) || null;
-    document.querySelectorAll('.patient').forEach(el => el.classList.toggle('active', el.dataset.codice === codice));
+    currentPatientMeta = PATIENTS.find(p => codiceStr_(p.Codice) === codice) || null;
+    document.querySelectorAll('.patient').forEach(el => el.classList.toggle('active', codiceStr_(el.dataset.codice) === codice));
     if(currentPatientMeta){
       document.getElementById('patient-name').textContent = currentPatientMeta.Nome || '—';
       document.getElementById('patient-goal').textContent = (currentPatientMeta.Eta ? currentPatientMeta.Eta+' anni · ' : '') + 'Obiettivo: ' + (currentPatientMeta.Obiettivo || '—');
@@ -3038,7 +3046,7 @@
     // Aggiorna subito in locale, poi conferma con il foglio Google in background.
     currentPatientMeta.StatoTipo = statoTipo;
     currentPatientMeta.StatoTesto = statoTesto;
-    const p = PATIENTS.find(p => p.Codice === currentPatientCode);
+    const p = PATIENTS.find(p => codiceStr_(p.Codice) === currentPatientCode);
     if(p){ p.StatoTipo = statoTipo; p.StatoTesto = statoTesto; }
     try{
       const res = await apiPost('aggiornaStatoPaziente', { codice: SESSION.codice, paziente: currentPatientCode, statoTipo, statoTesto });
