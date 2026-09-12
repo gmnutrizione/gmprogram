@@ -660,6 +660,38 @@
   .cp-tgt-info{ font-size:12px; line-height:1.55; color:var(--ink-soft); background:var(--accent-soft); border-radius:var(--radius-s); padding:10px 12px; margin-bottom:14px; }
   .cp-tgt-info b{ color:var(--ink); }
 
+  /* ---- pannello di calcolo TDEE (formula BMR + LAF + deficit/surplus) nel modale Obiettivo ---- */
+  .cp-tgt-calc{ background:var(--accent-soft); border-radius:var(--radius-s); padding:14px 14px 13px; margin-bottom:16px; display:flex; flex-direction:column; gap:13px; }
+  .cp-tgt-calc-label{ display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:7px; }
+  .cp-tgt-calc-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 14px; }
+  .cp-tgt-laf-custom{ width:100px; font-family:var(--font-mono); font-size:13px; padding:6px 9px; border:1px solid var(--border); border-radius:var(--radius-s); background:var(--surface-raised); color:var(--ink); }
+  .cp-tgt-laf-custom:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .cp-tgt-laf-custom-wrap{ display:flex; flex-direction:column; gap:4px; }
+  .cp-tgt-laf-custom-wrap span{ font-size:10.5px; color:var(--ink-faint); }
+  .cp-tgt-deficit-toggle{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--ink); cursor:pointer; user-select:none; }
+  .cp-tgt-deficit-toggle input{ width:15px; height:15px; accent-color:var(--accent); cursor:pointer; }
+  .cp-tgt-deficit-kcal, .cp-tgt-surplus-kcal{ width:90px; font-family:var(--font-mono); font-size:13px; padding:6px 9px; border:1px solid var(--border); border-radius:var(--radius-s); background:var(--surface-raised); color:var(--ink); }
+  .cp-tgt-deficit-kcal:disabled, .cp-tgt-surplus-kcal:disabled{ opacity:.45; cursor:not-allowed; }
+  .cp-tgt-weight-goal-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width: 560px){ .cp-tgt-weight-goal-grid{ grid-template-columns:1fr; } }
+  .cp-tgt-calc-out{ font-size:12.5px; line-height:1.65; color:var(--ink-soft); padding-top:10px; border-top:1px dashed var(--border); }
+  .cp-tgt-calc-out b{ color:var(--ink); }
+  .cp-tgt-calc-final{ display:flex; align-items:baseline; gap:8px; font-size:13.5px; font-weight:600; color:var(--ink); }
+  .cp-tgt-calc-final .num{ font-family:var(--font-mono); font-size:19px; color:var(--accent-ink); }
+  .cp-tgt-calc-apply{ align-self:flex-start; }
+
+  .cp-tgt-macro-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width: 560px){ .cp-tgt-macro-grid{ grid-template-columns:1fr; } }
+  .cp-tgt-macro-col-label{ display:flex; align-items:baseline; gap:6px; font-size:11.5px; font-weight:600; color:var(--ink); margin-bottom:5px; }
+  .cp-tgt-macro-auto-badge{ font-size:9px; font-weight:700; color:var(--accent-ink); background:var(--surface-raised); padding:1px 6px; border-radius:999px; text-transform:uppercase; letter-spacing:.03em; }
+  .cp-tgt-macro-reset{ font-size:10.5px; color:var(--accent-ink); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+  .cp-tgt-macro-input-row{ display:flex; align-items:center; gap:6px; }
+  .cp-tgt-macro-input-row input{ width:58px; font-family:var(--font-mono); font-size:13px; padding:6px 8px; border:1px solid var(--border); border-radius:var(--radius-s); background:var(--surface-raised); color:var(--ink); }
+  .cp-tgt-macro-input-row input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .cp-tgt-macro-input-row span{ font-size:10.5px; color:var(--ink-faint); }
+  .cp-tgt-macro-grams{ font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--ink); margin-top:5px; }
+  .cp-tgt-macro-warn{ font-size:11.5px; color:var(--warning); background:var(--warning-soft); border-radius:var(--radius-s); padding:7px 10px; }
+
   .andamento-cat-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
   .andamento-cat-btn{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; border:1.5px solid var(--border); background:var(--surface-raised); color:var(--ink-soft); cursor:pointer; transition:all .15s ease; }
   .andamento-cat-btn:hover{ border-color:var(--accent); color:var(--accent-ink); }
@@ -906,10 +938,76 @@
           <h3>Obiettivo giornaliero</h3>
           <p>Usato per le barre di riferimento e per l'andamento settimanale.</p>
           <div class="cp-tgt-info" id="cp-tgt-info">—</div>
+
+          <div class="cp-tgt-calc" id="cp-tgt-calc" style="display:none;">
+            <div>
+              <label class="cp-tgt-calc-label">Formula metabolismo basale</label>
+              <div class="chip-row" id="cp-tgt-formula-chips" style="margin-bottom:0;">
+                <button type="button" class="chip" data-formula="mifflin">Mifflin-St Jeor</button>
+                <button type="button" class="chip" data-formula="harris">Harris-Benedict</button>
+              </div>
+            </div>
+            <div>
+              <label class="cp-tgt-calc-label">Livello di attività fisica (LAF)</label>
+              <div class="cp-tgt-calc-row">
+                <div class="chip-row" id="cp-tgt-laf-chips" style="margin-bottom:0;">
+                  <button type="button" class="chip" data-laf="1.2">1,2</button>
+                  <button type="button" class="chip" data-laf="1.3">1,3</button>
+                  <button type="button" class="chip" data-laf="1.4">1,4</button>
+                  <button type="button" class="chip" data-laf="1.5">1,5</button>
+                  <button type="button" class="chip" data-laf="1.6">1,6</button>
+                </div>
+                <div class="cp-tgt-laf-custom-wrap">
+                  <input type="number" class="cp-tgt-laf-custom" id="cp-tgt-laf-custom" step="0.05" min="1" max="2.5" placeholder="es. 1,45">
+                  <span>o un valore libero</span>
+                </div>
+              </div>
+            </div>
+            <div class="cp-tgt-weight-goal-grid">
+              <div>
+                <label class="cp-tgt-deficit-toggle"><input type="checkbox" id="cp-tgt-deficit-on"> Applica deficit per dimagrimento</label>
+                <div class="cp-tgt-calc-row" style="margin-top:8px;">
+                  <input type="number" class="cp-tgt-deficit-kcal" id="cp-tgt-deficit-kcal" step="10" min="0"> <span style="font-size:11.5px; color:var(--ink-faint);">kcal in meno rispetto al TDEE</span>
+                </div>
+              </div>
+              <div>
+                <label class="cp-tgt-deficit-toggle"><input type="checkbox" id="cp-tgt-surplus-on"> Applica surplus per aumento di peso</label>
+                <div class="cp-tgt-calc-row" style="margin-top:8px;">
+                  <input type="number" class="cp-tgt-surplus-kcal" id="cp-tgt-surplus-kcal" step="10" min="0"> <span style="font-size:11.5px; color:var(--ink-faint);">kcal in più rispetto al TDEE</span>
+                </div>
+              </div>
+            </div>
+            <div class="cp-tgt-calc-out" id="cp-tgt-calc-out">—</div>
+            <div class="cp-tgt-calc-final"><span>Kcal obiettivo calcolato:</span> <span class="num" id="cp-tgt-calc-final-val">—</span></div>
+
+            <div>
+              <label class="cp-tgt-calc-label">Ripartizione macronutrienti (g per kg di peso corporeo)</label>
+              <div class="cp-tgt-macro-grid">
+                <div>
+                  <div class="cp-tgt-macro-col-label">Proteine</div>
+                  <div class="cp-tgt-macro-input-row"><input type="number" id="cp-tgt-ratio-prot" step="0.1" min="0"><span>g/kg</span></div>
+                  <div class="cp-tgt-macro-grams" id="cp-tgt-macro-prot-g">— g</div>
+                </div>
+                <div>
+                  <div class="cp-tgt-macro-col-label">Grassi</div>
+                  <div class="cp-tgt-macro-input-row"><input type="number" id="cp-tgt-ratio-grassi" step="0.1" min="0"><span>g/kg</span></div>
+                  <div class="cp-tgt-macro-grams" id="cp-tgt-macro-grassi-g">— g</div>
+                </div>
+                <div>
+                  <div class="cp-tgt-macro-col-label">Carboidrati <span class="cp-tgt-macro-auto-badge" id="cp-tgt-carb-auto-badge">automatico</span><button type="button" class="cp-tgt-macro-reset" id="cp-tgt-carb-reset-btn" style="display:none;">torna automatico</button></div>
+                  <div class="cp-tgt-macro-input-row"><input type="number" id="cp-tgt-ratio-carb" step="0.1" min="0"><span>g/kg</span></div>
+                  <div class="cp-tgt-macro-grams" id="cp-tgt-macro-carb-g">— g</div>
+                </div>
+              </div>
+              <div class="cp-tgt-calc-out" id="cp-tgt-calc-macros" style="border-top:none; padding-top:8px;">—</div>
+              <div class="cp-tgt-macro-warn" id="cp-tgt-macro-warn" style="display:none;"></div>
+            </div>
+
+            <button class="btn ghost small cp-tgt-calc-apply" type="button" id="cp-tgt-apply-calc-btn" onclick="cpApplicaCalcoloTarget()">Usa questo valore qui sotto ↓</button>
+          </div>
+
           <div class="field-grid" style="grid-template-columns:repeat(2,1fr);" id="cp-tgt-fields"></div>
           <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px; flex-wrap:wrap;">
-            <button class="btn ghost" type="button" id="cp-tgt-recalc-btn" style="display:none;" onclick="cpRicalcolaTarget()">Ricalcola dai dati del paziente</button>
-            <div style="flex:1;"></div>
             <button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button>
             <button class="btn primary" type="button" onclick="cpSalvaTarget()">Applica</button>
           </div>
@@ -2062,25 +2160,55 @@
   function cpTargetVuoto_(t){ return CP_NUTRIENTI.every(n => !t[n.key]); }
 
   // ---- Obiettivo calcolato automaticamente da età/sesso/altezza/peso del paziente ----
-  // Formula di partenza (Mifflin-St Jeor per il metabolismo basale, poi fattore attività e un
-  // deficit percentuale) — valori tipici usati come punto di partenza, sempre modificabili a mano
-  // dal riquadro "Obiettivo". eta/altezzaCm vengono dalla scheda Pazienti, pesoKg dall'ultima
-  // misurazione registrata.
-  function cpCalcolaObiettivo_(eta, sesso, altezzaCm, pesoKg, opts){
+  // Metabolismo basale con formula a scelta (Mifflin-St Jeor o Harris-Benedict), moltiplicato per un
+  // LAF (livello di attività fisica) libero, con un eventuale deficit (dimagrimento) o surplus (aumento
+  // di peso) in kcal rispetto al TDEE — tutto scelto/modificato dal riquadro "Obiettivo". Le proteine e
+  // i grassi sono in g/kg di peso corporeo (anch'essi modificabili), i carboidrati assorbono il resto
+  // delle kcal a meno che non venga fissato anche per loro un g/kg specifico. eta/altezzaCm vengono
+  // dalla scheda Pazienti, pesoKg dall'ultima misurazione registrata.
+  function cpCalcolaBmr_(formula, eta, sesso, altezzaCm, pesoKg){
+    if(formula === 'harris'){
+      return sesso === 'M'
+        ? 88.362 + 13.397*pesoKg + 4.799*altezzaCm - 5.677*eta
+        : 447.593 + 9.247*pesoKg + 3.098*altezzaCm - 4.330*eta;
+    }
+    // Mifflin-St Jeor (default)
+    return 10*pesoKg + 6.25*altezzaCm - 5*eta + (sesso === 'M' ? 5 : -161);
+  }
+  function cpCalcolaObiettivoAvanzato_(eta, sesso, altezzaCm, pesoKg, opts){
     opts = opts || {};
-    const fattoreAttivita = opts.fattoreAttivita || 1.55; // attività moderata
-    const deficitPct = opts.deficitPct != null ? opts.deficitPct : 0.15; // -15% kcal
-    const bmr = 10*pesoKg + 6.25*altezzaCm - 5*eta + (sesso === 'M' ? 5 : -161);
-    const tdee = bmr * fattoreAttivita;
-    const kcal = tdee * (1 - deficitPct);
-    const prot = pesoKg * 1.8;               // g/kg peso corporeo
-    const grassi = (kcal*0.25) / 9;           // 25% delle kcal
-    const carb = Math.max(0, kcal - prot*4 - grassi*9) / 4;
+    const formula = opts.formula === 'harris' ? 'harris' : 'mifflin';
+    const laf = opts.laf > 0 ? opts.laf : 1.55;
+    const deficitOn = !!opts.deficitOn;
+    const surplusOn = !deficitOn && !!opts.surplusOn; // dimagrimento e aumento di peso si escludono a vicenda
+    const deficitKcal = opts.deficitKcal >= 0 ? opts.deficitKcal : (sesso === 'M' ? 500 : 350);
+    const surplusKcal = opts.surplusKcal >= 0 ? opts.surplusKcal : 300;
+    const bmr = cpCalcolaBmr_(formula, eta, sesso, altezzaCm, pesoKg);
+    const tdee = bmr * laf;
+    const kcal = Math.max(1000, deficitOn ? tdee - deficitKcal : (surplusOn ? tdee + surplusKcal : tdee)); // soglia di sicurezza a 1000 kcal
+    // Ripartizione macronutrienti: proteine e grassi in g/kg di peso corporeo (modificabili, default
+    // 1,8 e 0,8), i carboidrati assorbono tutto ciò che resta delle kcal obiettivo e si ricalcolano
+    // automaticamente ogni volta che cambia il kcal obiettivo — a meno che non si fissi anche per loro
+    // un g/kg specifico (ratioCarbFisso), nel qual caso restano a quel valore anche se il totale
+    // energetico non combacia più esattamente con le kcal obiettivo.
+    const ratioProt = opts.ratioProt > 0 ? opts.ratioProt : 1.8;
+    const ratioGrassi = opts.ratioGrassi > 0 ? opts.ratioGrassi : 0.8;
+    const prot = pesoKg * ratioProt;
+    const grassi = pesoKg * ratioGrassi;
+    let carb, ratioCarb;
+    if(opts.ratioCarbFisso > 0){
+      ratioCarb = opts.ratioCarbFisso;
+      carb = pesoKg * ratioCarb;
+    } else {
+      carb = Math.max(0, kcal - prot*4 - grassi*9) / 4;  // resto delle kcal, convertito in grammi
+      ratioCarb = pesoKg ? carb / pesoKg : 0;
+    }
     const fibra = (kcal/1000) * 14;           // 14g ogni 1000 kcal
     const zuccheri = (kcal*0.10) / 4;         // entro il 10% delle kcal
     const grassiSaturi = (kcal*0.10) / 9;     // entro il 10% delle kcal
     const sale = 5;                           // limite OMS
-    return { bmr, tdee, kcal, prot, carb, zuccheri, grassi, grassiSaturi, fibra, sale };
+    const kcalMacro = prot*4 + grassi*9 + carb*4; // energia effettiva dei 3 macro (può differire da kcal se carb è fisso)
+    return { formula, laf, deficitOn, deficitKcal, surplusOn, surplusKcal, bmr, tdee, kcal, kcalMacro, ratioProt, ratioGrassi, ratioCarb, prot, carb, zuccheri, grassi, grassiSaturi, fibra, sale };
   }
   // Restituisce { eta, sesso, altezzaCm, pesoKg } se il paziente ha tutti i dati necessari per il
   // calcolo automatico, altrimenti null (mancano Sesso/Altezza in scheda paziente o un peso in Misurazioni).
@@ -2099,11 +2227,16 @@
   let CP_TARGET_ORIGINE = null;     // 'auto' | 'manuale' | null
   // Da chiamare ogni volta che si entra in "Crea piano": se il paziente non ha ancora nessun
   // obiettivo impostato lo calcola e lo applica subito; se ne ha già uno, verifica solo se
-  // corrisponde ancora al calcolo automatico (per mostrare il badge giusto), senza toccarlo.
+  // corrisponde ancora al calcolo automatico (per mostrare il badge giusto), senza toccarlo. Il
+  // deficit/surplus di partenza viene suggerito dal testo dell'Obiettivo del paziente ("dimagrimento"
+  // vs "aumento"/"massa"); resta comunque tutto modificabile dal riquadro "Obiettivo".
   function cpAggiornaObiettivoAutomatico_(){
     CP_TARGET_AUTO_DATA = cpDatiObiettivoDisponibili_();
     if(!CP_TARGET_AUTO_DATA){ CP_TARGET_CALCOLATO = null; CP_TARGET_ORIGINE = null; return; }
-    CP_TARGET_CALCOLATO = cpCalcolaObiettivo_(CP_TARGET_AUTO_DATA.eta, CP_TARGET_AUTO_DATA.sesso, CP_TARGET_AUTO_DATA.altezzaCm, CP_TARGET_AUTO_DATA.pesoKg);
+    const obiettivoTxt = (currentPatientMeta && currentPatientMeta.Obiettivo) || '';
+    const deficitOnDefault = /dimagr/i.test(obiettivoTxt);
+    const surplusOnDefault = !deficitOnDefault && /aumento|massa/i.test(obiettivoTxt);
+    CP_TARGET_CALCOLATO = cpCalcolaObiettivoAvanzato_(CP_TARGET_AUTO_DATA.eta, CP_TARGET_AUTO_DATA.sesso, CP_TARGET_AUTO_DATA.altezzaCm, CP_TARGET_AUTO_DATA.pesoKg, { deficitOn: deficitOnDefault, surplusOn: surplusOnDefault });
     if(cpTargetVuoto_(CP_TARGET)){
       CP_TARGET = cpZeroNutrienti();
       CP_NUTRIENTI.forEach(n => { CP_TARGET[n.key] = CP_TARGET_CALCOLATO[n.key]; });
@@ -2652,29 +2785,178 @@
         document.getElementById('cp-tgt-'+n.key).value = Math.round(CP_TARGET[n.key]) || '';
       });
       const infoEl = document.getElementById('cp-tgt-info');
-      const recalcBtn = document.getElementById('cp-tgt-recalc-btn');
-      if(CP_TARGET_AUTO_DATA && CP_TARGET_CALCOLATO){
-        const d = CP_TARGET_AUTO_DATA, c = CP_TARGET_CALCOLATO;
-        infoEl.innerHTML = `<b>Come lo calcoliamo</b> — dati di ${cpEsc(currentPatientMeta.Nome||'questo paziente')}: ${d.eta} anni, ${d.sesso==='M'?'uomo':'donna'}, ${cpFmt(d.altezzaCm)} cm, ${cpFmt(d.pesoKg)} kg (ultimo peso registrato in Misurazioni).<br>
-          Metabolismo basale (Mifflin-St Jeor) → ${cpFmt(c.bmr)} kcal · × attività moderata (1,55) → ${cpFmt(c.tdee)} kcal · − 15% di deficit → <b class="num">${cpFmt(c.kcal)} kcal</b><br>
-          Proteine 1,8 g/kg peso · grassi 25% delle kcal · fibre 14g ogni 1000kcal · zuccheri e grassi saturi entro il 10% delle kcal ciascuno · sale 5g (limite OMS).<br>
-          <span style="color:var(--ink-faint);">Sono valori di partenza tipici, da confermare insieme: puoi modificare ogni campo qui sotto, restano così finché non premi "Ricalcola".</span>`;
-        recalcBtn.style.display = '';
+      const calcEl = document.getElementById('cp-tgt-calc');
+      if(CP_TARGET_AUTO_DATA){
+        const d = CP_TARGET_AUTO_DATA;
+        infoEl.innerHTML = `Dati di ${cpEsc(currentPatientMeta.Nome||'questo paziente')} usati per il calcolo: <b>${d.eta} anni, ${d.sesso==='M'?'uomo':'donna'}, ${cpFmt(d.altezzaCm)} cm, ${cpFmt(d.pesoKg)} kg</b> (ultimo peso registrato in Misurazioni).
+          Scegli formula, LAF ed eventuale deficit/surplus qui sotto, poi usa il risultato: resta comunque tutto modificabile a mano nei campi in fondo.`;
+        calcEl.style.display = '';
+        cpTgtCalcInit_();
       } else {
-        infoEl.innerHTML = `Per calcolare l'obiettivo automaticamente servono <b>età, sesso e altezza</b> nella scheda di questo paziente, più almeno <b>un peso registrato in Misurazioni</b>. Finché mancano questi dati, imposta i valori a mano qui sotto.`;
-        recalcBtn.style.display = 'none';
+        infoEl.innerHTML = `Per calcolare l'obiettivo servono <b>età, sesso e altezza</b> nella scheda di questo paziente, più almeno <b>un peso registrato in Misurazioni</b>. Finché mancano questi dati, imposta i valori a mano qui sotto.`;
+        calcEl.style.display = 'none';
       }
     }
     document.getElementById('cp-modal-overlay').style.display = 'flex';
   }
   function cpCloseModal(){ document.getElementById('cp-modal-overlay').style.display = 'none'; }
 
-  function cpRicalcolaTarget(){
-    if(!CP_TARGET_CALCOLATO) return;
-    CP_NUTRIENTI.forEach(n => {
-      document.getElementById('cp-tgt-'+n.key).value = Math.round(CP_TARGET_CALCOLATO[n.key]);
-    });
+  // ---- pannello di calcolo TDEE dentro il modale Obiettivo ----
+  // Ricorda le scelte di formula/LAF/deficit-o-surplus/ripartizione fatte dal nutrizionista durante la
+  // sessione. Deficit e surplus si escludono a vicenda (dimagrimento oppure aumento di peso, non
+  // entrambi) e ripartono da un suggerimento per-paziente (dedotto dal testo dell'Obiettivo e dal
+  // sesso) finché non vengono toccati a mano. Proteine/grassi sono sempre in g/kg modificabile
+  // (default 1,8 e 0,8); i carboidrati restano "automatici" (resto delle kcal) finché non si scrive
+  // a mano anche per loro un g/kg specifico.
+  let CP_TGT_CALC = { formula:'mifflin', laf:1.55, deficitOn:false, deficitKcal:null, surplusOn:false, surplusKcal:null, pesoGoalToccato:false, deficitKcalToccato:false, surplusKcalToccato:false, ratioProt:1.8, ratioGrassi:0.8, ratioCarb:null, ratioCarbToccato:false, _risultato:null };
+
+  function cpTgtCalcInit_(){
+    const d = CP_TARGET_AUTO_DATA;
+    if(!d) return;
+    if(!CP_TGT_CALC.deficitKcalToccato) CP_TGT_CALC.deficitKcal = d.sesso === 'M' ? 500 : 350;
+    if(!CP_TGT_CALC.surplusKcalToccato) CP_TGT_CALC.surplusKcal = 300;
+    if(!CP_TGT_CALC.pesoGoalToccato){
+      const obiettivoTxt = currentPatientMeta.Obiettivo || '';
+      CP_TGT_CALC.deficitOn = /dimagr/i.test(obiettivoTxt);
+      CP_TGT_CALC.surplusOn = !CP_TGT_CALC.deficitOn && /aumento|massa/i.test(obiettivoTxt);
+    }
+    document.querySelectorAll('#cp-tgt-formula-chips .chip').forEach(b => b.classList.toggle('active', b.dataset.formula === CP_TGT_CALC.formula));
+    const lafChipAttivo = [...document.querySelectorAll('#cp-tgt-laf-chips .chip')].find(b => +b.dataset.laf === CP_TGT_CALC.laf);
+    document.querySelectorAll('#cp-tgt-laf-chips .chip').forEach(b => b.classList.toggle('active', b === lafChipAttivo));
+    document.getElementById('cp-tgt-laf-custom').value = lafChipAttivo ? '' : CP_TGT_CALC.laf;
+    document.getElementById('cp-tgt-deficit-on').checked = CP_TGT_CALC.deficitOn;
+    document.getElementById('cp-tgt-deficit-kcal').value = Math.round(CP_TGT_CALC.deficitKcal);
+    document.getElementById('cp-tgt-deficit-kcal').disabled = !CP_TGT_CALC.deficitOn;
+    document.getElementById('cp-tgt-surplus-on').checked = CP_TGT_CALC.surplusOn;
+    document.getElementById('cp-tgt-surplus-kcal').value = Math.round(CP_TGT_CALC.surplusKcal);
+    document.getElementById('cp-tgt-surplus-kcal').disabled = !CP_TGT_CALC.surplusOn;
+    document.getElementById('cp-tgt-ratio-prot').value = CP_TGT_CALC.ratioProt;
+    document.getElementById('cp-tgt-ratio-grassi').value = CP_TGT_CALC.ratioGrassi;
+    document.getElementById('cp-tgt-carb-auto-badge').style.display = CP_TGT_CALC.ratioCarbToccato ? 'none' : '';
+    document.getElementById('cp-tgt-carb-reset-btn').style.display = CP_TGT_CALC.ratioCarbToccato ? '' : 'none';
+    cpTgtCalcRender_();
   }
+
+  function cpTgtCalcRender_(){
+    const d = CP_TARGET_AUTO_DATA;
+    if(!d) return;
+    const c = cpCalcolaObiettivoAvanzato_(d.eta, d.sesso, d.altezzaCm, d.pesoKg, Object.assign({}, CP_TGT_CALC, {
+      ratioCarbFisso: CP_TGT_CALC.ratioCarbToccato ? CP_TGT_CALC.ratioCarb : null,
+    }));
+    const formulaLabel = CP_TGT_CALC.formula === 'harris' ? 'Harris-Benedict' : 'Mifflin-St Jeor';
+    const lafFmt = String(CP_TGT_CALC.laf).replace('.', ',');
+    let html = `Metabolismo basale (<b>${formulaLabel}</b>) → <b class="num">${cpFmt(c.bmr)} kcal</b> · × LAF ${lafFmt} → <b class="num">${cpFmt(c.tdee)} kcal</b> (TDEE)`;
+    if(CP_TGT_CALC.deficitOn){
+      html += `<br>− ${cpFmt(CP_TGT_CALC.deficitKcal)} kcal di deficit → <b class="num">${cpFmt(c.kcal)} kcal</b>`;
+    } else if(CP_TGT_CALC.surplusOn){
+      html += `<br>+ ${cpFmt(CP_TGT_CALC.surplusKcal)} kcal di surplus → <b class="num">${cpFmt(c.kcal)} kcal</b>`;
+    }
+    document.getElementById('cp-tgt-calc-out').innerHTML = html;
+    document.getElementById('cp-tgt-calc-final-val').textContent = cpFmt(c.kcal) + ' kcal';
+    document.getElementById('cp-tgt-macro-prot-g').textContent = cpFmt(c.prot) + ' g';
+    document.getElementById('cp-tgt-macro-grassi-g').textContent = cpFmt(c.grassi) + ' g';
+    document.getElementById('cp-tgt-macro-carb-g').textContent = cpFmt(c.carb) + ' g';
+    // il campo Carboidrati mostra sempre il g/kg corrente, ma lo aggiorniamo dal calcolo solo se non
+    // è stato toccato a mano (altrimenti sovrascriveremmo quello che il nutrizionista sta scrivendo)
+    if(!CP_TGT_CALC.ratioCarbToccato){
+      document.getElementById('cp-tgt-ratio-carb').value = Math.round(c.ratioCarb*10)/10;
+    }
+    document.getElementById('cp-tgt-calc-macros').innerHTML =
+      `Proteine <b class="num">${cpFmt(c.prot*4)} kcal</b> · Grassi <b class="num">${cpFmt(c.grassi*9)} kcal</b> · Carboidrati <b class="num">${cpFmt(c.carb*4)} kcal</b> · totale <b class="num">${cpFmt(c.kcalMacro)} kcal</b>`;
+    const warnEl = document.getElementById('cp-tgt-macro-warn');
+    const scarto = c.kcalMacro - c.kcal;
+    if(CP_TGT_CALC.ratioCarbToccato && Math.abs(scarto) > 15){
+      warnEl.style.display = '';
+      warnEl.textContent = scarto > 0
+        ? `Con questi valori i tre macronutrienti superano di ${cpFmt(scarto)} kcal l'obiettivo calcolato.`
+        : `Con questi valori i tre macronutrienti sono ${cpFmt(-scarto)} kcal sotto l'obiettivo calcolato.`;
+    } else {
+      warnEl.style.display = 'none';
+    }
+    CP_TGT_CALC._risultato = c;
+  }
+
+  function cpApplicaCalcoloTarget(){
+    const c = CP_TGT_CALC._risultato;
+    if(!c) return;
+    CP_NUTRIENTI.forEach(n => { document.getElementById('cp-tgt-'+n.key).value = Math.round(c[n.key]); });
+    showToast('Valori applicati ai campi qui sotto — premi "Applica" per confermare');
+  }
+
+  (function setupTgtCalc(){
+    document.getElementById('cp-tgt-formula-chips').addEventListener('click', e => {
+      const btn = e.target.closest('.chip'); if(!btn) return;
+      CP_TGT_CALC.formula = btn.dataset.formula;
+      document.querySelectorAll('#cp-tgt-formula-chips .chip').forEach(b => b.classList.toggle('active', b===btn));
+      cpTgtCalcRender_();
+    });
+    document.getElementById('cp-tgt-laf-chips').addEventListener('click', e => {
+      const btn = e.target.closest('.chip'); if(!btn) return;
+      CP_TGT_CALC.laf = +btn.dataset.laf;
+      document.querySelectorAll('#cp-tgt-laf-chips .chip').forEach(b => b.classList.toggle('active', b===btn));
+      document.getElementById('cp-tgt-laf-custom').value = '';
+      cpTgtCalcRender_();
+    });
+    document.getElementById('cp-tgt-laf-custom').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v > 0){
+        CP_TGT_CALC.laf = v;
+        document.querySelectorAll('#cp-tgt-laf-chips .chip').forEach(b => b.classList.remove('active'));
+        cpTgtCalcRender_();
+      }
+    });
+    document.getElementById('cp-tgt-deficit-on').addEventListener('change', e => {
+      CP_TGT_CALC.deficitOn = e.target.checked;
+      if(CP_TGT_CALC.deficitOn) CP_TGT_CALC.surplusOn = false;
+      CP_TGT_CALC.pesoGoalToccato = true;
+      document.getElementById('cp-tgt-deficit-kcal').disabled = !CP_TGT_CALC.deficitOn;
+      document.getElementById('cp-tgt-surplus-on').checked = CP_TGT_CALC.surplusOn;
+      document.getElementById('cp-tgt-surplus-kcal').disabled = !CP_TGT_CALC.surplusOn;
+      cpTgtCalcRender_();
+    });
+    document.getElementById('cp-tgt-deficit-kcal').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v >= 0){ CP_TGT_CALC.deficitKcal = v; CP_TGT_CALC.deficitKcalToccato = true; cpTgtCalcRender_(); }
+    });
+    document.getElementById('cp-tgt-surplus-on').addEventListener('change', e => {
+      CP_TGT_CALC.surplusOn = e.target.checked;
+      if(CP_TGT_CALC.surplusOn) CP_TGT_CALC.deficitOn = false;
+      CP_TGT_CALC.pesoGoalToccato = true;
+      document.getElementById('cp-tgt-surplus-kcal').disabled = !CP_TGT_CALC.surplusOn;
+      document.getElementById('cp-tgt-deficit-on').checked = CP_TGT_CALC.deficitOn;
+      document.getElementById('cp-tgt-deficit-kcal').disabled = !CP_TGT_CALC.deficitOn;
+      cpTgtCalcRender_();
+    });
+    document.getElementById('cp-tgt-surplus-kcal').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v >= 0){ CP_TGT_CALC.surplusKcal = v; CP_TGT_CALC.surplusKcalToccato = true; cpTgtCalcRender_(); }
+    });
+    document.getElementById('cp-tgt-ratio-prot').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v >= 0){ CP_TGT_CALC.ratioProt = v; cpTgtCalcRender_(); }
+    });
+    document.getElementById('cp-tgt-ratio-grassi').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v >= 0){ CP_TGT_CALC.ratioGrassi = v; cpTgtCalcRender_(); }
+    });
+    document.getElementById('cp-tgt-ratio-carb').addEventListener('input', e => {
+      const v = +e.target.value;
+      if(v >= 0){
+        CP_TGT_CALC.ratioCarb = v;
+        CP_TGT_CALC.ratioCarbToccato = true;
+        document.getElementById('cp-tgt-carb-auto-badge').style.display = 'none';
+        document.getElementById('cp-tgt-carb-reset-btn').style.display = '';
+        cpTgtCalcRender_();
+      }
+    });
+    document.getElementById('cp-tgt-carb-reset-btn').addEventListener('click', () => {
+      CP_TGT_CALC.ratioCarbToccato = false;
+      CP_TGT_CALC.ratioCarb = null;
+      document.getElementById('cp-tgt-carb-auto-badge').style.display = '';
+      document.getElementById('cp-tgt-carb-reset-btn').style.display = 'none';
+      cpTgtCalcRender_();
+    });
+  })();
 
   function cpSalvaTarget(){
     const nuovo = cpZeroNutrienti();
@@ -2682,8 +2964,12 @@
       nuovo[n.key] = Math.max(0, +document.getElementById('cp-tgt-'+n.key).value || 0);
     });
     CP_TARGET = nuovo;
-    CP_TARGET_ORIGINE = CP_TARGET_CALCOLATO
-      ? (CP_NUTRIENTI.every(n => Math.round(CP_TARGET[n.key]) === Math.round(CP_TARGET_CALCOLATO[n.key])) ? 'auto' : 'manuale')
+    // Riferimento per il badge "calcolato automaticamente"/"modificato manualmente": se il riquadro di
+    // calcolo è stato aperto per questo paziente usiamo il suo ultimo risultato (con le scelte di
+    // formula/LAF/deficit-surplus/ripartizione fatte), altrimenti il calcolo di base fatto all'ingresso.
+    const riferimento = CP_TARGET_AUTO_DATA ? (CP_TGT_CALC._risultato || CP_TARGET_CALCOLATO) : null;
+    CP_TARGET_ORIGINE = riferimento
+      ? (CP_NUTRIENTI.every(n => Math.round(CP_TARGET[n.key]) === Math.round(riferimento[n.key])) ? 'auto' : 'manuale')
       : null;
     cpCloseModal();
     cpRenderAll();
