@@ -284,6 +284,8 @@
   .btn.primary:hover{ background:#0A7A6A; }
   .btn.ghost{ background:transparent; }
   .btn.small{ padding:6px 12px; font-size:12.5px; }
+  .btn.warm{ background:var(--accent-warm-soft); color:var(--accent-warm); border-color:transparent; }
+  .btn.warm:hover{ background:var(--accent-warm); color:#fff; }
 
   /* ---------- Modale nuovo paziente ---------- */
   .sidebar-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
@@ -520,6 +522,143 @@
 
   .p-screen{ display:none; }
   .p-screen.active{ display:block; }
+
+
+  .cp-spesa-cat-head{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-warm);
+    margin:14px 0 6px; padding-left:2px;
+  }
+  .cp-spesa-cat-head:first-child{ margin-top:0; }
+  .cp-spesa-item{
+    display:flex; justify-content:space-between; gap:10px; padding:8px 4px; font-size:13px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .cp-spesa-item:last-child{ border-bottom:none; }
+  .cp-spesa-item .num{ color:var(--ink-faint); flex:none; }
+
+  /* ---- Spesa: sotto-tab "Cerca alimenti" ---- */
+  .spesa-subpanel{ margin-top:14px; }
+  .cerca-alimenti-controls{ display:flex; flex-direction:column; gap:9px; margin-bottom:4px; }
+  .cerca-alimenti-controls input[type="text"], .cerca-alimenti-controls select{
+    padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px;
+    background:var(--surface); color:var(--ink); font-family:inherit;
+  }
+  .cerca-alimenti-controls input[type="text"]:focus, .cerca-alimenti-controls select:focus{
+    outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);
+  }
+  .alimento-card{
+    display:flex; align-items:center; gap:11px; padding:10px 11px; border-radius:12px;
+    background:var(--surface); border:1px solid var(--border-soft); cursor:pointer; text-align:left; width:100%;
+  }
+  .alimento-card + .alimento-card{ margin-top:7px; }
+  .alimento-card:hover{ border-color:var(--accent); }
+  .alimento-thumb{
+    width:42px; height:42px; border-radius:10px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .alimento-thumb svg{ width:20px; height:20px; }
+  .alimento-card-body{ flex:1; min-width:0; }
+  .alimento-card-nome{ font-size:12.8px; font-weight:600; line-height:1.3; }
+  .alimento-card-cat{ font-size:11px; color:var(--ink-faint); }
+  .alimento-card-add{
+    flex:none; width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); color:var(--accent-ink); border:none; cursor:pointer;
+  }
+  .alimento-card-add svg{ width:16px; height:16px; }
+  .alimento-card-add.in-lista{ background:var(--accent); color:#fff; }
+  .punteggio-badge{
+    display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:19px; padding:0 6px;
+    border-radius:999px; background:var(--accent-warm-soft); color:var(--accent-warm); font-size:10.5px; font-weight:700;
+  }
+
+  /* ---- Dettaglio alimento: card in stile "Guida alla spesa" ---- */
+  .alimento-detail-actions{ display:flex; gap:8px; margin-bottom:12px; }
+  .alimento-detail-actions .btn{ flex:1; justify-content:center; }
+  .alimento-detail-thumb{
+    width:56px; height:56px; border-radius:14px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .alimento-detail-thumb svg{ width:26px; height:26px; }
+  .alimento-detail-card{
+    background:var(--surface-raised); border:1px solid var(--border-soft); border-radius:var(--radius-m); padding:16px;
+  }
+  .alimento-detail-eyebrow{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-warm); margin-bottom:2px; }
+  .alimento-detail-marca{ font-size:12px; color:var(--ink-faint); margin-top:2px; }
+  .punteggio-circle{
+    flex:none; width:46px; height:46px; border-radius:50%; border:2px solid var(--accent); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:16px;
+  }
+  .unit-toggle-wide{ display:flex; margin-top:14px; }
+  .unit-toggle-wide .chip{ flex:1; justify-content:center; text-align:center; }
+  .alimento-detail-nutri-grid{ display:grid; grid-template-columns:1fr 1fr; gap:13px 18px; margin-bottom:2px; }
+  .alimento-detail-nutri-cell .lbl{ display:block; font-size:11px; color:var(--ink-faint); margin-bottom:2px; }
+  .alimento-detail-nutri-cell .val{ font-size:15.5px; font-weight:700; color:var(--ink); }
+  .alimento-detail-section{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border-soft); }
+  .alimento-detail-section h5{ font-size:12.5px; font-weight:700; margin:0 0 5px; }
+  .alimento-detail-section p{ font-size:12.5px; color:var(--ink-soft); margin:0; line-height:1.55; }
+
+  /* ---- Spesa: lista editabile (stile "La tua lista") ---- */
+  .spesa-list-row{
+    display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:10px;
+    background:var(--surface); border:1px solid var(--border-soft);
+  }
+  .spesa-list-row + .spesa-list-row{ margin-top:6px; }
+  .spesa-list-row.sortable-ghost{ opacity:.4; }
+  .spesa-drag-handle{
+    flex:none; width:20px; height:20px; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-faint); cursor:grab; touch-action:none;
+  }
+  .spesa-drag-handle svg{ width:15px; height:15px; }
+  .spesa-list-row input[type="checkbox"]{ width:17px; height:17px; accent-color:var(--accent); flex:none; cursor:pointer; }
+  .spesa-list-row-body{ flex:1; min-width:0; cursor:pointer; }
+  .spesa-list-row-nome{ font-size:13px; font-weight:600; line-height:1.3; }
+  .spesa-list-row-nome.checked{ text-decoration:line-through; color:var(--ink-faint); font-weight:500; }
+  .spesa-list-row-cat{ font-size:11px; color:var(--ink-faint); }
+  .spesa-list-row-remove{
+    flex:none; width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    background:none; border:none; color:var(--ink-faint); cursor:pointer; border-radius:8px;
+  }
+  .spesa-list-row-remove:hover{ background:var(--critical-soft); color:var(--critical); }
+  .spesa-list-row-remove svg{ width:15px; height:15px; }
+  .spesa-list-actions{ display:flex; gap:8px; margin-top:12px; }
+  .spesa-list-actions .btn{ flex:1; justify-content:center; }
+  .btn.danger{ background:var(--critical-soft); color:var(--critical); border-color:transparent; }
+  .btn.danger:hover{ background:var(--critical); color:#fff; }
+  .spesa-add-nonfood{
+    width:100%; margin-top:10px; padding:11px 14px; border-radius:10px; border:1.5px dashed var(--border);
+    background:none; color:var(--ink-soft); font-size:12.8px; font-weight:600; cursor:pointer; text-align:center;
+  }
+  .spesa-add-nonfood:hover{ border-color:var(--accent); color:var(--accent-ink); }
+  .spesa-add-form{ display:flex; gap:7px; margin-top:10px; }
+  .spesa-add-form input{
+    flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px;
+    background:var(--surface); color:var(--ink); font-family:inherit;
+  }
+  .spesa-add-form input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+
+  .confronto-bar{
+    position:fixed; left:50%; bottom:72px; transform:translateX(-50%); width:480px; max-width:calc(100% - 24px);
+    background:var(--accent-ink); color:#fff; border-radius:14px; padding:11px 14px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; z-index:70; box-shadow:var(--shadow-1);
+  }
+  .confronto-bar span{ font-size:12.8px; font-weight:600; }
+  .confronto-bar .btn.small.ghost{ color:#fff; border-color:rgba(255,255,255,.35); background:none; }
+  .confronto-bar .btn.small.primary:disabled{ opacity:.5; cursor:default; }
+  .confronto-cols{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .confronto-col-head{ font-size:12.5px; font-weight:700; margin-bottom:8px; line-height:1.3; }
+  .confronto-row{ font-size:12px; padding:6px 0; border-bottom:1px solid var(--border-soft); }
+  .confronto-row .lbl{ color:var(--ink-faint); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; display:block; margin-bottom:2px; }
+  .confronto-row .val.migliore{ color:var(--accent); font-weight:700; }
+
+  .p-empty-note{ font-size:12.5px; color:var(--ink-faint); padding:20px 4px; text-align:center; }
+
+  @media print{
+    body.printing-spesa > *:not(.modal-overlay){ display:none !important; }
+    body.printing-spesa .modal-overlay{ position:static !important; background:none !important; display:block !important; padding:0 !important; }
+    body.printing-spesa .modal-card{ box-shadow:none !important; max-width:none !important; border:none !important; }
+    body.printing-spesa .modal-card > *:not(#cp-modal-spesa-view){ display:none !important; }
+    body.printing-spesa #cp-modal-spesa-view button{ display:none !important; }
+  }
 
   .p-checkin-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-soft); }
   .p-checkin-row:last-child{ border-bottom:none; }
@@ -929,8 +1068,23 @@
         <div id="cp-modal-duplicate-view" style="display:none;">
           <h3 id="cp-dup-title">Duplica pasto</h3>
           <p id="cp-dup-sub">—</p>
+          <div id="cp-dup-all-wrap" style="display:none; margin-bottom:14px;">
+            <button class="btn small warm" type="button" id="cp-dup-all-btn" onclick="cpConfirmDuplicateAllDays()">Duplica su tutti i giorni della settimana</button>
+            <p style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Sostituisce questo pasto in tutti gli altri giorni, sovrascrivendo quello che c'è già.</p>
+          </div>
           <div class="cp-day-picker-grid" id="cp-day-picker-grid"></div>
           <div style="display:flex; justify-content:flex-end; margin-top:14px;"><button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button></div>
+        </div>
+
+        <!-- Lista della spesa -->
+        <div id="cp-modal-spesa-view" style="display:none;">
+          <h3>Lista della spesa</h3>
+          <p id="cp-spesa-nutri-sub">—</p>
+          <div id="cp-spesa-nutri-list" style="max-height:420px; overflow-y:auto;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px; flex-wrap:wrap;">
+            <button class="btn small ghost" type="button" onclick="cpStampaSpesa()">Stampa lista</button>
+            <button class="btn ghost" type="button" onclick="cpCloseModal()">Chiudi</button>
+          </div>
         </div>
 
         <!-- Obiettivo -->
@@ -1174,6 +1328,7 @@
               <h3 style="color:var(--warning);">Database alimenti non ancora collegato</h3>
               <p id="cp-config-warning-text">—</p>
             </div>
+            <button class="btn small" type="button" id="cp-retry-alimenti-btn" onclick="cpRiprovaAlimenti()">Riprova</button>
           </div>
         </div>
 
@@ -1193,6 +1348,8 @@
               <button class="btn small ghost" type="button" onclick="cpOpenModal('import')">Importa modello</button>
               <button class="btn small ghost" type="button" onclick="cpOpenDuplicateModal('day')">Duplica giorno</button>
               <button class="btn small ghost" type="button" onclick="cpOpenModal('save')">Salva come modello</button>
+              <button class="btn small ghost" type="button" onclick="cpApriListaSpesa()">Lista della spesa</button>
+              <button class="btn small warm" type="button" onclick="cpSalvaBozza()" id="cp-btn-bozza" title="Tiene in memoria lo stato attuale del piano per questo paziente, senza renderlo ancora definitivo">Salva bozza</button>
               <button class="btn small primary" type="button" onclick="cpSalvaPiano()" id="cp-btn-salva">Salva piano</button>
             </div>
           </div>
@@ -1400,6 +1557,10 @@
           <div class="p-screen" id="p-piano">
             <div class="p-greeting" style="font-size:18px;">Il tuo piano</div>
             <div class="p-sub" id="p-piano-sub">—</div>
+            <button type="button" class="btn small" id="p-piano-spesa-btn" style="width:100%; justify-content:center; margin-bottom:14px; display:none;" onclick="setPatientScreen('spesa'); setSpesaSubtab('lista')">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 4H5L7.2 15.2C7.35 16 8.05 16.5 8.85 16.5H18.1C18.85 16.5 19.5 16 19.7 15.3L21.5 8.5H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20" r="1.3" fill="currentColor"/></svg>
+              Lista della spesa della settimana
+            </button>
             <div class="p-plan-preview" id="p-piano-empty">
               Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà caricato.
             </div>
@@ -1414,6 +1575,62 @@
                 <div class="p-card-top"><h4>Media settimanale</h4></div>
                 <div id="p-piano-week-range" style="font-size:12.8px; color:var(--ink-soft);"></div>
               </div>
+            </div>
+          </div>
+
+          <!-- SPESA -->
+          <div class="p-screen" id="p-spesa">
+            <div class="p-greeting" style="font-size:18px;">Spesa</div>
+            <div class="p-sub">La lista della settimana, e tutto il catalogo alimenti con valori nutrizionali e punteggio.</div>
+            <div class="chip-row" id="spesa-subtab-chips" style="margin-bottom:6px;">
+              <button type="button" class="chip active" data-subtab="lista" onclick="setSpesaSubtab('lista')">Lista della spesa</button>
+              <button type="button" class="chip" data-subtab="cerca" onclick="setSpesaSubtab('cerca')">Cerca alimenti</button>
+            </div>
+
+            <p id="p-spesa-loading" class="p-empty-note" style="display:none;">Carico il catalogo alimenti…</p>
+            <div class="p-card" id="p-spesa-warning" style="display:none;">
+              <p id="p-spesa-warning-text" style="margin-bottom:10px;">—</p>
+              <button type="button" class="btn small" id="p-spesa-retry-btn" onclick="cpRiprovaCatalogoSpesa()" style="width:100%; justify-content:center;">Riprova</button>
+            </div>
+
+            <div id="spesa-sub-lista" class="spesa-subpanel">
+              <div id="p-spesa-count" style="font-size:12px; font-weight:600; color:var(--accent-ink); margin-bottom:12px;">—</div>
+              <div id="p-spesa-list"></div>
+              <div class="spesa-list-actions">
+                <button type="button" class="btn small ghost" onclick="cpSpesaTogliSpunte()">Togli le spunte</button>
+                <button type="button" class="btn small danger" onclick="cpSpesaSvuota()">Svuota</button>
+              </div>
+              <button type="button" class="spesa-add-nonfood" id="spesa-add-nonfood-btn" onclick="cpMostraAggiungiNonAlimentare()">+ Aggiungi prodotto non alimentare</button>
+              <div class="spesa-add-form" id="spesa-add-form" style="display:none;">
+                <input type="text" id="spesa-add-input" placeholder="Es. Detersivo, carta igienica…" onkeydown="if(event.key==='Enter'){ event.preventDefault(); cpConfermaAggiungiNonAlimentare(); }">
+                <button type="button" class="btn small primary" onclick="cpConfermaAggiungiNonAlimentare()">Aggiungi</button>
+                <button type="button" class="btn small ghost" onclick="cpAnnullaAggiungiNonAlimentare()">Annulla</button>
+              </div>
+            </div>
+
+            <div id="spesa-sub-cerca" class="spesa-subpanel" style="display:none;">
+              <div class="cerca-alimenti-controls">
+                <input type="text" id="cerca-alimenti-input" placeholder="Cerca un alimento o una marca…">
+                <select id="cerca-alimenti-categoria"></select>
+                <div class="chip-row" id="unita-alimenti-chips" style="margin:0;">
+                  <button type="button" class="chip active" data-unit="porzione" onclick="setUnitaAlimenti('porzione')">Per porzione</button>
+                  <button type="button" class="chip" data-unit="100g" onclick="setUnitaAlimenti('100g')">Per 100 g</button>
+                </div>
+              </div>
+              <div id="cerca-alimenti-count" style="font-size:12px; color:var(--ink-faint); margin:12px 0 8px;">—</div>
+              <div id="cerca-alimenti-list"></div>
+            </div>
+          </div>
+
+          <!-- RICETTARIO -->
+          <div class="p-screen" id="p-ricettario">
+            <div class="p-greeting" style="font-size:18px;">Ricettario</div>
+            <div class="p-sub">Colazione, pranzo, cena e spuntini: idee pronte in linea con il tuo piano.</div>
+            <div class="p-card" style="text-align:center; padding:32px 20px;">
+              <div class="alimento-detail-thumb" style="margin:0 auto 14px;">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>
+              </div>
+              <p style="margin:0; font-size:12.8px; color:var(--ink-soft);">In arrivo — qui troverai presto le ricette per ogni pasto, divise per categoria.</p>
             </div>
           </div>
 
@@ -1463,6 +1680,14 @@
             <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.7"/><path d="M8 12H16M8 15.5H16M8 8.5H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Piano
           </button>
+          <button class="nav-btn" onclick="setPatientScreen('spesa'); rinfrescaSpesaSottoTabAttiva();" data-screen="spesa">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 4H5L7.2 15.2C7.35 16 8.05 16.5 8.85 16.5H18.1C18.85 16.5 19.5 16 19.7 15.3L21.5 8.5H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20" r="1.3" fill="currentColor"/></svg>
+            Spesa
+          </button>
+          <button class="nav-btn" onclick="setPatientScreen('ricettario')" data-screen="ricettario">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>
+            Ricette
+          </button>
           <button class="nav-btn" onclick="setPatientScreen('andamento')" data-screen="andamento">
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V15M9.5 19V10M15 19V13M20 19V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             Andamento
@@ -1472,6 +1697,60 @@
             Profilo
           </button>
         </div>
+    </div>
+
+    <div class="confronto-bar" id="confronto-bar" style="display:none;">
+      <span id="confronto-bar-text">1 selezionato</span>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn small ghost" onclick="svuotaConfronto()">Svuota</button>
+        <button type="button" class="btn small primary" id="confronto-bar-btn" disabled onclick="apriConfronto()">Confronta</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="p-modal-overlay" style="display:none;" onclick="if(event.target===this) pCloseModal();">
+      <div class="modal-card">
+        <div id="p-modal-alimento-view">
+          <div class="alimento-detail-actions">
+            <button type="button" class="btn small ghost" id="p-modal-confronto-btn" onclick="pToggleConfrontoDaDettaglio()">Confronta con…</button>
+            <button type="button" class="btn small ghost" id="p-modal-lista-btn" onclick="pToggleListaDaDettaglio()">Aggiungi alla lista</button>
+          </div>
+          <div class="alimento-detail-card">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <div class="alimento-detail-thumb" id="p-modal-alimento-thumb"></div>
+              <div style="flex:1; min-width:0;">
+                <div class="alimento-detail-eyebrow" id="p-modal-alimento-eyebrow">—</div>
+                <h3 id="p-modal-alimento-nome" style="margin:0 0 2px;">—</h3>
+                <div class="alimento-detail-marca" id="p-modal-alimento-marca"></div>
+              </div>
+              <div class="punteggio-circle" id="p-modal-alimento-punteggio">—</div>
+            </div>
+            <div class="chip-row unit-toggle-wide" id="dettaglio-unita-chips" style="margin-bottom:8px;">
+              <button type="button" class="chip active" data-unit="porzione" onclick="setUnitaAlimenti('porzione')">Per porzione</button>
+              <button type="button" class="chip" data-unit="100g" onclick="setUnitaAlimenti('100g')">Per 100 g</button>
+            </div>
+            <div class="alimento-detail-nutri-grid" id="p-modal-alimento-nutri"></div>
+            <div class="alimento-detail-section" id="p-modal-alimento-ingredienti-wrap" style="display:none;">
+              <h5>Ingredienti</h5>
+              <p id="p-modal-alimento-ingredienti"></p>
+            </div>
+            <div class="alimento-detail-section">
+              <h5>Consiglio nutrizionale</h5>
+              <p id="p-modal-alimento-descrizione">—</p>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+            <button class="btn ghost" type="button" onclick="pCloseModal()">Chiudi</button>
+          </div>
+        </div>
+        <div id="p-modal-confronto-view" style="display:none;">
+          <h3>Confronto</h3>
+          <p>Il valore evidenziato è quello più contenuto tra i due, su grassi saturi, zuccheri e sale.</p>
+          <div class="confronto-cols" id="p-confronto-cols"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+            <button class="btn ghost" type="button" onclick="pCloseModal()">Chiudi</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1484,6 +1763,7 @@
 
 <div id="tooltip"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script>
   /* ================= CONFIGURAZIONE ================= */
   // Incolla qui, tra virgolette, l'indirizzo dell'app web di Google Apps Script
@@ -2269,6 +2549,26 @@
     await CP_FOODS_LOADING;
   }
 
+  async function cpRiprovaAlimenti(){
+    const btn = document.getElementById('cp-retry-alimenti-btn');
+    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    CP_FOODS = null;
+    CP_FOODS_ERROR = null;
+    CP_FOODS_LOADING = null;
+    await cpLoadFoods();
+    const warnEl = document.getElementById('cp-config-warning');
+    if(CP_FOODS_ERROR){
+      warnEl.style.display = '';
+      document.getElementById('cp-config-warning-text').textContent = CP_FOODS_ERROR;
+      showToast('Ancora nessuna risposta dal database alimenti.');
+    } else {
+      warnEl.style.display = 'none';
+      cpRenderAll();
+      showToast('Database alimenti collegato — puoi cercare gli alimenti qui sotto');
+    }
+    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+  }
+
   function cpComputeItem(item){
     const f = CP_FOODS_BY_ID[item.id];
     const out = cpZeroNutrienti();
@@ -2297,6 +2597,33 @@
     const out = cpZeroNutrienti();
     CP_NUTRIENTI.forEach(nut => { out[nut.key] = totals.reduce((a,t)=>a+t[nut.key],0)/n; });
     return out;
+  }
+
+  // ---- lista della spesa: somma i grammi di ogni alimento su tutta la settimana, raggruppati per
+  // categoria (la stessa categoria usata in Guida alla Spesa). Usata sia dalla vista paziente sia
+  // dall'anteprima lato nutrizionista, così la lista è sempre identica nei due punti.
+  function cpComputeShoppingList(){
+    const totali = {};
+    CP_GIORNI.forEach(g => {
+      CP_MEALS.forEach(m => {
+        (CP_PLAN[g][m]||[]).forEach(item => { totali[item.id] = (totali[item.id]||0) + item.g; });
+      });
+    });
+    const perCategoria = {};
+    Object.keys(totali).forEach(id => {
+      const f = CP_FOODS_BY_ID[id];
+      if(!f) return;
+      const cat = f.categoria || 'Altro';
+      (perCategoria[cat] = perCategoria[cat] || []).push({ id, nome: f.nome, grammi: totali[id] });
+    });
+    return Object.keys(perCategoria).sort((a,b) => a.localeCompare(b, 'it')).map(cat => ({
+      categoria: cat,
+      items: perCategoria[cat].sort((a,b) => a.nome.localeCompare(b.nome, 'it')),
+    }));
+  }
+  function cpFmtSpesaQta(g){
+    if(g >= 1000) return (Math.round(g/100)/10).toString().replace('.', ',') + ' kg';
+    return cpFmt(g) + ' g';
   }
 
   // ---- bozza locale non salvata (localStorage) ----
@@ -2764,11 +3091,20 @@
     btn.textContent = testoOriginale;
   }
 
+  function cpSalvaBozza(){
+    if(!currentPatientCode) return;
+    cpSalvaDraftLocale();
+    CP_DRAFT_ATTIVO = true;
+    document.getElementById('cp-draft-notice').style.display = '';
+    showToast('Bozza salvata — la ritrovi qui se torni su questo paziente più tardi');
+  }
+
   /* ---- modali: import / salva modello / duplica / obiettivo ---- */
   function cpOpenModal(mode){
     document.getElementById('cp-modal-import-view').style.display = mode==='import' ? '' : 'none';
     document.getElementById('cp-modal-save-view').style.display = mode==='save' ? '' : 'none';
     document.getElementById('cp-modal-duplicate-view').style.display = 'none';
+    document.getElementById('cp-modal-spesa-view').style.display = 'none';
     document.getElementById('cp-modal-target-view').style.display = mode==='target' ? '' : 'none';
     if(mode === 'import') cpRenderTemplateList();
     if(mode === 'save'){
@@ -2800,6 +3136,32 @@
     document.getElementById('cp-modal-overlay').style.display = 'flex';
   }
   function cpCloseModal(){ document.getElementById('cp-modal-overlay').style.display = 'none'; }
+
+  function cpApriListaSpesa(){
+    document.getElementById('cp-modal-import-view').style.display = 'none';
+    document.getElementById('cp-modal-save-view').style.display = 'none';
+    document.getElementById('cp-modal-duplicate-view').style.display = 'none';
+    document.getElementById('cp-modal-target-view').style.display = 'none';
+    document.getElementById('cp-modal-spesa-view').style.display = '';
+    const lista = cpComputeShoppingList();
+    const totale = lista.reduce((n,c) => n + c.items.length, 0);
+    const nomePaziente = (currentPatientMeta && currentPatientMeta.Nome) || 'questo paziente';
+    document.getElementById('cp-spesa-nutri-sub').textContent = totale
+      ? `${totale} alimenti diversi, sommati su tutta la settimana di ${nomePaziente} — è la stessa lista che vede in app.`
+      : 'Il piano di questo paziente non contiene ancora alimenti: componi almeno un pasto per generare la lista.';
+    document.getElementById('cp-spesa-nutri-list').innerHTML = lista.map(cat => `
+      <div class="cp-spesa-cat-head">${cpEsc(cat.categoria)}</div>
+      ${cat.items.map(it => `<div class="cp-spesa-item"><span>${cpEsc(it.nome)}</span><span class="num">${cpFmtSpesaQta(it.grammi)}</span></div>`).join('')}
+    `).join('');
+    document.getElementById('cp-modal-overlay').style.display = 'flex';
+  }
+  function cpStampaSpesa(){
+    document.body.classList.add('printing-spesa');
+    const cleanup = () => document.body.classList.remove('printing-spesa');
+    window.addEventListener('afterprint', cleanup, { once:true });
+    window.print();
+    setTimeout(cleanup, 1000);
+  }
 
   // ---- pannello di calcolo TDEE dentro il modale Obiettivo ----
   // Ricorda le scelte di formula/LAF/deficit-o-surplus/ripartizione fatte dal nutrizionista durante la
@@ -3054,6 +3416,7 @@
     document.getElementById('cp-dup-sub').textContent = isMeal
       ? `Duplica "${meal}" di ${cpState.day} su quale giorno? Il pasto del giorno scelto verrà sostituito.`
       : `Duplica tutti i pasti di ${cpState.day} su quale giorno? Tutti i pasti del giorno scelto verranno sostituiti.`;
+    document.getElementById('cp-dup-all-wrap').style.display = isMeal ? '' : 'none';
     const grid = document.getElementById('cp-day-picker-grid');
     grid.innerHTML = CP_GIORNI.filter(g => g !== cpState.day).map(g => `
       <button type="button" class="cp-day-picker-btn" data-day="${g}">
@@ -3067,6 +3430,7 @@
     document.getElementById('cp-modal-import-view').style.display = 'none';
     document.getElementById('cp-modal-save-view').style.display = 'none';
     document.getElementById('cp-modal-target-view').style.display = 'none';
+    document.getElementById('cp-modal-spesa-view').style.display = 'none';
     document.getElementById('cp-modal-duplicate-view').style.display = '';
     document.getElementById('cp-modal-overlay').style.display = 'flex';
   }
@@ -3081,6 +3445,20 @@
     cpRenderSummary();
     cpSalvaDraftLocale();
     showToast(cpDupState.mode === 'meal' ? `"${cpDupState.meal}" duplicato su ${destDay}` : `Giorno duplicato su ${destDay}`);
+  }
+  function cpConfirmDuplicateAllDays(){
+    if(!cpDupState || cpDupState.mode !== 'meal') return;
+    const meal = cpDupState.meal;
+    const source = cpState.day;
+    CP_GIORNI.forEach(g => {
+      if(g === source) return;
+      CP_PLAN[g][meal] = CP_PLAN[source][meal].map(item => ({ id:item.id, g:item.g }));
+    });
+    cpCloseModal();
+    cpRenderDayTabs();
+    cpRenderSummary();
+    cpSalvaDraftLocale();
+    showToast(`"${meal}" duplicato su tutti i giorni della settimana`);
   }
 
   /* ================= TOAST DI CONFERMA ================= */
@@ -3372,8 +3750,10 @@
     const emptyEl = document.getElementById('p-piano-empty');
     const subEl = document.getElementById('p-piano-sub');
     const structEl = document.getElementById('p-piano-struct');
+    const spesaBtn = document.getElementById('p-piano-spesa-btn');
 
     const { hasPdf, useStruct } = cpDecidePianoAttivo();
+    spesaBtn.style.display = useStruct ? '' : 'none';
 
     if(useStruct){
       dataEl.textContent = 'Ultimo aggiornamento: ' + fmtDateFull(new Date(CP_ATTIVO_DATA));
@@ -3402,6 +3782,376 @@
         ? 'Non riusciamo a caricare il piano: ' + pianoLoadError
         : 'Il tuo piano alimentare comparirà qui non appena la tua nutrizionista lo avrà preparato.';
     }
+  }
+
+  // ---- lista della spesa (vista paziente): elenco modificabile a sé stante — parte dagli
+  // alimenti del piano della settimana ma, da lì in poi, il paziente la gestisce come vuole
+  // (spunta, riordina trascinando, rimuove, aggiunge alimenti dal catalogo o prodotti non
+  // alimentari). Vive in memoria per la sessione: si azzera ricaricando la pagina.
+  let CP_SPESA_ITEMS = null; // null = non ancora inizializzata in questa sessione
+  let CP_SPESA_CHECKED = new Set();
+
+  function cpInizializzaSpesaSeServe(){
+    if(CP_SPESA_ITEMS) return;
+    CP_SPESA_ITEMS = [];
+    cpComputeShoppingList().forEach(cat => cat.items.forEach(it => {
+      CP_SPESA_ITEMS.push({ id: it.id, nome: it.nome, categoria: cat.categoria });
+    }));
+  }
+  function cpAlimentoInLista(id){
+    cpInizializzaSpesaSeServe();
+    return CP_SPESA_ITEMS.some(it => it.id === id);
+  }
+  // Aggiunge o toglie un alimento dalla lista; ritorna true se ora è presente.
+  function cpToggleAlimentoInLista(id){
+    cpInizializzaSpesaSeServe();
+    const idx = CP_SPESA_ITEMS.findIndex(it => it.id === id);
+    if(idx >= 0){
+      CP_SPESA_ITEMS.splice(idx, 1);
+      CP_SPESA_CHECKED.delete(id);
+      return false;
+    }
+    const f = CP_FOODS_BY_ID[id];
+    CP_SPESA_ITEMS.push({ id, nome: f ? f.nome : id, categoria: f ? (f.categoria||'Altro') : 'Altro' });
+    return true;
+  }
+
+  function renderPatientSpesa(){
+    cpInizializzaSpesaSeServe();
+    const listEl = document.getElementById('p-spesa-list');
+    if(!CP_SPESA_ITEMS.length){
+      listEl.innerHTML = '<p class="p-empty-note">La lista è vuota — aggiungi alimenti dal tuo piano o dalla sezione "Cerca alimenti", oppure un prodotto non alimentare qui sotto.</p>';
+      cpAggiornaContatoreSpesa();
+      return;
+    }
+    listEl.innerHTML = CP_SPESA_ITEMS.map(it => `
+      <div class="spesa-list-row" data-id="${cpEsc(it.id)}">
+        <span class="spesa-drag-handle" title="Trascina per riordinare">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/><circle cx="9" cy="18" r="1.4" fill="currentColor"/><circle cx="15" cy="18" r="1.4" fill="currentColor"/></svg>
+        </span>
+        <input type="checkbox" ${CP_SPESA_CHECKED.has(it.id) ? 'checked' : ''}>
+        <span class="spesa-list-row-body">
+          <span class="spesa-list-row-nome ${CP_SPESA_CHECKED.has(it.id) ? 'checked' : ''}">${cpEsc(it.nome)}</span>
+          <span class="spesa-list-row-cat">${cpEsc(it.categoria||'Altro')}</span>
+        </span>
+        <button type="button" class="spesa-list-row-remove" title="Rimuovi dalla lista">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.spesa-list-row').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+        if(e.target.checked) CP_SPESA_CHECKED.add(id); else CP_SPESA_CHECKED.delete(id);
+        row.querySelector('.spesa-list-row-nome').classList.toggle('checked', e.target.checked);
+        cpAggiornaContatoreSpesa();
+      });
+      row.querySelector('.spesa-list-row-body').addEventListener('click', () => apriDettaglioAlimento(id));
+      row.querySelector('.spesa-list-row-remove').addEventListener('click', () => {
+        CP_SPESA_ITEMS = CP_SPESA_ITEMS.filter(it => it.id !== id);
+        CP_SPESA_CHECKED.delete(id);
+        renderPatientSpesa();
+      });
+    });
+    cpAggiornaContatoreSpesa();
+    if(window.Sortable && !listEl._sortableInit){
+      listEl._sortableInit = true;
+      new Sortable(listEl, {
+        handle: '.spesa-drag-handle', animation: 150,
+        onEnd: function(evt){
+          if(evt.oldIndex === evt.newIndex) return;
+          const moved = CP_SPESA_ITEMS.splice(evt.oldIndex, 1)[0];
+          CP_SPESA_ITEMS.splice(evt.newIndex, 0, moved);
+        }
+      });
+    }
+  }
+  function cpAggiornaContatoreSpesa(){
+    const tot = CP_SPESA_ITEMS ? CP_SPESA_ITEMS.length : 0;
+    const fatti = CP_SPESA_ITEMS ? CP_SPESA_ITEMS.filter(it => CP_SPESA_CHECKED.has(it.id)).length : 0;
+    document.getElementById('p-spesa-count').textContent = tot ? `${fatti} di ${tot} presi` : '';
+  }
+  function cpSpesaTogliSpunte(){
+    CP_SPESA_CHECKED.clear();
+    renderPatientSpesa();
+  }
+  function cpSpesaSvuota(){
+    CP_SPESA_ITEMS = [];
+    CP_SPESA_CHECKED.clear();
+    renderPatientSpesa();
+  }
+  function cpMostraAggiungiNonAlimentare(){
+    document.getElementById('spesa-add-nonfood-btn').style.display = 'none';
+    document.getElementById('spesa-add-form').style.display = 'flex';
+    const inp = document.getElementById('spesa-add-input');
+    inp.value = '';
+    inp.focus();
+  }
+  function cpAnnullaAggiungiNonAlimentare(){
+    document.getElementById('spesa-add-form').style.display = 'none';
+    document.getElementById('spesa-add-nonfood-btn').style.display = '';
+  }
+  function cpConfermaAggiungiNonAlimentare(){
+    cpInizializzaSpesaSeServe();
+    const inp = document.getElementById('spesa-add-input');
+    const nome = (inp.value || '').trim();
+    if(!nome) return;
+    CP_SPESA_ITEMS.push({ id: 'manuale-' + Date.now() + '-' + Math.random().toString(36).slice(2,6), nome, categoria: 'Altro' });
+    cpAnnullaAggiungiNonAlimentare();
+    renderPatientSpesa();
+  }
+
+  // ---- Spesa: sotto-tab "Lista della spesa" / "Cerca alimenti" ----
+  // Il database alimenti si scarica una sola volta, alla PRIMA apertura della sezione Spesa (non
+  // al login): finché non serve, il paziente non se lo scarica affatto. cpAssicuraCatalogoSpesa()
+  // gestisce il caricamento (e l'eventuale errore, con un "Riprova") davanti a entrambe le sotto-schede.
+  async function setSpesaSubtab(name){
+    document.querySelectorAll('#spesa-subtab-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.subtab===name));
+    document.getElementById('spesa-sub-lista').style.display = name==='lista' ? '' : 'none';
+    document.getElementById('spesa-sub-cerca').style.display = name==='cerca' ? '' : 'none';
+    const pronto = await cpAssicuraCatalogoSpesa();
+    if(!pronto) return; // lo stato di caricamento/errore è già mostrato da cpAssicuraCatalogoSpesa()
+    // Nel frattempo l'utente potrebbe aver cambiato sotto-scheda: rendo quella davvero attiva ora.
+    const attivo = document.querySelector('#spesa-subtab-chips .chip.active');
+    const nomeAttuale = attivo ? attivo.dataset.subtab : name;
+    if(nomeAttuale==='lista') renderPatientSpesa();
+    if(nomeAttuale==='cerca') renderCercaAlimenti();
+  }
+  function rinfrescaSpesaSottoTabAttiva(){
+    const attivo = document.querySelector('#spesa-subtab-chips .chip.active');
+    setSpesaSubtab(attivo ? attivo.dataset.subtab : 'lista');
+  }
+  // Garantisce che CP_FOODS sia pronto prima di mostrare la lista o il catalogo; ritorna true se
+  // ok, false se ancora in caricamento o in errore (mostra lui stesso lo stato davanti alle sotto-schede).
+  async function cpAssicuraCatalogoSpesa(){
+    const loadingEl = document.getElementById('p-spesa-loading');
+    const warnEl = document.getElementById('p-spesa-warning');
+    if(CP_FOODS && !CP_FOODS_ERROR){
+      loadingEl.style.display = 'none';
+      warnEl.style.display = 'none';
+      return true;
+    }
+    warnEl.style.display = 'none';
+    loadingEl.style.display = '';
+    await cpLoadFoods();
+    loadingEl.style.display = 'none';
+    if(CP_FOODS_ERROR){
+      warnEl.style.display = '';
+      document.getElementById('p-spesa-warning-text').textContent = CP_FOODS_ERROR;
+      return false;
+    }
+    return true;
+  }
+  async function cpRiprovaCatalogoSpesa(){
+    const btn = document.getElementById('p-spesa-retry-btn');
+    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    CP_FOODS = null; CP_FOODS_ERROR = null; CP_FOODS_LOADING = null;
+    await rinfrescaSpesaSottoTabAttiva();
+    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+  }
+
+  // ---- Cerca alimenti: catalogo completo, ricerca + categoria + unità di misura ----
+  const ALIMENTO_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 21V12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  const ICONA_PIU_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const ICONA_CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  let CP_UNITA_ALIMENTI = 'porzione'; // 'porzione' | '100g'
+  let CP_CATEGORIE_POPOLATE = false;
+
+  function setUnitaAlimenti(u){
+    CP_UNITA_ALIMENTI = u;
+    document.querySelectorAll('[data-unit]').forEach(c => c.classList.toggle('active', c.dataset.unit===u));
+    renderCercaAlimenti();
+    if(CP_DETTAGLIO_APERTO_ID) renderDettaglioNutrienti(CP_DETTAGLIO_APERTO_ID);
+  }
+  // Valore di un nutriente nell'unità corrente: per 100g così com'è nel database, per porzione
+  // moltiplicato per la porzione di riferimento dell'alimento.
+  function cpValoreAlimento(f, key){
+    const v = f[key] || 0;
+    return CP_UNITA_ALIMENTI === 'porzione' ? v * (f.porzione||100) / 100 : v;
+  }
+  function cpEtichettaUnita(f){
+    return CP_UNITA_ALIMENTI === 'porzione' ? `porzione da ${cpFmt(f.porzione||100)} g` : '100 g';
+  }
+  // "Petto di pollo (Fileni)" -> { base:"Petto di pollo", marca:"Fileni" }
+  function cpSplitNomeMarca(nome){
+    const m = (nome||'').match(/^(.*)\s\((.+)\)$/);
+    return m ? { base: m[1], marca: m[2] } : { base: nome||'', marca: '' };
+  }
+
+  (function setupCercaAlimenti(){
+    const inp = document.getElementById('cerca-alimenti-input');
+    const sel = document.getElementById('cerca-alimenti-categoria');
+    if(!inp || !sel) return;
+    inp.addEventListener('input', renderCercaAlimenti);
+    sel.addEventListener('change', renderCercaAlimenti);
+  })();
+
+  function renderCercaAlimenti(){
+    const selCat = document.getElementById('cerca-alimenti-categoria');
+    if(!CP_CATEGORIE_POPOLATE){
+      const categorie = [...new Set((CP_FOODS||[]).map(f => f.categoria).filter(Boolean))].sort((a,b) => a.localeCompare(b,'it'));
+      selCat.innerHTML = '<option value="">Tutte le categorie</option>' + categorie.map(c => `<option value="${cpEsc(c)}">${cpEsc(c)}</option>`).join('');
+      CP_CATEGORIE_POPOLATE = true;
+    }
+    const termine = (document.getElementById('cerca-alimenti-input').value || '').trim().toLowerCase();
+    const categoria = selCat.value;
+    const risultati = (CP_FOODS||[]).filter(f => {
+      if(categoria && f.categoria !== categoria) return false;
+      if(termine && !f.nome.toLowerCase().includes(termine)) return false;
+      return true;
+    }).sort((a,b) => a.nome.localeCompare(b.nome, 'it'));
+
+    document.getElementById('cerca-alimenti-count').textContent = `${risultati.length} alimenti trovati`;
+    const listEl = document.getElementById('cerca-alimenti-list');
+    if(!risultati.length){
+      listEl.innerHTML = '<p class="p-empty-note">Nessun alimento trovato con questi filtri.</p>';
+      return;
+    }
+    listEl.innerHTML = risultati.map(f => {
+      const inLista = cpAlimentoInLista(f.id);
+      return `
+      <div class="alimento-card" data-id="${cpEsc(f.id)}">
+        <div class="alimento-thumb">${ALIMENTO_ICON_SVG}</div>
+        <div class="alimento-card-body">
+          <div class="alimento-card-nome">${cpEsc(f.nome)}</div>
+          <div class="alimento-card-cat">${cpEsc(f.categoria||'—')}</div>
+        </div>
+        <button type="button" class="alimento-card-add ${inLista ? 'in-lista' : ''}" data-id="${cpEsc(f.id)}" title="${inLista ? 'Nella lista della spesa' : 'Aggiungi alla lista della spesa'}">
+          ${inLista ? ICONA_CHECK_SVG : ICONA_PIU_SVG}
+        </button>
+      </div>
+    `;
+    }).join('');
+    listEl.querySelectorAll('.alimento-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if(e.target.closest('.alimento-card-add')) return;
+        apriDettaglioAlimento(card.dataset.id);
+      });
+    });
+    listEl.querySelectorAll('.alimento-card-add').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const oraPresente = cpToggleAlimentoInLista(id);
+        btn.classList.toggle('in-lista', oraPresente);
+        btn.title = oraPresente ? 'Nella lista della spesa' : 'Aggiungi alla lista della spesa';
+        btn.innerHTML = oraPresente ? ICONA_CHECK_SVG : ICONA_PIU_SVG;
+        if(CP_DETTAGLIO_APERTO_ID === id) aggiornaDettaglioAzioni(id);
+      });
+    });
+  }
+
+  // ---- dettaglio alimento + confronto (fino a 2) ----
+  let CP_CONFRONTO = [];
+  let CP_DETTAGLIO_APERTO_ID = null;
+  const ETICHETTE_DETTAGLIO = { kcal:'Kcal', zuccheri:'Di cui zuccheri', grassi:'Grassi', prot:'Proteine', grassiSaturi:'Di cui saturi', fibra:'Fibre', carb:'Carboidrati', sale:'Sale' };
+
+  function renderDettaglioNutrienti(id){
+    const f = CP_FOODS_BY_ID[id];
+    if(!f) return;
+    const byKey = {}; CP_NUTRIENTI.forEach(n => byKey[n.key] = n);
+    const coppie = [['kcal','zuccheri'], ['grassi','prot'], ['grassiSaturi','fibra'], ['carb','sale']];
+    document.getElementById('p-modal-alimento-nutri').innerHTML = coppie.map(([k1,k2]) => `
+      <div class="alimento-detail-nutri-cell"><span class="lbl">${ETICHETTE_DETTAGLIO[k1]}</span><span class="val num">${cpFmt(cpValoreAlimento(f,k1))}${byKey[k1].unit ? ' '+byKey[k1].unit : ''}</span></div>
+      <div class="alimento-detail-nutri-cell"><span class="lbl">${ETICHETTE_DETTAGLIO[k2]}</span><span class="val num">${cpFmt(cpValoreAlimento(f,k2))}${byKey[k2].unit ? ' '+byKey[k2].unit : ''}</span></div>
+    `).join('');
+  }
+  function aggiornaDettaglioAzioni(id){
+    const btnConf = document.getElementById('p-modal-confronto-btn');
+    const inConfronto = CP_CONFRONTO.includes(id);
+    btnConf.textContent = inConfronto ? 'Nel confronto ✓' : 'Confronta con…';
+    btnConf.classList.toggle('primary', inConfronto);
+    btnConf.classList.toggle('ghost', !inConfronto);
+
+    const btnLista = document.getElementById('p-modal-lista-btn');
+    const inLista = cpAlimentoInLista(id);
+    btnLista.textContent = inLista ? 'Nella lista ✓' : 'Aggiungi alla lista';
+    btnLista.classList.toggle('primary', inLista);
+    btnLista.classList.toggle('ghost', !inLista);
+  }
+  function apriDettaglioAlimento(id){
+    const f = CP_FOODS_BY_ID[id];
+    if(!f) return;
+    CP_DETTAGLIO_APERTO_ID = id;
+    const { base, marca } = cpSplitNomeMarca(f.nome);
+    document.getElementById('p-modal-alimento-thumb').innerHTML = ALIMENTO_ICON_SVG;
+    document.getElementById('p-modal-alimento-eyebrow').textContent = (f.categoria||'—').toUpperCase();
+    document.getElementById('p-modal-alimento-nome').textContent = base;
+    document.getElementById('p-modal-alimento-marca').textContent = marca || '';
+    document.getElementById('p-modal-alimento-punteggio').textContent = f.punteggio != null ? f.punteggio : '—';
+    const ingrWrap = document.getElementById('p-modal-alimento-ingredienti-wrap');
+    if(f.ingredienti){
+      ingrWrap.style.display = '';
+      document.getElementById('p-modal-alimento-ingredienti').textContent = f.ingredienti;
+    } else {
+      ingrWrap.style.display = 'none';
+    }
+    document.getElementById('p-modal-alimento-descrizione').textContent = f.descrizione || '—';
+    renderDettaglioNutrienti(id);
+    aggiornaDettaglioAzioni(id);
+    document.getElementById('p-modal-alimento-view').style.display = '';
+    document.getElementById('p-modal-confronto-view').style.display = 'none';
+    document.getElementById('p-modal-overlay').style.display = 'flex';
+  }
+  function pCloseModal(){
+    document.getElementById('p-modal-overlay').style.display = 'none';
+    CP_DETTAGLIO_APERTO_ID = null;
+  }
+
+  function pToggleConfrontoDaDettaglio(){
+    const id = CP_DETTAGLIO_APERTO_ID;
+    if(!id) return;
+    if(CP_CONFRONTO.includes(id)){
+      CP_CONFRONTO = CP_CONFRONTO.filter(x => x !== id);
+    } else {
+      if(CP_CONFRONTO.length >= 2){
+        showToast('Puoi confrontare al massimo 2 alimenti alla volta — svuota prima il confronto');
+        return;
+      }
+      CP_CONFRONTO.push(id);
+    }
+    aggiornaBarraConfronto();
+    aggiornaDettaglioAzioni(id);
+  }
+  function pToggleListaDaDettaglio(){
+    const id = CP_DETTAGLIO_APERTO_ID;
+    if(!id) return;
+    cpToggleAlimentoInLista(id);
+    aggiornaDettaglioAzioni(id);
+    renderPatientSpesa();
+  }
+  function svuotaConfronto(){
+    CP_CONFRONTO = [];
+    aggiornaBarraConfronto();
+    if(CP_DETTAGLIO_APERTO_ID) aggiornaDettaglioAzioni(CP_DETTAGLIO_APERTO_ID);
+  }
+  function aggiornaBarraConfronto(){
+    const bar = document.getElementById('confronto-bar');
+    const btn = document.getElementById('confronto-bar-btn');
+    if(!CP_CONFRONTO.length){ bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    document.getElementById('confronto-bar-text').textContent = CP_CONFRONTO.length === 1 ? '1 alimento selezionato' : '2 alimenti selezionati';
+    btn.disabled = CP_CONFRONTO.length !== 2;
+  }
+  function apriConfronto(){
+    if(CP_CONFRONTO.length !== 2) return;
+    const [a, b] = CP_CONFRONTO.map(id => CP_FOODS_BY_ID[id]);
+    if(!a || !b) return;
+    const daEvidenziare = ['grassiSaturi','zuccheri','sale'];
+    const colHtml = (f, altro) => `
+      <div>
+        <div class="confronto-col-head">${cpEsc(f.nome)}</div>
+        ${CP_NUTRIENTI.map(n => {
+          const v = cpValoreAlimento(f, n.key);
+          const vAltro = cpValoreAlimento(altro, n.key);
+          const migliore = daEvidenziare.includes(n.key) && v < vAltro;
+          return `<div class="confronto-row"><span class="lbl">${n.label}</span><span class="val ${migliore?'migliore':''} num">${cpFmt(v)}${n.unit?' '+n.unit:''}</span></div>`;
+        }).join('')}
+      </div>`;
+    document.getElementById('p-confronto-cols').innerHTML = colHtml(a,b) + colHtml(b,a);
+    document.getElementById('p-modal-alimento-view').style.display = 'none';
+    document.getElementById('p-modal-confronto-view').style.display = '';
+    document.getElementById('p-modal-overlay').style.display = 'flex';
   }
 
   function renderPatientPianoStruct(){
@@ -3556,7 +4306,9 @@
     document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
     document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
     currentMetric = 'peso'; patientMetric = 'peso';
-    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice), loadPianoStrutturato(p.Codice), cpLoadFoods()]);
+    // Il database alimenti (100+ voci) NON si carica qui: pesa troppo per essere scaricato ad ogni
+    // login. Si carica solo quando il paziente apre davvero la sezione "Spesa" — vedi cpAssicuraCatalogoSpesa().
+    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice), loadPianoStrutturato(p.Codice)]);
     renderPatientHomeCards();
     renderPatientCharts();
     renderCheckinList();
