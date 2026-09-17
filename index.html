@@ -2005,8 +2005,38 @@
 
 <div id="tooltip"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script>
+  /* ================= APP PIÙ VELOCE: CACHE E CARICAMENTO SU RICHIESTA ================= */
+  // Service worker: salva il "guscio" dell'app (questo file, le icone, i caratteri) sul telefono,
+  // così le aperture successive sono quasi istantanee. Non tocca MAI i dati (misurazioni, piano,
+  // ricette, ecc.): quelli arrivano sempre in diretta da Google, come prima. Se il browser non
+  // supporta i service worker, o la registrazione fallisce per qualsiasi motivo, l'app continua
+  // a funzionare esattamente come prima, solo senza questo miglioramento.
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.warn('Cache dell\'app non attivata (l\'app funziona comunque, solo senza avvio più rapido):', err);
+      });
+    });
+  }
+
+  // La libreria "Sortable" (usata solo per trascinare e riordinare gli elementi della lista della
+  // spesa) viene scaricata solo quando il paziente apre davvero quella schermata, invece che ad
+  // ogni apertura dell'app: chi non la usa risparmia un giro di rete in più al caricamento.
+  let _promessaSortable = null;
+  function cpCaricaSortable_(){
+    if(window.Sortable) return Promise.resolve();
+    if(_promessaSortable) return _promessaSortable;
+    _promessaSortable = new Promise(function(resolve, reject){
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js';
+      s.onload = function(){ resolve(); };
+      s.onerror = function(){ _promessaSortable = null; reject(new Error('Libreria di riordino non caricata')); };
+      document.head.appendChild(s);
+    });
+    return _promessaSortable;
+  }
+
   /* ================= CONFIGURAZIONE ================= */
   // Incolla qui, tra virgolette, l'indirizzo dell'app web di Google Apps Script
   // (vedi LEGGIMI-DATI.md). Finché resta vuoto, il sito mostra solo la schermata di accesso.
@@ -4308,16 +4338,25 @@
       });
     });
     cpAggiornaContatoreSpesa();
-    if(window.Sortable && !listEl._sortableInit){
-      listEl._sortableInit = true;
-      new Sortable(listEl, {
-        handle: '.spesa-drag-handle', animation: 150,
-        onEnd: function(evt){
-          if(evt.oldIndex === evt.newIndex) return;
-          const moved = CP_SPESA_ITEMS.splice(evt.oldIndex, 1)[0];
-          CP_SPESA_ITEMS.splice(evt.newIndex, 0, moved);
-          cpSalvaSpesaLocale();
-        }
+    if(!listEl._sortableInit && !listEl._sortableCaricamento){
+      listEl._sortableCaricamento = true;
+      cpCaricaSortable_().then(function(){
+        listEl._sortableCaricamento = false;
+        if(listEl._sortableInit) return; // già inizializzato nel frattempo
+        listEl._sortableInit = true;
+        new Sortable(listEl, {
+          handle: '.spesa-drag-handle', animation: 150,
+          onEnd: function(evt){
+            if(evt.oldIndex === evt.newIndex) return;
+            const moved = CP_SPESA_ITEMS.splice(evt.oldIndex, 1)[0];
+            CP_SPESA_ITEMS.splice(evt.newIndex, 0, moved);
+            cpSalvaSpesaLocale();
+          }
+        });
+      }).catch(function(){
+        listEl._sortableCaricamento = false;
+        // se il caricamento fallisce (es. nessuna connessione), la lista resta comunque
+        // utilizzabile: solo il trascinamento per riordinare non sarà disponibile.
       });
     }
   }
