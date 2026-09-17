@@ -5372,6 +5372,7 @@
     evt.preventDefault();
     const codeInput = document.getElementById('login-code');
     const errEl = document.getElementById('login-error');
+    const btnEl = document.getElementById('login-submit-btn');
     errEl.textContent = '';
     const code = codeInput.value.trim();
     if(!code){ errEl.textContent = 'Inserisci un codice.'; return false; }
@@ -5379,6 +5380,11 @@
       errEl.textContent = 'Il sito non è ancora collegato al Google Sheet: segui il file LEGGIMI-DATI.md.';
       return false;
     }
+    // Cambia la scritta sul pulsante mentre aspetta la risposta, cosi' si capisce che l'accesso e'
+    // in corso e non che l'app si e' bloccata (soprattutto quando la connessione e' un po' lenta).
+    const testoOriginaleBtn = btnEl.textContent;
+    btnEl.disabled = true;
+    btnEl.textContent = 'Accesso in corso...';
     try{
       const res = await apiGet('login', { codice: code });
       if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
@@ -5387,6 +5393,9 @@
       await enterApp(res.pazienti);
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
+    } finally {
+      btnEl.disabled = false;
+      btnEl.textContent = testoOriginaleBtn;
     }
     return false;
   }
@@ -5461,22 +5470,35 @@
     inputEl.style.display = 'none';
     btnEl.style.display = 'none';
     noteEl.textContent = '';
-    try{
-      const res = await apiGet('login', { codice: saved });
-      if(res.ok){
-        SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
-        await enterApp(res.pazienti);
-        return;
-      } else {
-        clearSavedCode();
+    // Il primo tentativo dopo un periodo di inattività può capitare mentre Google risponde ancora
+    // con qualche intoppo temporaneo: riprovo un paio di volte prima di arrendermi, così il paziente
+    // non si ritrova a dover ridigitare il codice per un problema che si risolve da solo in un attimo.
+    let codiceNonPiuValido = false;
+    for(let tentativo = 0; tentativo < 3; tentativo++){
+      try{
+        const res = await apiGet('login', { codice: saved });
+        if(res.ok){
+          SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
+          await enterApp(res.pazienti);
+          return;
+        } else {
+          // il server ha risposto regolarmente ma il codice non è (più) valido: inutile riprovare
+          clearSavedCode();
+          codiceNonPiuValido = true;
+          break;
+        }
+      } catch(err){
+        if(tentativo < 2) await new Promise(r => setTimeout(r, 1200));
+        // altrimenti: nessuna connessione dopo i tentativi, si ripristina la schermata qui sotto
       }
-    } catch(err){
-      // niente connessione: ripristina semplicemente la schermata di accesso normale
     }
     promptEl.textContent = promptOriginal;
     inputEl.style.display = '';
     btnEl.style.display = '';
     noteEl.innerHTML = noteOriginal;
+    // Il codice resta comunque salvato per il prossimo avvio: lo precompilo così basta toccare
+    // "Accedi" invece di doverlo ridigitare da capo (a meno che non fosse proprio quello sbagliato).
+    if(!codiceNonPiuValido) inputEl.value = saved;
   }
 
   /* ================= INIT ================= */
