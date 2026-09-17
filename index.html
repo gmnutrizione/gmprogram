@@ -5559,6 +5559,9 @@
     document.getElementById('topbar-brand-tag').style.display = 'none';
     document.getElementById('login-code').value = '';
     document.getElementById('login-error').textContent = '';
+    ripristinaFormAccesso_(); // riporta il modulo di accesso allo stato normale (visibile, con la
+                              // scritta giusta), altrimenti se l'ultimo accesso era stato quello
+                              // automatico rimaneva la scritta "Accesso in corso…" con il modulo nascosto
     document.getElementById('login-screen').style.display = 'flex';
   }
 
@@ -5574,6 +5577,21 @@
     try{ localStorage.removeItem(SAVED_CODE_KEY); }catch(e){}
   }
 
+  // Catturati subito all'avvio, prima che l'accesso automatico (o qualsiasi altra cosa) li
+  // modifichi: servono per far tornare la schermata di accesso "normale" sia se l'accesso
+  // automatico fallisce, sia più avanti quando l'utente tocca "Esci" (dopo un accesso automatico
+  // andato a buon fine, questi elementi erano rimasti nascosti/con la scritta "Accesso in corso…",
+  // ed è per questo che uscire non riportava alla schermata dove inserire il codice).
+  const LOGIN_PROMPT_TESTO_ORIGINALE = document.getElementById('login-prompt').textContent;
+  const LOGIN_NOTE_HTML_ORIGINALE = document.getElementById('login-note').innerHTML;
+
+  function ripristinaFormAccesso_(){
+    document.getElementById('login-prompt').textContent = LOGIN_PROMPT_TESTO_ORIGINALE;
+    document.getElementById('login-code').style.display = '';
+    document.getElementById('login-submit-btn').style.display = '';
+    document.getElementById('login-note').innerHTML = LOGIN_NOTE_HTML_ORIGINALE;
+  }
+
   async function tryAutoLogin(){
     const saved = readSavedCode();
     if(!saved || !apiConfigured()) return;
@@ -5581,8 +5599,6 @@
     const inputEl = document.getElementById('login-code');
     const btnEl = document.getElementById('login-submit-btn');
     const noteEl = document.getElementById('login-note');
-    const promptOriginal = promptEl.textContent;
-    const noteOriginal = noteEl.innerHTML;
     // Nasconde subito il modulo interattivo: niente "richiesta di codice" visibile durante l'accesso automatico.
     promptEl.textContent = 'Accesso in corso…';
     inputEl.style.display = 'none';
@@ -5606,10 +5622,7 @@
     } catch(err){
       // nessuna connessione dopo i tentativi automatici di apiGet: si ripristina la schermata qui sotto
     }
-    promptEl.textContent = promptOriginal;
-    inputEl.style.display = '';
-    btnEl.style.display = '';
-    noteEl.innerHTML = noteOriginal;
+    ripristinaFormAccesso_();
     // Il codice resta comunque salvato per il prossimo avvio: lo precompilo così basta toccare
     // "Accedi" invece di doverlo ridigitare da capo (a meno che non fosse proprio quello sbagliato).
     if(!codiceNonPiuValido) inputEl.value = saved;
