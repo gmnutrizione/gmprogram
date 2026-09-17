@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Percorso - gestione pazienti nutrizionali: piano alimentare sempre aggiornato, misurazioni e confronto controlli.">
 <meta name="theme-color" content="#0B8A78">
 <link rel="manifest" href="manifest.json">
@@ -298,12 +298,14 @@
   .btn-add:hover{ background:var(--accent); color:#fff; }
   .btn-add svg{ width:14px; height:14px; }
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(23,34,29,.45); display:flex; align-items:center; justify-content:center;
-    padding:20px; z-index:80;
+    position:fixed; top:0; right:0; bottom:0; left:0; background:rgba(23,34,29,.45);
+    display:flex; align-items:center; justify-content:center; padding:20px; z-index:80;
+    -webkit-transform:translateZ(0); transform:translateZ(0);
   }
   .modal-card{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m); box-shadow:var(--shadow-1);
-    padding:26px; width:100%; max-width:580px; max-height:88vh; overflow:auto;
+    padding:26px; width:100%; max-width:580px; max-height:min(88vh, 88dvh); overflow:auto;
+    -webkit-overflow-scrolling:touch;
   }
   .modal-card h3{ font-size:18px; margin-bottom:4px; }
   .modal-card > p{ font-size:13px; color:var(--ink-faint); margin-bottom:18px; }
@@ -368,11 +370,12 @@
   @media (max-width: 880px){ .field-grid{ grid-template-columns:repeat(3,1fr); } }
   @media (max-width: 560px){ .field-grid{ grid-template-columns:repeat(2,1fr); } }
   .field label{ display:flex; align-items:flex-end; min-height:22px; line-height:1.2; font-size:12.5px; font-weight:500; color:var(--ink); margin-bottom:3px; }
-  .field input, .field select{
+  .field input, .field select, .field textarea{
     width:100%; font-family:var(--font-mono); font-size:13px; padding:7px 9px; border-radius:7px;
     border:1px solid var(--border); background:var(--surface-raised); color:var(--ink);
   }
-  .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .field textarea{ font-family:inherit; resize:vertical; min-height:64px; }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
 
   /* ---------- Nuova rilevazione: box compatto ---------- */
   #card-nuova-rilevazione{ padding:16px 18px; }
@@ -507,7 +510,9 @@
   .p-plan-preview b:first-child{ margin-top:0; }
 
   .bottom-nav{
-    display:flex; position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    display:flex; position:fixed; left:50%; bottom:0;
+    -webkit-transform:translateX(-50%) translateZ(0); transform:translateX(-50%) translateZ(0);
+    will-change:transform;
     width:480px; max-width:100%; z-index:40;
     border-top:1px solid var(--border); background:var(--surface);
     padding:8px 6px calc(10px + env(safe-area-inset-bottom));
@@ -540,7 +545,7 @@
   .spesa-subpanel{ margin-top:14px; }
   .cerca-alimenti-controls{ display:flex; flex-direction:column; gap:9px; margin-bottom:4px; }
   .cerca-alimenti-controls input[type="text"], .cerca-alimenti-controls select{
-    padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px;
+    padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:16px;
     background:var(--surface); color:var(--ink); font-family:inherit;
   }
   .cerca-alimenti-controls input[type="text"]:focus, .cerca-alimenti-controls select:focus{
@@ -554,7 +559,7 @@
   .alimento-card:hover{ border-color:var(--accent); }
   .alimento-thumb{
     width:42px; height:42px; border-radius:10px; background:var(--accent-soft); color:var(--accent-ink);
-    display:flex; align-items:center; justify-content:center; flex:none;
+    display:flex; align-items:center; justify-content:center; flex:none; position:relative; overflow:hidden;
   }
   .alimento-thumb svg{ width:20px; height:20px; }
   .alimento-card-body{ flex:1; min-width:0; }
@@ -571,12 +576,62 @@
     border-radius:999px; background:var(--accent-warm-soft); color:var(--accent-warm); font-size:10.5px; font-weight:700;
   }
 
+  /* ---- Ricettario ---- */
+  .ricetta-card{
+    display:flex; align-items:center; gap:12px; padding:10px; border-radius:14px;
+    background:var(--surface); border:1px solid var(--border-soft); cursor:pointer; text-align:left; width:100%;
+  }
+  .ricetta-card + .ricetta-card{ margin-top:8px; }
+  .ricetta-card:hover{ border-color:var(--accent); }
+  .ricetta-card-thumb{
+    width:56px; height:56px; border-radius:12px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none; position:relative; overflow:hidden;
+  }
+  .ricetta-card-thumb svg{ width:24px; height:24px; }
+  .ricetta-card-nome{ font-size:13.5px; font-weight:700; line-height:1.3; }
+  .ricetta-card-match{ font-size:11.5px; color:var(--accent-ink); margin-top:2px; }
+  .ricetta-card-cat{ font-size:11px; color:var(--ink-faint); margin-top:2px; }
+  .ricetta-detail-foto{
+    width:100%; aspect-ratio:16/10; border-radius:14px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+  }
+  .ricetta-detail-foto svg{ width:34px; height:34px; }
+  .ricetta-ingrediente-row{
+    display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--border-soft);
+  }
+  .ricetta-ingrediente-row:last-child{ border-bottom:none; }
+  .ricetta-ingrediente-nome{ flex:1; min-width:0; font-size:13px; font-weight:600; }
+  .ricetta-ingrediente-fonte{ display:block; font-size:10.5px; font-weight:500; color:var(--ink-faint); margin-top:1px; }
+  .ricetta-ingrediente-fonte.dal-piano{ color:var(--accent-ink); }
+  .ricetta-ingrediente-qta{ font-size:13px; font-weight:700; color:var(--ink); text-align:right; white-space:nowrap; }
+  .ricetta-ingrediente-add{
+    flex:none; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); color:var(--accent-ink); border:none; cursor:pointer;
+  }
+  .ricetta-ingrediente-add.in-lista{ background:var(--accent); color:#fff; }
+  .ricetta-ingrediente-add svg{ width:14px; height:14px; }
+
+  /* ---- Ricettario: gestione lato nutrizionista ("Crea ricetta") ---- */
+  .radm-row{
+    display:flex; align-items:center; gap:10px; border:1.5px solid var(--border-soft); border-radius:var(--radius-s);
+    padding:11px 12px;
+  }
+  .radm-row + .radm-row{ margin-top:8px; }
+  .radm-row-name{ font-size:13.5px; font-weight:600; }
+  .radm-row-cat{ font-size:11.5px; color:var(--ink-faint); margin-top:1px; }
+  .radm-row-actions{ display:flex; gap:6px; flex:none; }
+  .radm-ing-row{
+    display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border-soft);
+  }
+  .radm-ing-row:last-child{ border-bottom:none; }
+  .radm-ing-name{ flex:1; min-width:0; font-size:13px; font-weight:600; }
+
   /* ---- Dettaglio alimento: card in stile "Guida alla spesa" ---- */
   .alimento-detail-actions{ display:flex; gap:8px; margin-bottom:12px; }
   .alimento-detail-actions .btn{ flex:1; justify-content:center; }
   .alimento-detail-thumb{
     width:56px; height:56px; border-radius:14px; background:var(--accent-soft); color:var(--accent-ink);
-    display:flex; align-items:center; justify-content:center; flex:none;
+    display:flex; align-items:center; justify-content:center; flex:none; position:relative; overflow:hidden;
   }
   .alimento-detail-thumb svg{ width:26px; height:26px; }
   .alimento-detail-card{
@@ -631,19 +686,18 @@
   .spesa-add-nonfood:hover{ border-color:var(--accent); color:var(--accent-ink); }
   .spesa-add-form{ display:flex; gap:7px; margin-top:10px; }
   .spesa-add-form input{
-    flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px;
+    flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:16px;
     background:var(--surface); color:var(--ink); font-family:inherit;
   }
-  .spesa-add-form input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
-
-  .confronto-bar{
-    position:fixed; left:50%; bottom:72px; transform:translateX(-50%); width:480px; max-width:calc(100% - 24px);
-    background:var(--accent-ink); color:#fff; border-radius:14px; padding:11px 14px;
-    display:flex; align-items:center; justify-content:space-between; gap:10px; z-index:70; box-shadow:var(--shadow-1);
+  .spesa-giorni-form{ display:flex; gap:7px; }
+  .spesa-giorni-form input[type="number"]{
+    flex:1; min-width:0; padding:10px 10px; border:1px solid var(--border); border-radius:10px; font-size:16px;
+    background:var(--surface); color:var(--ink); font-family:inherit; text-align:center;
   }
-  .confronto-bar span{ font-size:12.8px; font-weight:600; }
-  .confronto-bar .btn.small.ghost{ color:#fff; border-color:rgba(255,255,255,.35); background:none; }
-  .confronto-bar .btn.small.primary:disabled{ opacity:.5; cursor:default; }
+  .spesa-giorni-form input[type="number"]:focus, .spesa-add-form input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .spesa-sezione .p-card-top{ margin-bottom:10px; }
+  .spesa-list-row.readonly .spesa-list-row-body{ cursor:default; }
+
   .confronto-cols{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .confronto-col-head{ font-size:12.5px; font-weight:700; margin-bottom:8px; line-height:1.3; }
   .confronto-row{ font-size:12px; padding:6px 0; border-bottom:1px solid var(--border-soft); }
@@ -836,6 +890,22 @@
   .andamento-cat-btn:hover{ border-color:var(--accent); color:var(--accent-ink); }
   .andamento-cat-btn.active{ background:var(--accent); color:#fff; border-color:transparent; }
 
+  /* ---- Andamento paziente: 4 riquadri principali (Peso, Circonferenze, Plicometria, BIA) ---- */
+  .andamento-tiles-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0 20px; }
+  .andamento-tile{
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px; padding:16px; border-radius:14px;
+    border:1px solid var(--border-soft); background:var(--surface-raised); cursor:pointer; text-align:left;
+    transition:all .15s ease; font:inherit; width:100%;
+  }
+  .andamento-tile:hover, .andamento-tile:active{ border-color:var(--accent); background:var(--accent-soft); }
+  .andamento-tile-icon{
+    width:36px; height:36px; border-radius:10px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .andamento-tile-icon svg{ width:19px; height:19px; }
+  .andamento-tile-label{ font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.25; }
+  .andamento-tile-sub{ font-size:11.5px; color:var(--ink-faint); }
+
   .cp-target-bars{ display:flex; flex-direction:column; gap:9px; margin-bottom:18px; }
   .cp-bar-row-head{ display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:3px; }
   .cp-bar-row-head b{ color:var(--ink-soft); font-weight:600; }
@@ -915,6 +985,10 @@
       </div>
     </div>
 
+    <button class="btn ghost" id="btn-ricettario-nutri" style="display:none;" onclick="apriGestioneRicette()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>
+      Ricettario
+    </button>
     <button class="btn-logout" id="btn-logout" style="display:none;" onclick="logout()">
       <svg viewBox="0 0 24 24" fill="none"><path d="M15 17L20 12L15 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12H9M9 4H5C3.9 4 3 4.9 3 6V18C3 19.1 3.9 20 5 20H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Esci
@@ -1164,6 +1238,57 @@
           <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px; flex-wrap:wrap;">
             <button class="btn ghost" type="button" onclick="cpCloseModal()">Annulla</button>
             <button class="btn primary" type="button" onclick="cpSalvaTarget()">Applica</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ricettario — gestione ricette lato nutrizionista -->
+    <div class="modal-overlay" id="ricette-admin-overlay" style="display:none;" onclick="if(event.target===this) chiudiGestioneRicette();">
+      <div class="modal-card" style="max-width:520px;">
+        <!-- Elenco ricette -->
+        <div id="radm-list-view">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px;">
+            <h3 style="margin:0;">Ricettario</h3>
+            <button class="btn small primary" type="button" onclick="apriFormRicetta()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+              Nuova ricetta
+            </button>
+          </div>
+          <p style="margin:0 0 12px;">Le ricette create qui sono visibili a tutti i pazienti nel loro Ricettario, con le quantità già adattate al piano di ciascuno.</p>
+          <p id="radm-loading" class="cp-empty-note" style="display:none;">Caricamento…</p>
+          <div id="radm-list" style="max-height:52vh; overflow-y:auto;"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:14px;">
+            <button class="btn ghost" type="button" onclick="chiudiGestioneRicette()">Chiudi</button>
+          </div>
+        </div>
+
+        <!-- Nuova ricetta / Modifica ricetta -->
+        <div id="radm-form-view" style="display:none;">
+          <h3 id="radm-form-title" style="margin-top:0;">Nuova ricetta</h3>
+          <div class="field-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="field"><label>Nome della ricetta</label><input type="text" id="radm-nome" placeholder="Es. Pollo con riso e verdure"></div>
+            <div class="field"><label>Categoria</label><input type="text" id="radm-categoria" placeholder="Es. Pranzo o cena"></div>
+            <div class="field" style="grid-column:1 / -1;"><label>Link foto (Google Drive)</label><input type="text" id="radm-foto" placeholder="Incolla qui il link di condivisione Drive dell'immagine del piatto"></div>
+            <div class="field"><label>Porzioni della ricetta come scritta</label><input type="number" id="radm-porzioni" min="1" max="20" value="1"></div>
+          </div>
+
+          <div class="alimento-detail-section" style="margin-top:14px; padding-top:14px;">
+            <h5>Ingredienti</h5>
+            <div id="radm-ingredienti"></div>
+            <div class="cp-meal-search-input-wrap" style="position:relative; margin-top:8px;">
+              <input type="text" id="radm-ing-search-input" class="cp-meal-search-input" placeholder="Cerca alimento da aggiungere…" autocomplete="off">
+              <div class="cp-meal-suggestions" id="radm-ing-suggestions" hidden></div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:14px;"><label>Procedimento</label><textarea id="radm-procedimento" rows="4" placeholder="Passaggi per preparare il piatto, uno per riga"></textarea></div>
+          <div class="field" style="margin-top:10px;"><label>Commento del Doc (facoltativo)</label><textarea id="radm-commento" rows="2" placeholder="Una nota che il paziente vedrà in fondo alla ricetta"></textarea></div>
+
+          <div class="login-error" id="radm-form-error"></div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+            <button class="btn ghost" type="button" onclick="chiudiFormRicetta()">Annulla</button>
+            <button class="btn primary" type="button" onclick="salvaFormRicetta()">Salva ricetta</button>
           </div>
         </div>
       </div>
@@ -1543,7 +1668,7 @@
               </div>
               <h4>Prossimo controllo</h4>
               <p id="p-home-prossimo">—</p>
-              <button class="btn small ghost" style="width:100%; justify-content:center;">Aggiungi al calendario</button>
+              <button type="button" class="btn small ghost" id="p-home-calendario-btn" style="width:100%; justify-content:center; display:none;" onclick="cpAggiungiAlCalendario()">Aggiungi al calendario</button>
             </div>
 
             <div class="p-card">
@@ -1594,17 +1719,39 @@
             </div>
 
             <div id="spesa-sub-lista" class="spesa-subpanel">
-              <div id="p-spesa-count" style="font-size:12px; font-weight:600; color:var(--accent-ink); margin-bottom:12px;">—</div>
-              <div id="p-spesa-list"></div>
-              <div class="spesa-list-actions">
-                <button type="button" class="btn small ghost" onclick="cpSpesaTogliSpunte()">Togli le spunte</button>
-                <button type="button" class="btn small danger" onclick="cpSpesaSvuota()">Svuota</button>
+              <!-- SEZIONE 1: lista personale, fatta a mano dal paziente -->
+              <div class="p-card spesa-sezione">
+                <div class="p-card-top"><h4>La tua lista</h4></div>
+                <div id="p-spesa-count" style="font-size:12px; font-weight:600; color:var(--accent-ink); margin-bottom:12px;">—</div>
+                <div id="p-spesa-list"></div>
+                <div class="spesa-list-actions">
+                  <button type="button" class="btn small ghost" onclick="cpSpesaTogliSpunte()">Togli le spunte</button>
+                  <button type="button" class="btn small danger" onclick="cpSpesaSvuota()">Svuota</button>
+                </div>
+                <button type="button" class="spesa-add-nonfood" id="spesa-add-nonfood-btn" onclick="cpMostraAggiungiNonAlimentare()">+ Aggiungi prodotto non alimentare</button>
+                <div class="spesa-add-form" id="spesa-add-form" style="display:none;">
+                  <input type="text" id="spesa-add-input" placeholder="Es. Detersivo, carta igienica…" onkeydown="if(event.key==='Enter'){ event.preventDefault(); cpConfermaAggiungiNonAlimentare(); }">
+                  <button type="button" class="btn small primary" onclick="cpConfermaAggiungiNonAlimentare()">Aggiungi</button>
+                  <button type="button" class="btn small ghost" onclick="cpAnnullaAggiungiNonAlimentare()">Annulla</button>
+                </div>
               </div>
-              <button type="button" class="spesa-add-nonfood" id="spesa-add-nonfood-btn" onclick="cpMostraAggiungiNonAlimentare()">+ Aggiungi prodotto non alimentare</button>
-              <div class="spesa-add-form" id="spesa-add-form" style="display:none;">
-                <input type="text" id="spesa-add-input" placeholder="Es. Detersivo, carta igienica…" onkeydown="if(event.key==='Enter'){ event.preventDefault(); cpConfermaAggiungiNonAlimentare(); }">
-                <button type="button" class="btn small primary" onclick="cpConfermaAggiungiNonAlimentare()">Aggiungi</button>
-                <button type="button" class="btn small ghost" onclick="cpAnnullaAggiungiNonAlimentare()">Annulla</button>
+
+              <!-- SEZIONE 2: lista automatica calcolata dal piano alimentare -->
+              <div class="p-card spesa-sezione" style="margin-top:16px;">
+                <div class="p-card-top"><h4>Lista automatica dal piano</h4></div>
+                <p class="p-sub" style="margin:0 0 12px;">Calcola le quantità esatte da comprare per i prossimi giorni, a partire da domani.</p>
+                <div class="chip-row" id="spesa-giorni-chips" style="margin-bottom:10px;">
+                  <button type="button" class="chip" data-giorni="3" onclick="cpImpostaGiorniSpesaAuto(3)">3 giorni</button>
+                  <button type="button" class="chip active" data-giorni="7" onclick="cpImpostaGiorniSpesaAuto(7)">7 giorni</button>
+                  <button type="button" class="chip" data-giorni="14" onclick="cpImpostaGiorniSpesaAuto(14)">14 giorni</button>
+                </div>
+                <div class="spesa-giorni-form">
+                  <input type="number" id="spesa-giorni-custom" min="1" max="60" placeholder="Numero di giorni">
+                  <button type="button" class="btn small primary" onclick="cpImpostaGiorniSpesaAutoCustom()">Calcola</button>
+                </div>
+                <div id="p-spesa-auto-range" style="font-size:11.5px; color:var(--ink-faint); margin:12px 0 4px;">—</div>
+                <div id="p-spesa-auto-count" style="font-size:12px; font-weight:600; color:var(--accent-ink); margin-bottom:12px;">—</div>
+                <div id="p-spesa-auto-list"></div>
               </div>
             </div>
 
@@ -1612,10 +1759,6 @@
               <div class="cerca-alimenti-controls">
                 <input type="text" id="cerca-alimenti-input" placeholder="Cerca un alimento o una marca…">
                 <select id="cerca-alimenti-categoria"></select>
-                <div class="chip-row" id="unita-alimenti-chips" style="margin:0;">
-                  <button type="button" class="chip active" data-unit="porzione" onclick="setUnitaAlimenti('porzione')">Per porzione</button>
-                  <button type="button" class="chip" data-unit="100g" onclick="setUnitaAlimenti('100g')">Per 100 g</button>
-                </div>
               </div>
               <div id="cerca-alimenti-count" style="font-size:12px; color:var(--ink-faint); margin:12px 0 8px;">—</div>
               <div id="cerca-alimenti-list"></div>
@@ -1625,21 +1768,33 @@
           <!-- RICETTARIO -->
           <div class="p-screen" id="p-ricettario">
             <div class="p-greeting" style="font-size:18px;">Ricettario</div>
-            <div class="p-sub">Colazione, pranzo, cena e spuntini: idee pronte in linea con il tuo piano.</div>
-            <div class="p-card" style="text-align:center; padding:32px 20px;">
-              <div class="alimento-detail-thumb" style="margin:0 auto 14px;">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>
-              </div>
-              <p style="margin:0; font-size:12.8px; color:var(--ink-soft);">In arrivo — qui troverai presto le ricette per ogni pasto, divise per categoria.</p>
+            <div class="p-sub">Cerca per nome della ricetta o per un ingrediente — es. "tofu" trova tutte le ricette che lo contengono.</div>
+            <input type="text" id="ricette-search-input" placeholder="Cerca una ricetta o un ingrediente…" style="width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:12px; font-size:16px; background:var(--surface); color:var(--ink); font-family:inherit; margin-bottom:12px;">
+            <p id="ricette-loading" class="p-empty-note" style="display:none;">Carico il ricettario…</p>
+            <div class="p-card" id="ricette-warning" style="display:none;">
+              <p id="ricette-warning-text" style="margin-bottom:10px;">—</p>
+              <button type="button" id="ricette-retry-btn" class="btn small" onclick="cpRiprovaRicette()" style="width:100%; justify-content:center;">Riprova</button>
             </div>
+            <div id="ricette-count" style="font-size:12px; color:var(--ink-faint); margin-bottom:8px;">—</div>
+            <div id="ricette-list"></div>
           </div>
 
           <!-- ANDAMENTO -->
           <div class="p-screen" id="p-andamento">
             <div class="p-greeting" style="font-size:18px;">Il tuo andamento</div>
-            <div class="p-sub" id="p-andamento-sub">—</div>
-            <div class="chip-row" id="chip-row-paziente"></div>
-            <div class="chart-wrap" id="chart-paziente"></div>
+            <div class="p-sub" id="p-andamento-sub">Tocca una categoria per vedere il dettaglio.</div>
+
+            <div class="andamento-tiles-grid" id="p-andamento-tiles"></div>
+
+            <div id="p-andamento-dettaglio" style="display:none;">
+              <button type="button" class="btn small ghost" style="margin-bottom:12px;" onclick="pChiudiAndamentoDettaglio()">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Tutte le categorie
+              </button>
+              <div class="p-sub" id="p-andamento-dettaglio-sub" style="margin-bottom:6px;">—</div>
+              <div class="chip-row" id="chip-row-paziente"></div>
+              <div class="chart-wrap" id="chart-paziente"></div>
+            </div>
 
             <h4 style="font-size:13.5px; margin:18px 0 6px;">Storico controlli</h4>
             <div class="p-card" style="padding:4px 14px;">
@@ -1654,7 +1809,8 @@
 
             <div class="p-card">
               <h4 style="margin-bottom:10px;">Il tuo riferimento</h4>
-              <p style="margin-bottom:12px;">Studio di Nutrizione Percorso</p>
+              <p style="margin-bottom:2px;">Studio di Nutrizione Percorso</p>
+              <p style="margin-bottom:12px; color:var(--ink-soft); font-size:13px;">Dott. Giovanni Murdaca — Nutrizionista Sportivo</p>
               <button class="btn small" style="width:100%; justify-content:center;">
                 <svg viewBox="0 0 24 24" fill="none"><path d="M4 5H20V17H7L4 20V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
                 Scrivi al tuo nutrizionista
@@ -1664,8 +1820,7 @@
             <div class="p-card">
               <h4 style="margin-bottom:6px;">Notifiche</h4>
               <div class="toggle-row"><span>Piano aggiornato</span><div class="switch on"></div></div>
-              <div class="toggle-row"><span>Promemoria controllo</span><div class="switch on"></div></div>
-              <div class="toggle-row"><span>Promemoria pesata settimanale</span><div class="switch"></div></div>
+              <div class="toggle-row"><span>Promemoria controllo (48 ore prima)</span><div class="switch on"></div></div>
             </div>
           </div>
 
@@ -1680,17 +1835,17 @@
             <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.7"/><path d="M8 12H16M8 15.5H16M8 8.5H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Piano
           </button>
+          <button class="nav-btn" onclick="setPatientScreen('andamento')" data-screen="andamento">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V15M9.5 19V10M15 19V13M20 19V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Andamento
+          </button>
           <button class="nav-btn" onclick="setPatientScreen('spesa'); rinfrescaSpesaSottoTabAttiva();" data-screen="spesa">
             <svg viewBox="0 0 24 24" fill="none"><path d="M3 4H5L7.2 15.2C7.35 16 8.05 16.5 8.85 16.5H18.1C18.85 16.5 19.5 16 19.7 15.3L21.5 8.5H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20" r="1.3" fill="currentColor"/></svg>
             Spesa
           </button>
-          <button class="nav-btn" onclick="setPatientScreen('ricettario')" data-screen="ricettario">
+          <button class="nav-btn" onclick="setPatientScreen('ricettario'); apriRicettario();" data-screen="ricettario">
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>
             Ricette
-          </button>
-          <button class="nav-btn" onclick="setPatientScreen('andamento')" data-screen="andamento">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V15M9.5 19V10M15 19V13M20 19V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            Andamento
           </button>
           <button class="nav-btn" onclick="setPatientScreen('profilo')" data-screen="profilo">
             <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M5 20C5.8 16.5 8.5 14.5 12 14.5C15.5 14.5 18.2 16.5 19 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -1699,19 +1854,11 @@
         </div>
     </div>
 
-    <div class="confronto-bar" id="confronto-bar" style="display:none;">
-      <span id="confronto-bar-text">1 selezionato</span>
-      <div style="display:flex; gap:8px;">
-        <button type="button" class="btn small ghost" onclick="svuotaConfronto()">Svuota</button>
-        <button type="button" class="btn small primary" id="confronto-bar-btn" disabled onclick="apriConfronto()">Confronta</button>
-      </div>
-    </div>
-
     <div class="modal-overlay" id="p-modal-overlay" style="display:none;" onclick="if(event.target===this) pCloseModal();">
       <div class="modal-card">
         <div id="p-modal-alimento-view">
           <div class="alimento-detail-actions">
-            <button type="button" class="btn small ghost" id="p-modal-confronto-btn" onclick="pToggleConfrontoDaDettaglio()">Confronta con…</button>
+            <button type="button" class="btn small ghost" id="p-modal-confronto-btn" onclick="apriRicercaConfronto()">Confronta con…</button>
             <button type="button" class="btn small ghost" id="p-modal-lista-btn" onclick="pToggleListaDaDettaglio()">Aggiungi alla lista</button>
           </div>
           <div class="alimento-detail-card">
@@ -1725,7 +1872,7 @@
               <div class="punteggio-circle" id="p-modal-alimento-punteggio">—</div>
             </div>
             <div class="chip-row unit-toggle-wide" id="dettaglio-unita-chips" style="margin-bottom:8px;">
-              <button type="button" class="chip active" data-unit="porzione" onclick="setUnitaAlimenti('porzione')">Per porzione</button>
+              <button type="button" class="chip active" id="dettaglio-unita-porzione-btn" data-unit="porzione" onclick="setUnitaAlimenti('porzione')">Per porzione</button>
               <button type="button" class="chip" data-unit="100g" onclick="setUnitaAlimenti('100g')">Per 100 g</button>
             </div>
             <div class="alimento-detail-nutri-grid" id="p-modal-alimento-nutri"></div>
@@ -1742,6 +1889,15 @@
             <button class="btn ghost" type="button" onclick="pCloseModal()">Chiudi</button>
           </div>
         </div>
+        <div id="p-modal-confronto-ricerca-view" style="display:none;">
+          <h3>Confronta con…</h3>
+          <p>Cerca l'alimento da confrontare con <b id="p-confronto-ricerca-primo-nome">—</b>.</p>
+          <input type="text" id="confronto-ricerca-input" placeholder="Cerca un alimento…" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:16px; background:var(--surface); color:var(--ink); font-family:inherit; margin-bottom:12px;">
+          <div id="confronto-ricerca-list" style="max-height:46vh; overflow-y:auto;"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+            <button class="btn ghost" type="button" onclick="pCloseModal()">Annulla</button>
+          </div>
+        </div>
         <div id="p-modal-confronto-view" style="display:none;">
           <h3>Confronto</h3>
           <p>Il valore evidenziato è quello più contenuto tra i due, su grassi saturi, zuccheri e sale.</p>
@@ -1749,6 +1905,49 @@
           <div style="display:flex; justify-content:flex-end; margin-top:16px;">
             <button class="btn ghost" type="button" onclick="pCloseModal()">Chiudi</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ricettario — dettaglio ricetta -->
+    <div class="modal-overlay" id="p-modal-ricetta-overlay" style="display:none;" onclick="if(event.target===this) chiudiDettaglioRicetta();">
+      <div class="modal-card" style="max-width:420px;">
+        <div class="ricetta-detail-foto" id="ricetta-detail-foto"></div>
+        <h3 id="ricetta-detail-nome" style="margin:14px 0 2px;">—</h3>
+        <div style="font-size:12px; color:var(--ink-faint); margin-bottom:14px;" id="ricetta-detail-cat">—</div>
+
+        <div class="alimento-detail-section" style="margin-top:0; padding-top:0; border-top:none;">
+          <h5>Ingredienti <span style="font-weight:500; color:var(--ink-faint);" id="ricetta-detail-porzioni-label"></span></h5>
+          <div style="display:flex; align-items:center; gap:8px; margin:6px 0 12px;">
+            <label for="ricetta-porzioni-input" style="font-size:12.5px; color:var(--ink-soft);">Quante porzioni vuoi preparare?</label>
+            <input type="number" id="ricetta-porzioni-input" min="1" max="20" style="width:56px; padding:7px 8px; border:1px solid var(--border); border-radius:8px; font-size:15px; text-align:center; background:var(--surface); color:var(--ink); font-family:inherit;">
+          </div>
+          <div id="ricetta-detail-ingredienti"></div>
+        </div>
+
+        <button type="button" class="btn small ghost" style="width:100%; justify-content:center; margin:14px 0;" onclick="toggleCalcoloNutrizionaleRicetta()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 3H18V21H6V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 7H15M9 11H15M9 15H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Calcolo valori nutrizionali
+        </button>
+        <div id="ricetta-calcolo-nutrizionale" style="display:none; margin-bottom:14px;">
+          <div class="chip-row" style="margin-bottom:10px;">
+            <button type="button" class="chip active" data-modo="porzione" onclick="setModoCalcoloNutrizionale('porzione')">Per porzione</button>
+            <button type="button" class="chip" data-modo="intera" onclick="setModoCalcoloNutrizionale('intera')">Ricetta intera</button>
+          </div>
+          <div class="alimento-detail-nutri-grid" id="ricetta-calcolo-nutri-grid"></div>
+        </div>
+
+        <div class="alimento-detail-section">
+          <h5>Procedimento</h5>
+          <p id="ricetta-detail-procedimento" style="white-space:pre-line;">—</p>
+        </div>
+        <div class="alimento-detail-section">
+          <h5>Commento del Doc</h5>
+          <p id="ricetta-detail-commento">—</p>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+          <button class="btn ghost" type="button" onclick="chiudiDettaglioRicetta()">Chiudi</button>
         </div>
       </div>
     </div>
@@ -1903,6 +2102,56 @@
     const parti = normalizzaProssimoControllo_(prossimoControllo).split(' · ');
     if(parti.length > 1) return parti[0] + ' alle ore ' + parti[1];
     return parti[0];
+  }
+
+  // ---- "Aggiungi al calendario": un tasto unico. Su iPhone/iPad/Mac genera e scarica un file
+  // .ics (Safari lo apre direttamente nell'app Calendario); altrove apre la pagina di creazione
+  // evento di Google Calendar già compilata. In entrambi i casi l'evento dura 30 minuti a partire
+  // dall'orario del prossimo controllo salvato in scheda paziente.
+  function cpFormatoIcsData_(d){
+    return d.getUTCFullYear() + String(d.getUTCMonth()+1).padStart(2,'0') + String(d.getUTCDate()).padStart(2,'0')
+      + 'T' + String(d.getUTCHours()).padStart(2,'0') + String(d.getUTCMinutes()).padStart(2,'0') + String(d.getUTCSeconds()).padStart(2,'0') + 'Z';
+  }
+  function cpAggiungiAlCalendario(){
+    const p = SESSION.paziente;
+    if(!p || !p.ProssimoControllo){ showToast('Nessun controllo in programma da aggiungere.'); return; }
+    const { data, ora } = parseProssimoControlloAInput_(p.ProssimoControllo);
+    if(!data){ showToast('Non riesco a leggere la data del controllo.'); return; }
+    const inizio = new Date(data + 'T' + (ora || '09:00') + ':00');
+    if(isNaN(inizio.getTime())){ showToast('Non riesco a leggere la data del controllo.'); return; }
+    const fine = new Date(inizio.getTime() + 30*60000);
+    const titolo = 'Controllo nutrizionale';
+    const luogo = 'Studio di Nutrizione Percorso';
+    const descrizione = 'Controllo con Dott. Giovanni Murdaca — Nutrizionista Sportivo';
+
+    const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && !window.MSStream;
+    if(isApple){
+      const ics = [
+        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Percorso//IT','CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        'UID:controllo-' + inizio.getTime() + '@percorso',
+        'DTSTAMP:' + cpFormatoIcsData_(new Date()),
+        'DTSTART:' + cpFormatoIcsData_(inizio),
+        'DTEND:' + cpFormatoIcsData_(fine),
+        'SUMMARY:' + titolo,
+        'LOCATION:' + luogo,
+        'DESCRIPTION:' + descrizione,
+        'END:VEVENT','END:VCALENDAR',
+      ].join('\r\n');
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'controllo-nutrizionale.ics';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+    } else {
+      const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+        + '&text=' + encodeURIComponent(titolo)
+        + '&dates=' + cpFormatoIcsData_(inizio) + '/' + cpFormatoIcsData_(fine)
+        + '&details=' + encodeURIComponent(descrizione)
+        + '&location=' + encodeURIComponent(luogo);
+      window.open(url, '_blank');
+    }
   }
 
   /* ================= PATIENT LIST ================= */
@@ -2624,6 +2873,42 @@
   function cpFmtSpesaQta(g){
     if(g >= 1000) return (Math.round(g/100)/10).toString().replace('.', ',') + ' kg';
     return cpFmt(g) + ' g';
+  }
+  // Calcola la lista della spesa per i prossimi N giorni, a partire da DOMANI (rispetto alla data
+  // del dispositivo), ciclando sul piano settimanale che si ripete identico ogni settimana. Se N
+  // supera 7, i giorni vengono ripercorsi più volte e le quantità si sommano correttamente.
+  // Esempio: se oggi è lunedì e il paziente chiede 3 giorni, ottiene martedì+mercoledì+giovedì;
+  // se oggi è venerdì, ottiene sabato+domenica+lunedì.
+  function cpGiorniProssimi_(n){
+    const domani = new Date();
+    domani.setDate(domani.getDate() + 1);
+    const idxDomani = (domani.getDay() + 6) % 7; // JS: 0=domenica..6=sabato -> CP_GIORNI: 0=lunedì..6=domenica
+    const giorni = [];
+    for(let i=0;i<n;i++) giorni.push(CP_GIORNI[(idxDomani+i)%7]);
+    return giorni;
+  }
+  function cpComputeShoppingListForDays(n){
+    const giorni = cpGiorniProssimi_(Math.max(1, Math.min(60, Math.round(n)||1)));
+    const totali = {};
+    giorni.forEach(g => {
+      CP_MEALS.forEach(m => {
+        (CP_PLAN[g][m]||[]).forEach(item => { totali[item.id] = (totali[item.id]||0) + item.g; });
+      });
+    });
+    const perCategoria = {};
+    Object.keys(totali).forEach(id => {
+      const f = CP_FOODS_BY_ID[id];
+      if(!f) return;
+      const cat = f.categoria || 'Altro';
+      (perCategoria[cat] = perCategoria[cat] || []).push({ id, nome: f.nome, grammi: totali[id] });
+    });
+    return {
+      giorni,
+      categorie: Object.keys(perCategoria).sort((a,b) => a.localeCompare(b, 'it')).map(cat => ({
+        categoria: cat,
+        items: perCategoria[cat].sort((a,b) => a.nome.localeCompare(b.nome, 'it')),
+      })),
+    };
   }
 
   // ---- bozza locale non salvata (localStorage) ----
@@ -3784,19 +4069,20 @@
     }
   }
 
-  // ---- lista della spesa (vista paziente): elenco modificabile a sé stante — parte dagli
-  // alimenti del piano della settimana ma, da lì in poi, il paziente la gestisce come vuole
-  // (spunta, riordina trascinando, rimuove, aggiunge alimenti dal catalogo o prodotti non
-  // alimentari). Vive in memoria per la sessione: si azzera ricaricando la pagina.
+  // ---- lista della spesa (vista paziente): DUE liste separate nella stessa schermata.
+  // 1) "La tua lista" — personale, fatta a mano dal paziente (alimenti aggiunti dal catalogo,
+  //    dal dettaglio di un alimento, o prodotti non alimentari). Il paziente la gestisce come
+  //    vuole: spunta, riordina trascinando, rimuove.
+  // 2) "Lista automatica dal piano" — calcolata in automatico dal piano alimentare, per un
+  //    numero di giorni scelto dal paziente (3/7/14 o un numero libero), a partire da domani e
+  //    ciclando sul piano settimanale (che si ripete identico ogni settimana).
+  // Entrambe vivono in memoria per la sessione: si azzerano ricaricando la pagina.
   let CP_SPESA_ITEMS = null; // null = non ancora inizializzata in questa sessione
   let CP_SPESA_CHECKED = new Set();
 
   function cpInizializzaSpesaSeServe(){
     if(CP_SPESA_ITEMS) return;
     CP_SPESA_ITEMS = [];
-    cpComputeShoppingList().forEach(cat => cat.items.forEach(it => {
-      CP_SPESA_ITEMS.push({ id: it.id, nome: it.nome, categoria: cat.categoria });
-    }));
   }
   function cpAlimentoInLista(id){
     cpInizializzaSpesaSeServe();
@@ -3901,6 +4187,61 @@
     renderPatientSpesa();
   }
 
+  // ---- Lista automatica dal piano: 3/7/14 giorni o un numero libero, sempre a partire da domani ----
+  let CP_SPESA_AUTO_GIORNI = 7;
+  let CP_SPESA_AUTO_CHECKED = new Set();
+  function cpImpostaGiorniSpesaAuto(n){
+    CP_SPESA_AUTO_GIORNI = n;
+    document.getElementById('spesa-giorni-custom').value = '';
+    document.querySelectorAll('#spesa-giorni-chips .chip').forEach(c => c.classList.toggle('active', Number(c.dataset.giorni)===n));
+    renderSpesaAuto();
+  }
+  function cpImpostaGiorniSpesaAutoCustom(){
+    const inp = document.getElementById('spesa-giorni-custom');
+    const n = Math.round(Number(inp.value));
+    if(!n || n < 1){ inp.focus(); return; }
+    CP_SPESA_AUTO_GIORNI = Math.min(60, n);
+    document.querySelectorAll('#spesa-giorni-chips .chip').forEach(c => c.classList.remove('active'));
+    renderSpesaAuto();
+  }
+  function renderSpesaAuto(){
+    const { giorni, categorie } = cpComputeShoppingListForDays(CP_SPESA_AUTO_GIORNI);
+    const rangeEl = document.getElementById('p-spesa-auto-range');
+    const primo = giorni[0], ultimo = giorni[giorni.length-1];
+    rangeEl.textContent = giorni.length===1
+      ? `Per la giornata di ${primo.toLowerCase()}.`
+      : `Da ${primo.toLowerCase()} a ${ultimo.toLowerCase()} (${giorni.length} giorni), ciclando sul tuo piano settimanale.`;
+    const items = [];
+    categorie.forEach(cat => cat.items.forEach(it => items.push({ ...it, categoria: cat.categoria })));
+    const tot = items.length;
+    const fatti = items.filter(it => CP_SPESA_AUTO_CHECKED.has(it.id)).length;
+    document.getElementById('p-spesa-auto-count').textContent = tot ? `${fatti} di ${tot} presi` : '';
+    const listEl = document.getElementById('p-spesa-auto-list');
+    if(!tot){
+      listEl.innerHTML = '<p class="p-empty-note">Il tuo piano non contiene ancora alimenti per questi giorni.</p>';
+      return;
+    }
+    listEl.innerHTML = items.map(it => `
+      <div class="spesa-list-row readonly" data-id="${cpEsc(it.id)}">
+        <input type="checkbox" ${CP_SPESA_AUTO_CHECKED.has(it.id) ? 'checked' : ''}>
+        <span class="spesa-list-row-body">
+          <span class="spesa-list-row-nome ${CP_SPESA_AUTO_CHECKED.has(it.id) ? 'checked' : ''}">${cpEsc(it.nome)}</span>
+          <span class="spesa-list-row-cat">${cpEsc(it.categoria)} · ${cpFmtSpesaQta(it.grammi)}</span>
+        </span>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.spesa-list-row').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+        if(e.target.checked) CP_SPESA_AUTO_CHECKED.add(id); else CP_SPESA_AUTO_CHECKED.delete(id);
+        row.querySelector('.spesa-list-row-nome').classList.toggle('checked', e.target.checked);
+        const totC = items.length, fattiC = items.filter(x => CP_SPESA_AUTO_CHECKED.has(x.id)).length;
+        document.getElementById('p-spesa-auto-count').textContent = `${fattiC} di ${totC} presi`;
+      });
+      row.querySelector('.spesa-list-row-body').addEventListener('click', () => apriDettaglioAlimento(id));
+    });
+  }
+
   // ---- Spesa: sotto-tab "Lista della spesa" / "Cerca alimenti" ----
   // Il database alimenti si scarica una sola volta, alla PRIMA apertura della sezione Spesa (non
   // al login): finché non serve, il paziente non se lo scarica affatto. cpAssicuraCatalogoSpesa()
@@ -3914,7 +4255,7 @@
     // Nel frattempo l'utente potrebbe aver cambiato sotto-scheda: rendo quella davvero attiva ora.
     const attivo = document.querySelector('#spesa-subtab-chips .chip.active');
     const nomeAttuale = attivo ? attivo.dataset.subtab : name;
-    if(nomeAttuale==='lista') renderPatientSpesa();
+    if(nomeAttuale==='lista'){ renderPatientSpesa(); renderSpesaAuto(); }
     if(nomeAttuale==='cerca') renderCercaAlimenti();
   }
   function rinfrescaSpesaSottoTabAttiva(){
@@ -3952,6 +4293,15 @@
 
   // ---- Cerca alimenti: catalogo completo, ricerca + categoria + unità di misura ----
   const ALIMENTO_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 21V12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  // Se l'alimento ha un'immagine (dal link Drive inserito nel foglio "Guida alla Spesa"), la mostra
+  // sopra all'icona generica; se il link non carica (file non condiviso, link rotto…) l'immagine si
+  // nasconde da sola e resta visibile solo l'icona sotto, senza spazi vuoti o errori a schermo.
+  function cpThumbAlimentoHtml(f){
+    if(!f || !f.immagine) return ALIMENTO_ICON_SVG;
+    return ALIMENTO_ICON_SVG + `<img src="${cpEsc(f.immagine)}" alt="" loading="lazy" referrerpolicy="no-referrer"
+      style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:inherit;"
+      onerror="this.remove()">`;
+  }
   const ICONA_PIU_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   const ICONA_CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9.5 17.5L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let CP_UNITA_ALIMENTI = 'porzione'; // 'porzione' | '100g'
@@ -4011,7 +4361,7 @@
       const inLista = cpAlimentoInLista(f.id);
       return `
       <div class="alimento-card" data-id="${cpEsc(f.id)}">
-        <div class="alimento-thumb">${ALIMENTO_ICON_SVG}</div>
+        <div class="alimento-thumb">${cpThumbAlimentoHtml(f)}</div>
         <div class="alimento-card-body">
           <div class="alimento-card-nome">${cpEsc(f.nome)}</div>
           <div class="alimento-card-cat">${cpEsc(f.categoria||'—')}</div>
@@ -4041,9 +4391,9 @@
     });
   }
 
-  // ---- dettaglio alimento + confronto (fino a 2) ----
-  let CP_CONFRONTO = [];
+  // ---- dettaglio alimento + confronto diretto tra due alimenti ----
   let CP_DETTAGLIO_APERTO_ID = null;
+  let CP_CONFRONTO_PRIMO_ID = null;
   const ETICHETTE_DETTAGLIO = { kcal:'Kcal', zuccheri:'Di cui zuccheri', grassi:'Grassi', prot:'Proteine', grassiSaturi:'Di cui saturi', fibra:'Fibre', carb:'Carboidrati', sale:'Sale' };
 
   function renderDettaglioNutrienti(id){
@@ -4057,12 +4407,6 @@
     `).join('');
   }
   function aggiornaDettaglioAzioni(id){
-    const btnConf = document.getElementById('p-modal-confronto-btn');
-    const inConfronto = CP_CONFRONTO.includes(id);
-    btnConf.textContent = inConfronto ? 'Nel confronto ✓' : 'Confronta con…';
-    btnConf.classList.toggle('primary', inConfronto);
-    btnConf.classList.toggle('ghost', !inConfronto);
-
     const btnLista = document.getElementById('p-modal-lista-btn');
     const inLista = cpAlimentoInLista(id);
     btnLista.textContent = inLista ? 'Nella lista ✓' : 'Aggiungi alla lista';
@@ -4074,11 +4418,12 @@
     if(!f) return;
     CP_DETTAGLIO_APERTO_ID = id;
     const { base, marca } = cpSplitNomeMarca(f.nome);
-    document.getElementById('p-modal-alimento-thumb').innerHTML = ALIMENTO_ICON_SVG;
+    document.getElementById('p-modal-alimento-thumb').innerHTML = cpThumbAlimentoHtml(f);
     document.getElementById('p-modal-alimento-eyebrow').textContent = (f.categoria||'—').toUpperCase();
     document.getElementById('p-modal-alimento-nome').textContent = base;
     document.getElementById('p-modal-alimento-marca').textContent = marca || '';
     document.getElementById('p-modal-alimento-punteggio').textContent = f.punteggio != null ? f.punteggio : '—';
+    document.getElementById('dettaglio-unita-porzione-btn').textContent = `Per porzione (${cpFmt(f.porzione||100)} g)`;
     const ingrWrap = document.getElementById('p-modal-alimento-ingredienti-wrap');
     if(f.ingredienti){
       ingrWrap.style.display = '';
@@ -4090,28 +4435,14 @@
     renderDettaglioNutrienti(id);
     aggiornaDettaglioAzioni(id);
     document.getElementById('p-modal-alimento-view').style.display = '';
+    document.getElementById('p-modal-confronto-ricerca-view').style.display = 'none';
     document.getElementById('p-modal-confronto-view').style.display = 'none';
     document.getElementById('p-modal-overlay').style.display = 'flex';
   }
   function pCloseModal(){
     document.getElementById('p-modal-overlay').style.display = 'none';
     CP_DETTAGLIO_APERTO_ID = null;
-  }
-
-  function pToggleConfrontoDaDettaglio(){
-    const id = CP_DETTAGLIO_APERTO_ID;
-    if(!id) return;
-    if(CP_CONFRONTO.includes(id)){
-      CP_CONFRONTO = CP_CONFRONTO.filter(x => x !== id);
-    } else {
-      if(CP_CONFRONTO.length >= 2){
-        showToast('Puoi confrontare al massimo 2 alimenti alla volta — svuota prima il confronto');
-        return;
-      }
-      CP_CONFRONTO.push(id);
-    }
-    aggiornaBarraConfronto();
-    aggiornaDettaglioAzioni(id);
+    CP_CONFRONTO_PRIMO_ID = null;
   }
   function pToggleListaDaDettaglio(){
     const id = CP_DETTAGLIO_APERTO_ID;
@@ -4120,27 +4451,59 @@
     aggiornaDettaglioAzioni(id);
     renderPatientSpesa();
   }
-  function svuotaConfronto(){
-    CP_CONFRONTO = [];
-    aggiornaBarraConfronto();
-    if(CP_DETTAGLIO_APERTO_ID) aggiornaDettaglioAzioni(CP_DETTAGLIO_APERTO_ID);
+
+  // "Confronta con…" apre una ricerca dedicata: si sceglie il secondo alimento e si vede subito
+  // il confronto diretto, senza passaggi intermedi (niente più selezione multipla da una barra).
+  function apriRicercaConfronto(){
+    const id = CP_DETTAGLIO_APERTO_ID;
+    if(!id) return;
+    CP_CONFRONTO_PRIMO_ID = id;
+    const f = CP_FOODS_BY_ID[id];
+    document.getElementById('p-confronto-ricerca-primo-nome').textContent = f ? cpSplitNomeMarca(f.nome).base : '';
+    document.getElementById('confronto-ricerca-input').value = '';
+    renderRicercaConfronto();
+    document.getElementById('p-modal-alimento-view').style.display = 'none';
+    document.getElementById('p-modal-confronto-view').style.display = 'none';
+    document.getElementById('p-modal-confronto-ricerca-view').style.display = '';
   }
-  function aggiornaBarraConfronto(){
-    const bar = document.getElementById('confronto-bar');
-    const btn = document.getElementById('confronto-bar-btn');
-    if(!CP_CONFRONTO.length){ bar.style.display = 'none'; return; }
-    bar.style.display = 'flex';
-    document.getElementById('confronto-bar-text').textContent = CP_CONFRONTO.length === 1 ? '1 alimento selezionato' : '2 alimenti selezionati';
-    btn.disabled = CP_CONFRONTO.length !== 2;
+  function renderRicercaConfronto(){
+    const termine = (document.getElementById('confronto-ricerca-input').value || '').trim().toLowerCase();
+    const risultati = (CP_FOODS||[]).filter(f => {
+      if(f.id === CP_CONFRONTO_PRIMO_ID) return false;
+      if(termine && !f.nome.toLowerCase().includes(termine)) return false;
+      return true;
+    }).sort((a,b) => a.nome.localeCompare(b.nome, 'it'));
+    const listEl = document.getElementById('confronto-ricerca-list');
+    if(!risultati.length){
+      listEl.innerHTML = '<p class="p-empty-note">Nessun alimento trovato.</p>';
+      return;
+    }
+    listEl.innerHTML = risultati.map(f => `
+      <div class="alimento-card" data-id="${cpEsc(f.id)}">
+        <div class="alimento-thumb">${cpThumbAlimentoHtml(f)}</div>
+        <div class="alimento-card-body">
+          <div class="alimento-card-nome">${cpEsc(f.nome)}</div>
+          <div class="alimento-card-cat">${cpEsc(f.categoria||'—')}</div>
+        </div>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.alimento-card').forEach(card => {
+      card.addEventListener('click', () => apriConfrontoDiretto(CP_CONFRONTO_PRIMO_ID, card.dataset.id));
+    });
   }
-  function apriConfronto(){
-    if(CP_CONFRONTO.length !== 2) return;
-    const [a, b] = CP_CONFRONTO.map(id => CP_FOODS_BY_ID[id]);
+  (function setupRicercaConfronto(){
+    const inp = document.getElementById('confronto-ricerca-input');
+    if(!inp) return;
+    inp.addEventListener('input', renderRicercaConfronto);
+  })();
+  function apriConfrontoDiretto(idA, idB){
+    const a = CP_FOODS_BY_ID[idA], b = CP_FOODS_BY_ID[idB];
     if(!a || !b) return;
     const daEvidenziare = ['grassiSaturi','zuccheri','sale'];
     const colHtml = (f, altro) => `
       <div>
-        <div class="confronto-col-head">${cpEsc(f.nome)}</div>
+        <div class="alimento-thumb" style="margin:0 auto 8px;">${cpThumbAlimentoHtml(f)}</div>
+        <div class="confronto-col-head" style="text-align:center;">${cpEsc(cpSplitNomeMarca(f.nome).base)}</div>
         ${CP_NUTRIENTI.map(n => {
           const v = cpValoreAlimento(f, n.key);
           const vAltro = cpValoreAlimento(altro, n.key);
@@ -4150,6 +4513,7 @@
       </div>`;
     document.getElementById('p-confronto-cols').innerHTML = colHtml(a,b) + colHtml(b,a);
     document.getElementById('p-modal-alimento-view').style.display = 'none';
+    document.getElementById('p-modal-confronto-ricerca-view').style.display = 'none';
     document.getElementById('p-modal-confronto-view').style.display = '';
     document.getElementById('p-modal-overlay').style.display = 'flex';
   }
@@ -4247,14 +4611,74 @@
     }).join('');
   }
 
+  // ---- Andamento paziente: 4 riquadri principali (Peso, Circonferenze, Plicometria, BIA), come
+  // nel programma della nutrizionista — si apre il dettaglio (con le singole voci) solo dopo aver
+  // toccato la categoria che interessa, invece di mostrare tutti i ~24 parametri in un elenco piatto.
+  const ANDAMENTO_TILE_ICONS = {
+    peso: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 13L14 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 3V6M16 3V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    circonferenze: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 3.5V6M20.5 12H18M12 20.5V18M3.5 12H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    plicometria: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L11 12L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 6L13 12L18 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    bia: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+  };
+  let patCategoriaAttiva = null; // null = schermata con i 4 riquadri; altrimenti chiave della categoria aperta
+
+  function pUltimoValoreCategoria_(cat){
+    for(const k of cat.metriche){
+      const m = METRICS[k];
+      if(m && m.values && m.values.length) return 'Ultimo: ' + fmt(m.values[m.values.length-1]) + ' ' + m.unit;
+    }
+    return 'Nessun dato ancora';
+  }
+  function renderAndamentoTiles(){
+    const el = document.getElementById('p-andamento-tiles');
+    if(!el) return;
+    el.innerHTML = MIS_CATEGORIE.map(cat => `
+      <button type="button" class="andamento-tile" data-cat="${cat.key}">
+        <span class="andamento-tile-icon">${ANDAMENTO_TILE_ICONS[cat.key]||''}</span>
+        <span>
+          <span class="andamento-tile-label">${cpEsc(cat.label)}</span><br>
+          <span class="andamento-tile-sub">${cpEsc(pUltimoValoreCategoria_(cat))}</span>
+        </span>
+      </button>
+    `).join('');
+    el.querySelectorAll('.andamento-tile').forEach(btn => {
+      btn.addEventListener('click', () => pApriAndamentoCategoria(btn.dataset.cat));
+    });
+  }
+  function pApriAndamentoCategoria(catKey){
+    const cat = MIS_CATEGORIE.find(c => c.key===catKey);
+    if(!cat) return;
+    patCategoriaAttiva = catKey;
+    patientMetric = cat.metriche.includes(patientMetric) ? patientMetric : cat.metriche[0];
+    document.getElementById('p-andamento-tiles').style.display = 'none';
+    document.getElementById('p-andamento-dettaglio').style.display = '';
+    renderPatientChips();
+  }
+  function pChiudiAndamentoDettaglio(){
+    patCategoriaAttiva = null;
+    document.getElementById('p-andamento-dettaglio').style.display = 'none';
+    document.getElementById('p-andamento-tiles').style.display = '';
+    renderAndamentoTiles();
+  }
+
   function renderPatientCharts(){
     const m = METRICS.peso || { values:[], labels:[] };
     drawChart(document.getElementById('chart-home-preview'), m.values, { w:340, h:64, color:'var(--accent)' });
-    renderPatientChips();
+    patCategoriaAttiva = null;
+    document.getElementById('p-andamento-dettaglio').style.display = 'none';
+    document.getElementById('p-andamento-tiles').style.display = '';
+    renderAndamentoTiles();
   }
   function renderPatientChips(){
+    const cat = MIS_CATEGORIE.find(c => c.key===patCategoriaAttiva) || MIS_CATEGORIE[0];
     const row = document.getElementById('chip-row-paziente');
-    row.innerHTML = PATIENT_METRIC_KEYS.map(k => `<button class="chip ${k===patientMetric?'active':''}" onclick="selectPatientMetric('${k}')">${METRICS[k].label}</button>`).join('');
+    if(cat.metriche.length > 1){
+      row.style.display = '';
+      row.innerHTML = cat.metriche.map(k => `<button class="chip ${k===patientMetric?'active':''}" onclick="selectPatientMetric('${k}')">${METRICS[k].label}</button>`).join('');
+    } else {
+      row.style.display = 'none';
+      row.innerHTML = '';
+    }
     const m = METRICS[patientMetric];
     drawChart(document.getElementById('chart-paziente'), m.values, { big:true, showAxis:true, unit:m.unit, title:m.label, color:'var(--accent)', w:340, h:200, labels:m.labels });
     updateAndamentoSub();
@@ -4262,7 +4686,7 @@
   function selectPatientMetric(k){ patientMetric = k; renderPatientChips(); }
 
   function updateAndamentoSub(){
-    const subEl = document.getElementById('p-andamento-sub');
+    const subEl = document.getElementById('p-andamento-dettaglio-sub');
     const m = METRICS[patientMetric];
     if(!subEl || !m) return;
     if(!m.values.length){
@@ -4298,6 +4722,451 @@
     }).join('');
   }
 
+  /* ================= RICETTARIO ================= */
+  // Le ricette arrivano dal foglio "Ricette" (azione GET "ricette", vedi Codice.gs): ogni ricetta
+  // ha "riga" come identificativo (il numero di riga reale nel foglio), non un id a parte. Il
+  // catalogo alimenti (CP_FOODS) serve per conoscere nome/valori nutrizionali di ogni ingrediente,
+  // quindi va caricato insieme al ricettario, non al posto suo.
+  const RICETTA_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 3.5 6.5 3.5C9 3.5 11 4.5 12 5.5C13 4.5 15 3.5 17.5 3.5C19 3.5 20 4 20 5V17C20 17 18.5 16.5 17 16.5C15 16.5 13 17.3 12 18.3C11 17.3 9 16.5 7 16.5C5.5 16.5 4 17 4 17V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5.5V18.3" stroke="currentColor" stroke-width="1.5"/></svg>';
+  let CP_RECIPES = null;
+  let CP_RECIPES_ERROR = null;
+  let CP_RECIPES_LOADING = null;
+  let RICETTA_APERTA = null;
+  let RICETTA_INGREDIENTI_ADATTATI = [];
+  let RICETTA_CALCOLO_MODO = 'porzione';
+
+  async function cpLoadRicette(){
+    if(CP_RECIPES) return;
+    if(CP_RECIPES_LOADING) return CP_RECIPES_LOADING;
+    CP_RECIPES_LOADING = (async () => {
+      try{
+        const res = await apiGet('ricette', {});
+        if(res.ok){
+          CP_RECIPES = res.ricette || [];
+          CP_RECIPES_ERROR = null;
+        } else {
+          CP_RECIPES = [];
+          CP_RECIPES_ERROR = res.error || 'Errore nel caricamento del ricettario.';
+        }
+      } catch(err){
+        CP_RECIPES = [];
+        CP_RECIPES_ERROR = 'Errore di connessione: ' + err.message;
+      }
+    })();
+    await CP_RECIPES_LOADING;
+  }
+
+  async function cpAssicuraCatalogoRicette_(){
+    const loadingEl = document.getElementById('ricette-loading');
+    const warnEl = document.getElementById('ricette-warning');
+    if(CP_FOODS && !CP_FOODS_ERROR && CP_RECIPES && !CP_RECIPES_ERROR){ loadingEl.style.display = 'none'; warnEl.style.display = 'none'; return true; }
+    warnEl.style.display = 'none'; loadingEl.style.display = '';
+    await Promise.all([cpLoadFoods(), cpLoadRicette()]);
+    loadingEl.style.display = 'none';
+    const errore = CP_FOODS_ERROR || CP_RECIPES_ERROR;
+    if(errore){ warnEl.style.display = ''; document.getElementById('ricette-warning-text').textContent = errore; return false; }
+    return true;
+  }
+  async function apriRicettario(){
+    const pronto = await cpAssicuraCatalogoRicette_();
+    if(!pronto) return;
+    renderRicettario();
+  }
+  async function cpRiprovaRicette(){
+    const btn = document.getElementById('ricette-retry-btn');
+    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    if(CP_FOODS_ERROR){ CP_FOODS = null; CP_FOODS_ERROR = null; CP_FOODS_LOADING = null; }
+    if(CP_RECIPES_ERROR){ CP_RECIPES = null; CP_RECIPES_ERROR = null; CP_RECIPES_LOADING = null; }
+    await apriRicettario();
+    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+  }
+
+  // Trova, nel piano del paziente, il pasto (giorno+pasto) più simile alla ricetta — quello che
+  // condivide più ingredienti con lei. Distingue "pollo col riso" da "pollo col pane": ognuna delle
+  // due ricette troverà il PROPRIO pasto più simile, e prenderà la grammatura da lì.
+  function cpTrovaPastoSimileARicetta_(ricetta){
+    const idsRicetta = ricetta.ingredienti.map(i => i.id);
+    let migliore = null, punteggio = -1;
+    CP_GIORNI.forEach(g => {
+      CP_MEALS.forEach(m => {
+        const items = (CP_PLAN[g] && CP_PLAN[g][m]) || [];
+        if(!items.length) return;
+        const idsPasto = items.map(it => it.id);
+        const comuni = idsRicetta.filter(id => idsPasto.includes(id)).length;
+        if(comuni > punteggio){ punteggio = comuni; migliore = { giorno:g, pasto:m, items }; }
+      });
+    });
+    return punteggio > 0 ? migliore : null;
+  }
+  // Per ogni ingrediente: 1) prova a prendere la quantità dal pasto del piano più simile alla
+  // ricetta; 2) se l'ingrediente non è in quel pasto, usa la media di tutte le sue occorrenze nel
+  // piano; 3) se non compare mai nel piano, resta il valore preimpostato scritto nella ricetta.
+  function cpAdattaIngredientiRicetta(ricetta){
+    const pastoSimile = cpTrovaPastoSimileARicetta_(ricetta);
+    return ricetta.ingredienti.map(ing => {
+      const f = CP_FOODS_BY_ID[ing.id];
+      let g = ing.g, fonteEtichetta = 'valore standard della ricetta';
+      let daPiano = false;
+      if(pastoSimile){
+        const trovato = pastoSimile.items.find(it => it.id === ing.id);
+        if(trovato){ g = trovato.g; daPiano = true; fonteEtichetta = `dal tuo piano (${pastoSimile.giorno} · ${pastoSimile.pasto})`; }
+      }
+      if(!daPiano){
+        const occ = [];
+        CP_GIORNI.forEach(gg => CP_MEALS.forEach(mm => ((CP_PLAN[gg] && CP_PLAN[gg][mm]) || []).forEach(it => { if(it.id===ing.id) occ.push(it.g); })));
+        if(occ.length){ g = Math.round(occ.reduce((a,b)=>a+b,0)/occ.length); daPiano = true; fonteEtichetta = 'media dalle volte che compare nel tuo piano'; }
+      }
+      return { id:ing.id, food:f, gBase:g, daPiano, fonteEtichetta };
+    });
+  }
+
+  function cpThumbRicettaHtml(ricetta){
+    if(!ricetta.foto) return RICETTA_ICON_SVG;
+    return RICETTA_ICON_SVG + `<img src="${cpEsc(ricetta.foto)}" alt="" loading="lazy" referrerpolicy="no-referrer"
+      style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:inherit;"
+      onerror="this.remove()">`;
+  }
+
+  function renderRicettario(){
+    const termine = (document.getElementById('ricette-search-input').value || '').trim().toLowerCase();
+    const risultati = (CP_RECIPES||[]).filter(r => {
+      if(!termine) return true;
+      if(r.nome.toLowerCase().includes(termine)) return true;
+      return r.ingredienti.some(ing => {
+        const f = CP_FOODS_BY_ID[ing.id];
+        return f && f.nome.toLowerCase().includes(termine);
+      });
+    });
+    document.getElementById('ricette-count').textContent = `${risultati.length} ricette trovate`;
+    const listEl = document.getElementById('ricette-list');
+    if(!risultati.length){
+      listEl.innerHTML = '<p class="p-empty-note">Nessuna ricetta trovata con questa ricerca.</p>';
+      return;
+    }
+    listEl.innerHTML = risultati.map(r => {
+      // se il match arriva da un ingrediente (non dal titolo), lo segnaliamo sotto al nome
+      let matchIngrediente = '';
+      if(termine && !r.nome.toLowerCase().includes(termine)){
+        const ing = r.ingredienti.map(i => CP_FOODS_BY_ID[i.id]).find(f => f && f.nome.toLowerCase().includes(termine));
+        if(ing) matchIngrediente = `Contiene: ${cpEsc(cpSplitNomeMarca(ing.nome).base)}`;
+      }
+      return `
+      <div class="ricetta-card" data-riga="${cpEsc(r.riga)}">
+        <div class="ricetta-card-thumb">${cpThumbRicettaHtml(r)}</div>
+        <div style="flex:1; min-width:0;">
+          <div class="ricetta-card-nome">${cpEsc(r.nome)}</div>
+          ${matchIngrediente ? `<div class="ricetta-card-match">${matchIngrediente}</div>` : `<div class="ricetta-card-cat">${cpEsc(r.categoria)}</div>`}
+        </div>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('.ricetta-card').forEach(card => {
+      card.addEventListener('click', () => apriDettaglioRicetta(card.dataset.riga));
+    });
+  }
+  (function setupRicercaRicette(){
+    const inp = document.getElementById('ricette-search-input');
+    if(!inp) return;
+    inp.addEventListener('input', renderRicettario);
+  })();
+
+  function apriDettaglioRicetta(riga){
+    const ricetta = (CP_RECIPES||[]).find(r => String(r.riga) === String(riga));
+    if(!ricetta) return;
+    RICETTA_APERTA = ricetta;
+    RICETTA_INGREDIENTI_ADATTATI = cpAdattaIngredientiRicetta(ricetta);
+    RICETTA_CALCOLO_MODO = 'porzione';
+    document.getElementById('ricetta-detail-foto').innerHTML = cpThumbRicettaHtml(ricetta);
+    document.getElementById('ricetta-detail-nome').textContent = ricetta.nome;
+    document.getElementById('ricetta-detail-cat').textContent = ricetta.categoria;
+    document.getElementById('ricetta-detail-porzioni-label').textContent = `(per ${ricetta.porzioni} porzion${ricetta.porzioni===1?'e':'i'} come scritta)`;
+    document.getElementById('ricetta-porzioni-input').value = ricetta.porzioni;
+    document.getElementById('ricetta-detail-procedimento').textContent = ricetta.procedimento;
+    document.getElementById('ricetta-detail-commento').textContent = ricetta.commento || '—';
+    document.getElementById('ricetta-calcolo-nutrizionale').style.display = 'none';
+    document.querySelectorAll('#ricetta-calcolo-nutrizionale .chip').forEach(c => c.classList.toggle('active', c.dataset.modo==='porzione'));
+    renderIngredientiRicetta();
+    document.getElementById('p-modal-ricetta-overlay').style.display = 'flex';
+  }
+  function chiudiDettaglioRicetta(){
+    document.getElementById('p-modal-ricetta-overlay').style.display = 'none';
+    RICETTA_APERTA = null;
+  }
+  // La quantità mostrata = quantità adattata al piano (per le porzioni "base" della ricetta),
+  // scalata in proporzione al numero di porzioni che il paziente vuole preparare adesso.
+  function cpFattoreProzioni_(){
+    const richieste = Math.max(1, Math.round(Number(document.getElementById('ricetta-porzioni-input').value)) || RICETTA_APERTA.porzioni);
+    return richieste / RICETTA_APERTA.porzioni;
+  }
+  function renderIngredientiRicetta(){
+    if(!RICETTA_APERTA) return;
+    const fattore = cpFattoreProzioni_();
+    const el = document.getElementById('ricetta-detail-ingredienti');
+    el.innerHTML = RICETTA_INGREDIENTI_ADATTATI.map(ing => {
+      const gScalato = Math.round(ing.gBase * fattore);
+      const inLista = ing.food ? cpAlimentoInLista(ing.id) : false;
+      return `
+      <div class="ricetta-ingrediente-row" data-id="${cpEsc(ing.id)}">
+        <span class="ricetta-ingrediente-nome">
+          ${cpEsc(ing.food ? cpSplitNomeMarca(ing.food.nome).base : ing.id)}
+          <span class="ricetta-ingrediente-fonte ${ing.daPiano?'dal-piano':''}">${cpEsc(ing.fonteEtichetta)}</span>
+        </span>
+        <span class="ricetta-ingrediente-qta">${cpFmt(gScalato)} g</span>
+        <button type="button" class="ricetta-ingrediente-add ${inLista?'in-lista':''}" data-id="${cpEsc(ing.id)}" title="${inLista?'Nella lista della spesa':'Aggiungi alla lista della spesa'}">
+          ${inLista ? ICONA_CHECK_SVG : ICONA_PIU_SVG}
+        </button>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.ricetta-ingrediente-add').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ora = cpToggleAlimentoInLista(btn.dataset.id);
+        btn.classList.toggle('in-lista', ora);
+        btn.innerHTML = ora ? ICONA_CHECK_SVG : ICONA_PIU_SVG;
+        btn.title = ora ? 'Nella lista della spesa' : 'Aggiungi alla lista della spesa';
+      });
+    });
+    if(document.getElementById('ricetta-calcolo-nutrizionale').style.display !== 'none') renderCalcoloNutrizionaleRicetta();
+  }
+  document.addEventListener('input', (e) => { if(e.target && e.target.id === 'ricetta-porzioni-input') renderIngredientiRicetta(); });
+
+  function toggleCalcoloNutrizionaleRicetta(){
+    const el = document.getElementById('ricetta-calcolo-nutrizionale');
+    const aperto = el.style.display !== 'none';
+    el.style.display = aperto ? 'none' : '';
+    if(!aperto) renderCalcoloNutrizionaleRicetta();
+  }
+  function setModoCalcoloNutrizionale(modo){
+    RICETTA_CALCOLO_MODO = modo;
+    document.querySelectorAll('#ricetta-calcolo-nutrizionale .chip').forEach(c => c.classList.toggle('active', c.dataset.modo===modo));
+    renderCalcoloNutrizionaleRicetta();
+  }
+  function renderCalcoloNutrizionaleRicetta(){
+    if(!RICETTA_APERTA) return;
+    const fattore = cpFattoreProzioni_();
+    const richieste = Math.max(1, Math.round(Number(document.getElementById('ricetta-porzioni-input').value)) || RICETTA_APERTA.porzioni);
+    const totali = {};
+    CP_NUTRIENTI.forEach(n => totali[n.key] = 0);
+    RICETTA_INGREDIENTI_ADATTATI.forEach(ing => {
+      if(!ing.food) return;
+      const gScalato = ing.gBase * fattore;
+      CP_NUTRIENTI.forEach(n => { totali[n.key] += (ing.food[n.key]||0) * gScalato / 100; });
+    });
+    const divisore = RICETTA_CALCOLO_MODO === 'porzione' ? richieste : 1;
+    document.getElementById('ricetta-calcolo-nutri-grid').innerHTML = CP_NUTRIENTI.map(n => `
+      <div class="alimento-detail-nutri-cell"><span class="lbl">${n.label}</span><span class="val num">${cpFmt(totali[n.key]/divisore)}${n.unit?' '+n.unit:''}</span></div>
+    `).join('');
+  }
+
+  /* ================= RICETTARIO — gestione (nutrizionista) ================= */
+  let RICETTA_ADMIN_RIGA = null;       // riga della ricetta in modifica, null se è una ricetta nuova
+  let RICETTA_ADMIN_INGREDIENTI = [];  // [{id,g}] mentre si compila il form "Nuova ricetta"/"Modifica ricetta"
+
+  async function apriGestioneRicette(){
+    document.getElementById('ricette-admin-overlay').style.display = 'flex';
+    document.getElementById('radm-list-view').style.display = '';
+    document.getElementById('radm-form-view').style.display = 'none';
+    const loadingEl = document.getElementById('radm-loading');
+    loadingEl.style.display = '';
+    document.getElementById('radm-list').innerHTML = '';
+    await Promise.all([cpLoadFoods(), cpLoadRicette()]);
+    loadingEl.style.display = 'none';
+    if(CP_RECIPES_ERROR) showToast(CP_RECIPES_ERROR);
+    renderRicetteAdminList();
+  }
+  function chiudiGestioneRicette(){
+    document.getElementById('ricette-admin-overlay').style.display = 'none';
+  }
+  function renderRicetteAdminList(){
+    const el = document.getElementById('radm-list');
+    const ricette = (CP_RECIPES||[]).slice().sort((a,b) => a.nome.localeCompare(b.nome, 'it'));
+    if(!ricette.length){
+      el.innerHTML = `<p class="cp-empty-note">Nessuna ricetta ancora. Usa "Nuova ricetta" per crearne una.</p>`;
+      return;
+    }
+    el.innerHTML = ricette.map(r => `
+      <div class="radm-row">
+        <div style="flex:1; min-width:0;">
+          <div class="radm-row-name">${cpEsc(r.nome)}</div>
+          <div class="radm-row-cat">${cpEsc(r.categoria || '—')} · ${(r.ingredienti||[]).length} ingredienti</div>
+        </div>
+        <div class="radm-row-actions">
+          <button type="button" class="btn small ghost" data-azione="modifica" data-riga="${cpEsc(r.riga)}">Modifica</button>
+          <button type="button" class="btn small ghost" data-azione="elimina" data-riga="${cpEsc(r.riga)}">Elimina</button>
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('button[data-azione="modifica"]').forEach(btn => {
+      btn.addEventListener('click', () => apriFormRicetta(btn.dataset.riga));
+    });
+    el.querySelectorAll('button[data-azione="elimina"]').forEach(btn => {
+      btn.addEventListener('click', () => eliminaRicettaAdmin(btn.dataset.riga));
+    });
+  }
+
+  function apriFormRicetta(riga){
+    const ricetta = riga ? (CP_RECIPES||[]).find(r => String(r.riga) === String(riga)) : null;
+    RICETTA_ADMIN_RIGA = ricetta ? ricetta.riga : null;
+    RICETTA_ADMIN_INGREDIENTI = ricetta ? ricetta.ingredienti.map(i => ({ id:i.id, g:i.g })) : [];
+    document.getElementById('radm-form-title').textContent = ricetta ? 'Modifica ricetta' : 'Nuova ricetta';
+    document.getElementById('radm-nome').value = ricetta ? ricetta.nome : '';
+    document.getElementById('radm-categoria').value = ricetta ? ricetta.categoria : '';
+    document.getElementById('radm-foto').value = ricetta ? ricetta.foto : '';
+    document.getElementById('radm-porzioni').value = ricetta ? ricetta.porzioni : 1;
+    document.getElementById('radm-procedimento').value = ricetta ? ricetta.procedimento : '';
+    document.getElementById('radm-commento').value = ricetta ? ricetta.commento : '';
+    document.getElementById('radm-form-error').textContent = '';
+    document.getElementById('radm-ing-search-input').value = '';
+    renderRicetteAdminIngredienti();
+    document.getElementById('radm-list-view').style.display = 'none';
+    document.getElementById('radm-form-view').style.display = '';
+  }
+  function chiudiFormRicetta(){
+    document.getElementById('radm-form-view').style.display = 'none';
+    document.getElementById('radm-list-view').style.display = '';
+  }
+
+  function renderRicetteAdminIngredienti(){
+    const el = document.getElementById('radm-ingredienti');
+    if(!RICETTA_ADMIN_INGREDIENTI.length){
+      el.innerHTML = `<p class="cp-empty-note">Nessun ingrediente ancora — cercalo qui sotto per aggiungerlo.</p>`;
+      return;
+    }
+    el.innerHTML = RICETTA_ADMIN_INGREDIENTI.map((ing, idx) => {
+      const f = CP_FOODS_BY_ID[ing.id];
+      return `
+        <div class="radm-ing-row">
+          <span class="radm-ing-name">${cpEsc(f ? cpSplitNomeMarca(f.nome).base : ing.id)}</span>
+          <div style="display:flex; align-items:center; gap:3px;">
+            <input type="number" class="radm-ing-grammi" min="0" step="5" value="${ing.g}" data-idx="${idx}" style="width:64px; padding:6px 8px; border:1px solid var(--border); border-radius:7px; font-family:var(--font-mono); font-size:13px; background:var(--surface-raised); color:var(--ink);">
+            <span style="font-size:11px; color:var(--ink-faint);">g</span>
+          </div>
+          <button type="button" class="cp-btn-remove" data-idx="${idx}" title="Rimuovi">${CP_ICON_X}</button>
+        </div>`;
+    }).join('');
+    el.querySelectorAll('.radm-ing-grammi').forEach(inp => {
+      inp.addEventListener('input', () => {
+        RICETTA_ADMIN_INGREDIENTI[+inp.dataset.idx].g = Math.max(0, +inp.value || 0);
+      });
+    });
+    el.querySelectorAll('.cp-btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        RICETTA_ADMIN_INGREDIENTI.splice(+btn.dataset.idx, 1);
+        renderRicetteAdminIngredienti();
+      });
+    });
+  }
+
+  // Ricerca alimenti da aggiungere alla ricetta in compilazione — stesso meccanismo delle
+  // suggestions di "Crea piano" (cp-meal-search-input), qui su un singolo campo.
+  (function setupRicercaIngredienteRicetta(){
+    const inp = document.getElementById('radm-ing-search-input');
+    const box = document.getElementById('radm-ing-suggestions');
+    if(!inp || !box) return;
+    let currentMatches = [];
+    let highlighted = -1;
+    const selectFood = (f) => {
+      if(!f) return;
+      RICETTA_ADMIN_INGREDIENTI.push({ id:f.id, g:f.porzione });
+      renderRicetteAdminIngredienti();
+      inp.value = '';
+      box.hidden = true;
+    };
+    const updateHighlight = () => {
+      const rows = box.querySelectorAll('.cp-suggestion-item');
+      rows.forEach((row, i) => {
+        row.classList.toggle('active', i === highlighted);
+        if(i === highlighted) row.scrollIntoView({ block:'nearest' });
+      });
+    };
+    const renderSuggestions = () => {
+      const term = inp.value.trim().toLowerCase();
+      highlighted = -1;
+      currentMatches = [];
+      if(term === ''){ box.hidden = true; box.innerHTML = ''; return; }
+      const matches = (CP_FOODS||[]).filter(f => f.nome.toLowerCase().startsWith(term)).slice(0, 7);
+      currentMatches = matches;
+      if(matches.length === 0){
+        box.innerHTML = `<div class="cp-suggestion-empty">Nessun alimento trovato per "${cpEsc(inp.value.trim())}"</div>`;
+      } else {
+        box.innerHTML = matches.map(f => `
+          <div class="cp-suggestion-item" data-id="${cpEsc(f.id)}">
+            <span class="cp-suggestion-name"><b>${cpEsc(f.nome.slice(0, term.length))}</b>${cpEsc(f.nome.slice(term.length))}</span>
+            <span class="cp-suggestion-kcal">porzione rif. ${cpFmt(f.porzione)} g · ${cpFmt(f.kcal*f.porzione/100)} kcal</span>
+          </div>`).join('');
+        box.querySelectorAll('.cp-suggestion-item').forEach(row => {
+          row.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            selectFood(CP_FOODS_BY_ID[row.dataset.id]);
+          });
+        });
+      }
+      box.hidden = false;
+    };
+    inp.addEventListener('input', renderSuggestions);
+    inp.addEventListener('focus', () => { if(inp.value.trim() !== '') renderSuggestions(); });
+    inp.addEventListener('blur', () => { setTimeout(() => { box.hidden = true; }, 120); });
+    inp.addEventListener('keydown', (e) => {
+      if(box.hidden || currentMatches.length === 0){
+        if(e.key === 'ArrowDown' && inp.value.trim() !== ''){ renderSuggestions(); }
+        return;
+      }
+      if(e.key === 'ArrowDown'){ e.preventDefault(); highlighted = Math.min(highlighted + 1, currentMatches.length - 1); updateHighlight(); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); highlighted = Math.max(highlighted - 1, 0); updateHighlight(); }
+      else if(e.key === 'Enter'){
+        if(highlighted >= 0){ e.preventDefault(); selectFood(currentMatches[highlighted]); }
+        else if(currentMatches.length === 1){ e.preventDefault(); selectFood(currentMatches[0]); }
+      } else if(e.key === 'Escape'){ box.hidden = true; }
+    });
+  })();
+
+  async function salvaFormRicetta(){
+    const errEl = document.getElementById('radm-form-error');
+    errEl.textContent = '';
+    const nome = document.getElementById('radm-nome').value.trim();
+    if(!nome){ errEl.textContent = 'Dai un nome alla ricetta.'; document.getElementById('radm-nome').focus(); return; }
+    if(!RICETTA_ADMIN_INGREDIENTI.length){ errEl.textContent = 'Aggiungi almeno un ingrediente.'; return; }
+    const categoria = document.getElementById('radm-categoria').value.trim();
+    const foto = document.getElementById('radm-foto').value.trim();
+    const porzioni = Math.max(1, Math.round(Number(document.getElementById('radm-porzioni').value)) || 1);
+    const procedimento = document.getElementById('radm-procedimento').value.trim();
+    const commento = document.getElementById('radm-commento').value.trim();
+    const ingredienti = RICETTA_ADMIN_INGREDIENTI.map(i => ({ id:i.id, g:i.g }));
+    const body = { codice: SESSION.codice, nome, categoria, foto, porzioni, ingredienti, procedimento, commento };
+    if(RICETTA_ADMIN_RIGA) body.riga = RICETTA_ADMIN_RIGA;
+    try{
+      const res = await apiPost('salvaRicetta', body);
+      if(res.ok){
+        // ricarichiamo il ricettario dal server: cosi' il link Drive appena inserito torna già
+        // trasformato nell'indirizzo dell'anteprima (stesso meccanismo delle foto degli alimenti)
+        CP_RECIPES = null; CP_RECIPES_LOADING = null; CP_RECIPES_ERROR = null;
+        await cpLoadRicette();
+        chiudiFormRicetta();
+        renderRicetteAdminList();
+        showToast('Ricetta "' + nome + '" salvata — ora disponibile a tutti i pazienti');
+      } else {
+        errEl.textContent = res.error || 'Errore durante il salvataggio.';
+      }
+    } catch(err){
+      errEl.textContent = 'Errore di connessione: ' + err.message;
+    }
+  }
+
+  async function eliminaRicettaAdmin(riga){
+    const ricetta = (CP_RECIPES||[]).find(r => String(r.riga) === String(riga));
+    if(!confirm('Eliminare definitivamente la ricetta "' + (ricetta ? ricetta.nome : '') + '"? Verrà tolta anche dal Google Sheet e non si potrà recuperare.')) return;
+    try{
+      const res = await apiPost('eliminaRicetta', { codice: SESSION.codice, riga });
+      if(res.ok){
+        if(CP_RECIPES) CP_RECIPES = CP_RECIPES.filter(r => String(r.riga) !== String(riga));
+        renderRicetteAdminList();
+        showToast('Ricetta eliminata');
+      } else {
+        showToast(res.error || "Errore durante l'eliminazione.");
+      }
+    } catch(err){
+      showToast('Errore di connessione: ' + err.message);
+    }
+  }
+
   async function enterPazienteView(){
     const p = SESSION.paziente;
     document.getElementById('p-home-greeting').textContent = 'Ciao' + (p.Nome ? ' '+p.Nome.split(' ')[0] : '');
@@ -4305,6 +5174,7 @@
     document.getElementById('p-home-sub').textContent = 'Ecco il punto della situazione di oggi, ' + oggi.toLocaleDateString('it-IT',{day:'numeric', month:'long'}) + '.';
     document.getElementById('p-profilo-sub').textContent = (p.Nome||'—') + (p.Eta ? ' · '+p.Eta+' anni' : '');
     document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
+    document.getElementById('p-home-calendario-btn').style.display = p.ProssimoControllo ? '' : 'none';
     currentMetric = 'peso'; patientMetric = 'peso';
     // Il database alimenti (100+ voci) NON si carica qui: pesa troppo per essere scaricato ad ogni
     // login. Si carica solo quando il paziente apre davvero la sezione "Spesa" — vedi cpAssicuraCatalogoSpesa().
@@ -4363,6 +5233,7 @@
     if(SESSION.role === 'nutrizionista'){
       document.getElementById('view-nutri').style.display = 'grid';
       document.getElementById('view-paziente').style.display = 'none';
+      document.getElementById('btn-ricettario-nutri').style.display = 'flex';
       cpLoadFoods(); // in background: pronto per quando si apre il tab "Crea piano"
       if(preloadedPazienti){
         PATIENTS = preloadedPazienti;
@@ -4385,6 +5256,7 @@
     document.getElementById('view-nutri').style.display = 'none';
     document.getElementById('view-paziente').style.display = 'none';
     document.getElementById('btn-logout').style.display = 'none';
+    document.getElementById('btn-ricettario-nutri').style.display = 'none';
     document.getElementById('login-code').value = '';
     document.getElementById('login-error').textContent = '';
     document.getElementById('login-screen').style.display = 'flex';
