@@ -291,6 +291,16 @@
   .btn.small{ padding:6px 12px; font-size:12.5px; }
   .btn.warm{ background:var(--accent-warm-soft); color:var(--accent-warm); border-color:transparent; }
   .btn.warm:hover{ background:var(--accent-warm); color:#fff; }
+  .btn:disabled{ cursor:default; opacity:.85; }
+  /* Rotellina che compare nei pulsanti mentre il programma sta lavorando (salvataggi, accesso,
+     ricaricamenti…). Usa currentColor per il bordo, così si adatta da sola al colore del testo del
+     pulsante (bianco su quelli pieni, scuro su quelli col solo contorno) senza bisogno di varianti. */
+  .btn-spinner{
+    display:inline-block; width:13px; height:13px; flex:none;
+    border:2px solid currentColor; border-right-color:transparent; border-radius:50%;
+    opacity:.8; animation:btnSpin .65s linear infinite;
+  }
+  @keyframes btnSpin{ to{ transform:rotate(360deg); } }
 
   /* ---------- Modale nuovo paziente ---------- */
   .sidebar-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
@@ -1314,7 +1324,7 @@
           <div class="login-error" id="radm-form-error"></div>
           <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
             <button class="btn ghost" type="button" onclick="chiudiFormRicetta()">Annulla</button>
-            <button class="btn primary" type="button" onclick="salvaFormRicetta()">Salva ricetta</button>
+            <button class="btn primary" type="button" id="radm-btn-salva" onclick="salvaFormRicetta()">Salva ricetta</button>
           </div>
         </div>
       </div>
@@ -2086,12 +2096,31 @@
 
   /* ================= API ================= */
   function apiConfigured(){ return !!API_URL; }
+  // Le richieste di LETTURA a volte incappano in un intoppo temporaneo di Google (una pagina di
+  // errore al posto dei dati attesi, che di solito si risolve da sola in un paio di secondi): dato
+  // che leggere due volte non ha alcun effetto collaterale, si riprova automaticamente qui, una
+  // volta sola, per tutto il programma — così ogni schermata che legge dati ne beneficia senza
+  // doverlo gestire da sé.
   async function apiGet(action, params){
     if(!apiConfigured()) throw new Error('CONFIG');
     const qs = new URLSearchParams(Object.assign({action}, params||{})).toString();
-    const res = await fetch(API_URL + '?' + qs);
-    return res.json();
+    let ultimoErrore;
+    for(let tentativo = 0; tentativo < 3; tentativo++){
+      try{
+        const res = await fetch(API_URL + '?' + qs);
+        return await res.json();
+      } catch(err){
+        ultimoErrore = err;
+        if(tentativo < 2) await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+    throw ultimoErrore;
   }
+  // Le richieste di SCRITTURA invece NON vengono riprovate automaticamente qui: se il salvataggio è
+  // già arrivato al foglio Google e solo la risposta si perde per strada, rifare la stessa richiesta
+  // rischierebbe di duplicare il dato (es. due misurazioni identiche). Le schermate che salvano dati
+  // gestiscono questo caso verificando se il salvataggio è comunque andato a buon fine, invece di
+  // rimandare la richiesta (vedi es. cpVerificaMisurazioneSalvata_, cpVerificaPazienteCreato_).
   async function apiPost(action, body){
     if(!apiConfigured()) throw new Error('CONFIG');
     const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(Object.assign({action}, body||{})) });
@@ -2833,7 +2862,7 @@
 
   async function cpRiprovaAlimenti(){
     const btn = document.getElementById('cp-retry-alimenti-btn');
-    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    cpBottoneCaricando_(btn, 'Nuovo tentativo…');
     CP_FOODS = null;
     CP_FOODS_ERROR = null;
     CP_FOODS_LOADING = null;
@@ -2848,7 +2877,7 @@
       cpRenderAll();
       showToast('Database alimenti collegato — puoi cercare gli alimenti qui sotto');
     }
-    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+    cpBottoneFinito_(btn);
   }
 
   function cpComputeItem(item){
@@ -3383,9 +3412,7 @@
   /* ---- salva piano ---- */
   async function cpSalvaPiano(){
     const btn = document.getElementById('cp-btn-salva');
-    btn.disabled = true;
-    const testoOriginale = btn.textContent;
-    btn.textContent = 'Salvataggio…';
+    cpBottoneCaricando_(btn, 'Salvataggio…');
     try{
       const avg = cpComputeWeekAverage();
       const res = await apiPost('salvaPianoStrutturato', {
@@ -3405,8 +3432,7 @@
     } catch(err){
       showToast('Errore di connessione: ' + err.message);
     }
-    btn.disabled = false;
-    btn.textContent = testoOriginale;
+    cpBottoneFinito_(btn);
   }
 
   function cpSalvaBozza(){
@@ -3779,6 +3805,26 @@
     showToast(`"${meal}" duplicato su tutti i giorni della settimana`);
   }
 
+  /* ================= ROTELLINA "STO LAVORANDO" SUI PULSANTI ================= */
+  // Da chiamare appena parte un salvataggio/caricamento: disabilita il pulsante, salva il suo testo
+  // originale e ci mette davanti una rotellina, così si vede subito che il click è stato registrato
+  // e il programma sta lavorando (non è bloccato). cpBottoneFinito_ lo riporta come prima.
+  function cpBottoneCaricando_(btn, testoCaricamento){
+    if(!btn || btn.dataset.cpCaricando === '1') return;
+    btn.dataset.cpTestoOriginale = btn.innerHTML;
+    btn.dataset.cpCaricando = '1';
+    btn.disabled = true;
+    const spinner = '<span class="btn-spinner" aria-hidden="true"></span>';
+    btn.innerHTML = spinner + (testoCaricamento != null ? testoCaricamento : btn.dataset.cpTestoOriginale);
+  }
+  function cpBottoneFinito_(btn){
+    if(!btn || btn.dataset.cpCaricando !== '1') return;
+    btn.innerHTML = btn.dataset.cpTestoOriginale || btn.innerHTML;
+    delete btn.dataset.cpTestoOriginale;
+    delete btn.dataset.cpCaricando;
+    btn.disabled = false;
+  }
+
   /* ================= TOAST DI CONFERMA ================= */
   let toastTimer = null;
   function showToast(msg){
@@ -3810,21 +3856,51 @@
       body[field] = parseNum(document.getElementById(MISURAZIONE_FIELD_IDS[field]).value);
     });
     const btn = document.getElementById('btn-save-misurazione');
-    btn.disabled = true;
+    cpBottoneCaricando_(btn);
     try{
       const res = await apiPost('aggiungiMisurazione', body);
       if(res.ok){
-        Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
-        await loadMisurazioni(currentPatientCode);
-        renderMisCategorie(); renderBigChart(); renderSparkGrid(); renderPanoramica();
-        showToast('Rilevazione salvata correttamente');
+        await cpMisurazioneSalvataConSuccesso_();
       } else {
         errEl.textContent = res.error || 'Errore durante il salvataggio.';
       }
     } catch(err){
-      errEl.textContent = 'Errore di connessione: ' + err.message;
+      // Come per il salvataggio di un nuovo paziente: a volte Google risponde con un errore di
+      // connessione anche se la rilevazione è stata comunque registrata. Prima di segnalare un
+      // errore, verifico se la rilevazione di questa data risulta già salvata.
+      errEl.textContent = 'Verifica in corso, un attimo...';
+      const salvata = await cpVerificaMisurazioneSalvata_(currentPatientCode, dataVal);
+      if(salvata){
+        await cpMisurazioneSalvataConSuccesso_();
+      } else {
+        errEl.textContent = 'Errore di connessione: ' + err.message;
+      }
     }
-    btn.disabled = false;
+    cpBottoneFinito_(btn);
+  }
+  async function cpMisurazioneSalvataConSuccesso_(){
+    document.getElementById('misurazione-error').textContent = '';
+    Object.values(MISURAZIONE_FIELD_IDS).forEach(id => document.getElementById(id).value = '');
+    await loadMisurazioni(currentPatientCode);
+    renderMisCategorie(); renderBigChart(); renderSparkGrid(); renderPanoramica();
+    showToast('Rilevazione salvata correttamente');
+  }
+  // Estrae solo la parte "aaaa-mm-gg" da un valore Data, che il foglio Google può restituire come
+  // testo semplice o come data/ora completa: serve per confrontarla con il valore del campo data
+  // del modulo (sempre in formato aaaa-mm-gg) senza sbagliare per via dell'orario.
+  function cpSoloDataISO_(v){
+    const m = String(v||'').match(/^(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : String(v||'');
+  }
+  async function cpVerificaMisurazioneSalvata_(codice, dataVal){
+    for(let tentativo = 0; tentativo < 4; tentativo++){
+      await new Promise(r => setTimeout(r, 1500));
+      try{
+        const res = await apiGet('misurazioni', { codice: SESSION.codice, paziente: codice });
+        if(res.ok && (res.misurazioni||[]).some(m => cpSoloDataISO_(m.Data) === dataVal)) return true;
+      } catch(e){ /* la connessione non è ancora tornata stabile: riprovo al prossimo giro */ }
+    }
+    return false;
   }
 
   /* ================= CARICAMENTO DATI PAZIENTE ================= */
@@ -3911,7 +3987,7 @@
     };
 
     const btn = document.getElementById('btn-add-patient-save');
-    btn.disabled = true;
+    cpBottoneCaricando_(btn);
     try{
       const res = await apiPost('aggiungiPaziente', { codice: SESSION.codice, paziente });
       if(res.ok){
@@ -3935,7 +4011,7 @@
         errEl.textContent = 'Errore di connessione: ' + err.message;
       }
     }
-    btn.disabled = false;
+    cpBottoneFinito_(btn);
   }
   // Riprova a leggere l'elenco pazienti per qualche secondo, per capire se un salvataggio che
   // sembrava fallito (errore di connessione) è invece andato a buon fine sul foglio Google.
@@ -4020,7 +4096,7 @@
     };
 
     const btn = document.getElementById('btn-edit-patient-save');
-    btn.disabled = true;
+    cpBottoneCaricando_(btn);
     try{
       const res = await apiPost('modificaPaziente', { codice: SESSION.codice, codiceAttuale: currentPatientCode, paziente });
       if(res.ok){
@@ -4033,7 +4109,7 @@
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
     }
-    btn.disabled = false;
+    cpBottoneFinito_(btn);
   }
 
   async function selectPatientByCode(codice){
@@ -4401,10 +4477,10 @@
   }
   async function cpRiprovaCatalogoSpesa(){
     const btn = document.getElementById('p-spesa-retry-btn');
-    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    cpBottoneCaricando_(btn, 'Nuovo tentativo…');
     CP_FOODS = null; CP_FOODS_ERROR = null; CP_FOODS_LOADING = null;
     await rinfrescaSpesaSottoTabAttiva();
-    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+    cpBottoneFinito_(btn);
   }
 
   // ---- Cerca alimenti: catalogo completo, ricerca + categoria + unità di misura ----
@@ -4877,6 +4953,9 @@
     const warnEl = document.getElementById('ricette-warning');
     if(CP_FOODS && !CP_FOODS_ERROR && CP_RECIPES && !CP_RECIPES_ERROR){ loadingEl.style.display = 'none'; warnEl.style.display = 'none'; return true; }
     warnEl.style.display = 'none'; loadingEl.style.display = '';
+    // apiGet riprova già da sola un paio di volte in caso di intoppi temporanei di Google (vedi
+    // sopra), quindi qui basta un solo giro: se anche così fallisce, si mostra l'errore con il
+    // pulsante "Riprova" come rete di sicurezza finale.
     await Promise.all([cpLoadFoods(), cpLoadRicette()]);
     loadingEl.style.display = 'none';
     const errore = CP_FOODS_ERROR || CP_RECIPES_ERROR;
@@ -4890,11 +4969,11 @@
   }
   async function cpRiprovaRicette(){
     const btn = document.getElementById('ricette-retry-btn');
-    if(btn){ btn.disabled = true; btn.textContent = 'Nuovo tentativo…'; }
+    cpBottoneCaricando_(btn, 'Nuovo tentativo…');
     if(CP_FOODS_ERROR){ CP_FOODS = null; CP_FOODS_ERROR = null; CP_FOODS_LOADING = null; }
     if(CP_RECIPES_ERROR){ CP_RECIPES = null; CP_RECIPES_ERROR = null; CP_RECIPES_LOADING = null; }
     await apriRicettario();
-    if(btn){ btn.disabled = false; btn.textContent = 'Riprova'; }
+    cpBottoneFinito_(btn);
   }
 
   // Trova, nel piano del paziente, il pasto (giorno+pasto) più simile alla ricetta — quello che
@@ -5296,6 +5375,8 @@
     const ingredienti = RICETTA_ADMIN_INGREDIENTI.map(i => i.id ? { id:i.id, g:i.g } : { testo:i.testo });
     const body = { codice: SESSION.codice, nome, categoria, foto, porzioni, ingredienti, procedimento, commento };
     if(RICETTA_ADMIN_RIGA) body.riga = RICETTA_ADMIN_RIGA;
+    const btn = document.getElementById('radm-btn-salva');
+    cpBottoneCaricando_(btn);
     try{
       const res = await apiPost('salvaRicetta', body);
       if(res.ok){
@@ -5312,6 +5393,7 @@
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
     }
+    cpBottoneFinito_(btn);
   }
 
   async function eliminaRicettaAdmin(riga){
@@ -5380,11 +5462,9 @@
       errEl.textContent = 'Il sito non è ancora collegato al Google Sheet: segui il file LEGGIMI-DATI.md.';
       return false;
     }
-    // Cambia la scritta sul pulsante mentre aspetta la risposta, cosi' si capisce che l'accesso e'
-    // in corso e non che l'app si e' bloccata (soprattutto quando la connessione e' un po' lenta).
-    const testoOriginaleBtn = btnEl.textContent;
-    btnEl.disabled = true;
-    btnEl.textContent = 'Accesso in corso...';
+    // Rotellina + scritta sul pulsante mentre aspetta la risposta, cosi' si capisce che l'accesso
+    // e' in corso e non che l'app si e' bloccata (soprattutto quando la connessione e' un po' lenta).
+    cpBottoneCaricando_(btnEl, 'Accesso in corso...');
     try{
       const res = await apiGet('login', { codice: code });
       if(!res.ok){ errEl.textContent = res.error || 'Codice non valido.'; return false; }
@@ -5394,8 +5474,7 @@
     } catch(err){
       errEl.textContent = 'Errore di connessione: ' + err.message;
     } finally {
-      btnEl.disabled = false;
-      btnEl.textContent = testoOriginaleBtn;
+      cpBottoneFinito_(btnEl);
     }
     return false;
   }
@@ -5470,27 +5549,23 @@
     inputEl.style.display = 'none';
     btnEl.style.display = 'none';
     noteEl.textContent = '';
-    // Il primo tentativo dopo un periodo di inattività può capitare mentre Google risponde ancora
-    // con qualche intoppo temporaneo: riprovo un paio di volte prima di arrendermi, così il paziente
-    // non si ritrova a dover ridigitare il codice per un problema che si risolve da solo in un attimo.
+    // apiGet riprova già da sola un paio di volte in caso di intoppi temporanei di Google, quindi
+    // qui basta un solo tentativo: se fallisce comunque, si ripristina la schermata di accesso
+    // normale qui sotto, col codice precompilato per comodità.
     let codiceNonPiuValido = false;
-    for(let tentativo = 0; tentativo < 3; tentativo++){
-      try{
-        const res = await apiGet('login', { codice: saved });
-        if(res.ok){
-          SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
-          await enterApp(res.pazienti);
-          return;
-        } else {
-          // il server ha risposto regolarmente ma il codice non è (più) valido: inutile riprovare
-          clearSavedCode();
-          codiceNonPiuValido = true;
-          break;
-        }
-      } catch(err){
-        if(tentativo < 2) await new Promise(r => setTimeout(r, 1200));
-        // altrimenti: nessuna connessione dopo i tentativi, si ripristina la schermata qui sotto
+    try{
+      const res = await apiGet('login', { codice: saved });
+      if(res.ok){
+        SESSION = { role: res.role, codice: saved, paziente: res.paziente || null };
+        await enterApp(res.pazienti);
+        return;
+      } else {
+        // il server ha risposto regolarmente ma il codice non è (più) valido: niente da ripetere
+        clearSavedCode();
+        codiceNonPiuValido = true;
       }
+    } catch(err){
+      // nessuna connessione dopo i tentativi automatici di apiGet: si ripristina la schermata qui sotto
     }
     promptEl.textContent = promptOriginal;
     inputEl.style.display = '';
