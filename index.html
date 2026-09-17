@@ -3908,9 +3908,33 @@
         errEl.textContent = res.error || 'Errore durante il salvataggio.';
       }
     } catch(err){
-      errEl.textContent = 'Errore di connessione: ' + err.message;
+      // A volte Google risponde con un errore di connessione (una pagina invece dei dati
+      // attesi) anche se il salvataggio sul foglio è comunque andato a buon fine, perché il
+      // server ha impiegato qualche secondo in più del solito a rispondere. Prima di mostrare
+      // un errore controlliamo se il paziente è stato effettivamente creato, riprovando per
+      // qualche secondo, così non si vede un errore per un'operazione riuscita.
+      errEl.textContent = 'Verifica in corso, un attimo...';
+      const creato = await cpVerificaPazienteCreato_(codice);
+      if(creato){
+        closeAddPatientModal();
+        await loadPazienti(codice);
+      } else {
+        errEl.textContent = 'Errore di connessione: ' + err.message;
+      }
     }
     btn.disabled = false;
+  }
+  // Riprova a leggere l'elenco pazienti per qualche secondo, per capire se un salvataggio che
+  // sembrava fallito (errore di connessione) è invece andato a buon fine sul foglio Google.
+  async function cpVerificaPazienteCreato_(codice){
+    for(let tentativo = 0; tentativo < 4; tentativo++){
+      await new Promise(r => setTimeout(r, 1500));
+      try{
+        const res = await apiGet('pazienti', { codice: SESSION.codice });
+        if(res.ok && res.pazienti.some(p => codiceStr_(p.Codice) === codiceStr_(codice))) return true;
+      } catch(e){ /* la connessione non è ancora tornata stabile: riprovo al prossimo giro */ }
+    }
+    return false;
   }
 
   /* ================= MODIFICA PAZIENTE ================= */
