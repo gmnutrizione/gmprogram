@@ -1268,7 +1268,16 @@
           <h3 id="radm-form-title" style="margin-top:0;">Nuova ricetta</h3>
           <div class="field-grid" style="grid-template-columns:1fr 1fr;">
             <div class="field"><label>Nome della ricetta</label><input type="text" id="radm-nome" placeholder="Es. Pollo con riso e verdure"></div>
-            <div class="field"><label>Categoria</label><input type="text" id="radm-categoria" placeholder="Es. Pranzo o cena"></div>
+            <div class="field">
+              <label>Categoria</label>
+              <select id="radm-categoria">
+                <option value="">—</option>
+                <option value="Colazione">Colazione</option>
+                <option value="Pranzo - Primi piatti">Pranzo - Primi piatti</option>
+                <option value="Spuntini">Spuntini</option>
+                <option value="Cena - Secondo piatto">Cena - Secondo piatto</option>
+              </select>
+            </div>
             <div class="field" style="grid-column:1 / -1;"><label>Link foto (Google Drive)</label><input type="text" id="radm-foto" placeholder="Incolla qui il link di condivisione Drive dell'immagine del piatto"></div>
             <div class="field"><label>Porzioni della ricetta come scritta</label><input type="number" id="radm-porzioni" min="1" max="20" value="1"></div>
           </div>
@@ -1277,8 +1286,12 @@
             <h5>Ingredienti</h5>
             <div id="radm-ingredienti"></div>
             <div class="cp-meal-search-input-wrap" style="position:relative; margin-top:8px;">
-              <input type="text" id="radm-ing-search-input" class="cp-meal-search-input" placeholder="Cerca alimento da aggiungere…" autocomplete="off">
+              <input type="text" id="radm-ing-search-input" class="cp-meal-search-input" placeholder="Cerca alimento dal database da aggiungere…" autocomplete="off">
               <div class="cp-meal-suggestions" id="radm-ing-suggestions" hidden></div>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:8px;">
+              <input type="text" id="radm-ing-libero-input" placeholder='Ingrediente generico, senza valori nutrizionali (es. "Spezie a piacere")' style="flex:1; min-width:0; padding:7px 9px; border:1px solid var(--border); border-radius:7px; font-size:13px; background:var(--surface-raised); color:var(--ink); font-family:inherit;">
+              <button type="button" class="btn small ghost" onclick="aggiungiIngredienteLiberoRicetta()">Aggiungi</button>
             </div>
           </div>
 
@@ -1769,7 +1782,14 @@
           <div class="p-screen" id="p-ricettario">
             <div class="p-greeting" style="font-size:18px;">Ricettario</div>
             <div class="p-sub">Cerca per nome della ricetta o per un ingrediente — es. "tofu" trova tutte le ricette che lo contengono.</div>
-            <input type="text" id="ricette-search-input" placeholder="Cerca una ricetta o un ingrediente…" style="width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:12px; font-size:16px; background:var(--surface); color:var(--ink); font-family:inherit; margin-bottom:12px;">
+            <input type="text" id="ricette-search-input" placeholder="Cerca una ricetta o un ingrediente…" style="width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:12px; font-size:16px; background:var(--surface); color:var(--ink); font-family:inherit; margin-bottom:10px;">
+            <div class="chip-row" id="ricette-categoria-chips">
+              <button type="button" class="chip active" data-cat="" onclick="setFiltroCategoriaRicette('')">Tutte</button>
+              <button type="button" class="chip" data-cat="Colazione" onclick="setFiltroCategoriaRicette('Colazione')">Colazione</button>
+              <button type="button" class="chip" data-cat="Pranzo - Primi piatti" onclick="setFiltroCategoriaRicette('Pranzo - Primi piatti')">Pranzo - Primi piatti</button>
+              <button type="button" class="chip" data-cat="Spuntini" onclick="setFiltroCategoriaRicette('Spuntini')">Spuntini</button>
+              <button type="button" class="chip" data-cat="Cena - Secondo piatto" onclick="setFiltroCategoriaRicette('Cena - Secondo piatto')">Cena - Secondo piatto</button>
+            </div>
             <p id="ricette-loading" class="p-empty-note" style="display:none;">Carico il ricettario…</p>
             <div class="p-card" id="ricette-warning" style="display:none;">
               <p id="ricette-warning-text" style="margin-bottom:10px;">—</p>
@@ -4076,13 +4096,44 @@
   // 2) "Lista automatica dal piano" — calcolata in automatico dal piano alimentare, per un
   //    numero di giorni scelto dal paziente (3/7/14 o un numero libero), a partire da domani e
   //    ciclando sul piano settimanale (che si ripete identico ogni settimana).
-  // Entrambe vivono in memoria per la sessione: si azzerano ricaricando la pagina.
+  // Entrambe vengono anche salvate nel localStorage del telefono (chiave legata al codice del
+  // paziente): così, se l'app viene tolta dal multitasking/background e il sistema la ricarica da
+  // zero (cosa che i telefoni fanno spesso con le PWA per liberare memoria), la lista non si perde.
+  // localStorage è comunque legato al browser/telefono: cambiando dispositivo la lista non segue.
   let CP_SPESA_ITEMS = null; // null = non ancora inizializzata in questa sessione
   let CP_SPESA_CHECKED = new Set();
 
+  function cpSpesaKey_(){ return 'percorsoSpesaLista::' + (SESSION && SESSION.codice); }
+  // Le due liste ("La tua lista" e quella automatica) condividono la stessa chiave di salvataggio.
+  // Se una delle due viene toccata prima che l'altra sia mai stata caricata in questa sessione (es.
+  // si aggiunge un alimento dal Ricettario prima di aver mai aperto la scheda "Spesa"), non bisogna
+  // sovrascriverla con i valori di default (lista vuota, 7 giorni) — si tiene quanto già salvato.
+  function cpSalvaSpesaLocale(){
+    if(!SESSION) return;
+    try{
+      const esistente = cpLeggiSpesaLocale() || {};
+      localStorage.setItem(cpSpesaKey_(), JSON.stringify({
+        items: CP_SPESA_ITEMS !== null ? CP_SPESA_ITEMS : (esistente.items || []),
+        checked: CP_SPESA_ITEMS !== null ? Array.from(CP_SPESA_CHECKED) : (esistente.checked || []),
+        autoGiorni: CP_SPESA_AUTO_INIZIALIZZATA ? CP_SPESA_AUTO_GIORNI : (typeof esistente.autoGiorni === 'number' ? esistente.autoGiorni : CP_SPESA_AUTO_GIORNI),
+        autoChecked: CP_SPESA_AUTO_INIZIALIZZATA ? Array.from(CP_SPESA_AUTO_CHECKED) : (esistente.autoChecked || []),
+        ts: Date.now(),
+      }));
+    } catch(err){ /* localStorage non disponibile — la lista resta comunque in memoria per la sessione */ }
+  }
+  function cpLeggiSpesaLocale(){
+    try{
+      const raw = localStorage.getItem(cpSpesaKey_());
+      if(!raw) return null;
+      return JSON.parse(raw);
+    } catch(err){ return null; }
+  }
+
   function cpInizializzaSpesaSeServe(){
     if(CP_SPESA_ITEMS) return;
-    CP_SPESA_ITEMS = [];
+    const salvata = cpLeggiSpesaLocale();
+    CP_SPESA_ITEMS = (salvata && Array.isArray(salvata.items)) ? salvata.items : [];
+    CP_SPESA_CHECKED = new Set((salvata && Array.isArray(salvata.checked)) ? salvata.checked : []);
   }
   function cpAlimentoInLista(id){
     cpInizializzaSpesaSeServe();
@@ -4095,10 +4146,12 @@
     if(idx >= 0){
       CP_SPESA_ITEMS.splice(idx, 1);
       CP_SPESA_CHECKED.delete(id);
+      cpSalvaSpesaLocale();
       return false;
     }
     const f = CP_FOODS_BY_ID[id];
     CP_SPESA_ITEMS.push({ id, nome: f ? f.nome : id, categoria: f ? (f.categoria||'Altro') : 'Altro' });
+    cpSalvaSpesaLocale();
     return true;
   }
 
@@ -4131,12 +4184,14 @@
         if(e.target.checked) CP_SPESA_CHECKED.add(id); else CP_SPESA_CHECKED.delete(id);
         row.querySelector('.spesa-list-row-nome').classList.toggle('checked', e.target.checked);
         cpAggiornaContatoreSpesa();
+        cpSalvaSpesaLocale();
       });
       row.querySelector('.spesa-list-row-body').addEventListener('click', () => apriDettaglioAlimento(id));
       row.querySelector('.spesa-list-row-remove').addEventListener('click', () => {
         CP_SPESA_ITEMS = CP_SPESA_ITEMS.filter(it => it.id !== id);
         CP_SPESA_CHECKED.delete(id);
         renderPatientSpesa();
+        cpSalvaSpesaLocale();
       });
     });
     cpAggiornaContatoreSpesa();
@@ -4148,6 +4203,7 @@
           if(evt.oldIndex === evt.newIndex) return;
           const moved = CP_SPESA_ITEMS.splice(evt.oldIndex, 1)[0];
           CP_SPESA_ITEMS.splice(evt.newIndex, 0, moved);
+          cpSalvaSpesaLocale();
         }
       });
     }
@@ -4160,11 +4216,13 @@
   function cpSpesaTogliSpunte(){
     CP_SPESA_CHECKED.clear();
     renderPatientSpesa();
+    cpSalvaSpesaLocale();
   }
   function cpSpesaSvuota(){
     CP_SPESA_ITEMS = [];
     CP_SPESA_CHECKED.clear();
     renderPatientSpesa();
+    cpSalvaSpesaLocale();
   }
   function cpMostraAggiungiNonAlimentare(){
     document.getElementById('spesa-add-nonfood-btn').style.display = 'none';
@@ -4185,16 +4243,34 @@
     CP_SPESA_ITEMS.push({ id: 'manuale-' + Date.now() + '-' + Math.random().toString(36).slice(2,6), nome, categoria: 'Altro' });
     cpAnnullaAggiungiNonAlimentare();
     renderPatientSpesa();
+    cpSalvaSpesaLocale();
   }
 
   // ---- Lista automatica dal piano: 3/7/14 giorni o un numero libero, sempre a partire da domani ----
   let CP_SPESA_AUTO_GIORNI = 7;
   let CP_SPESA_AUTO_CHECKED = new Set();
+  let CP_SPESA_AUTO_INIZIALIZZATA = false;
+  // Anche la scelta dei giorni e le spunte della lista automatica vengono ripristinate dal
+  // localStorage, una sola volta per sessione (poi restano semplicemente in memoria, come per la
+  // lista personale) — così anche questa metà della schermata Spesa sopravvive alla chiusura dell'app.
+  function cpInizializzaSpesaAutoSeServe(){
+    if(CP_SPESA_AUTO_INIZIALIZZATA) return;
+    CP_SPESA_AUTO_INIZIALIZZATA = true;
+    const salvata = cpLeggiSpesaLocale();
+    if(salvata){
+      if(typeof salvata.autoGiorni === 'number' && salvata.autoGiorni > 0) CP_SPESA_AUTO_GIORNI = salvata.autoGiorni;
+      if(Array.isArray(salvata.autoChecked)) CP_SPESA_AUTO_CHECKED = new Set(salvata.autoChecked);
+    }
+    const chipCorrispondente = document.querySelector(`#spesa-giorni-chips .chip[data-giorni="${CP_SPESA_AUTO_GIORNI}"]`);
+    document.querySelectorAll('#spesa-giorni-chips .chip').forEach(c => c.classList.toggle('active', c === chipCorrispondente));
+    document.getElementById('spesa-giorni-custom').value = chipCorrispondente ? '' : CP_SPESA_AUTO_GIORNI;
+  }
   function cpImpostaGiorniSpesaAuto(n){
     CP_SPESA_AUTO_GIORNI = n;
     document.getElementById('spesa-giorni-custom').value = '';
     document.querySelectorAll('#spesa-giorni-chips .chip').forEach(c => c.classList.toggle('active', Number(c.dataset.giorni)===n));
     renderSpesaAuto();
+    cpSalvaSpesaLocale();
   }
   function cpImpostaGiorniSpesaAutoCustom(){
     const inp = document.getElementById('spesa-giorni-custom');
@@ -4203,8 +4279,10 @@
     CP_SPESA_AUTO_GIORNI = Math.min(60, n);
     document.querySelectorAll('#spesa-giorni-chips .chip').forEach(c => c.classList.remove('active'));
     renderSpesaAuto();
+    cpSalvaSpesaLocale();
   }
   function renderSpesaAuto(){
+    cpInizializzaSpesaAutoSeServe();
     const { giorni, categorie } = cpComputeShoppingListForDays(CP_SPESA_AUTO_GIORNI);
     const rangeEl = document.getElementById('p-spesa-auto-range');
     const primo = giorni[0], ultimo = giorni[giorni.length-1];
@@ -4237,6 +4315,7 @@
         row.querySelector('.spesa-list-row-nome').classList.toggle('checked', e.target.checked);
         const totC = items.length, fattiC = items.filter(x => CP_SPESA_AUTO_CHECKED.has(x.id)).length;
         document.getElementById('p-spesa-auto-count').textContent = `${fattiC} di ${totC} presi`;
+        cpSalvaSpesaLocale();
       });
       row.querySelector('.spesa-list-row-body').addEventListener('click', () => apriDettaglioAlimento(id));
     });
@@ -4785,7 +4864,7 @@
   // condivide più ingredienti con lei. Distingue "pollo col riso" da "pollo col pane": ognuna delle
   // due ricette troverà il PROPRIO pasto più simile, e prenderà la grammatura da lì.
   function cpTrovaPastoSimileARicetta_(ricetta){
-    const idsRicetta = ricetta.ingredienti.map(i => i.id);
+    const idsRicetta = ricetta.ingredienti.filter(i => i.id).map(i => i.id);
     let migliore = null, punteggio = -1;
     CP_GIORNI.forEach(g => {
       CP_MEALS.forEach(m => {
@@ -4804,6 +4883,9 @@
   function cpAdattaIngredientiRicetta(ricetta){
     const pastoSimile = cpTrovaPastoSimileARicetta_(ricetta);
     return ricetta.ingredienti.map(ing => {
+      // ingrediente generico scritto a mano (es. "Spezie a piacere"): nessun dato nutrizionale,
+      // nessuna quantità da adattare al piano — non entra nel calcolo né nell'aggiunta alla spesa.
+      if(!ing.id) return { libero:true, testo: ing.testo || '' };
       const f = CP_FOODS_BY_ID[ing.id];
       let g = ing.g, fonteEtichetta = 'valore standard della ricetta';
       let daPiano = false;
@@ -4827,12 +4909,20 @@
       onerror="this.remove()">`;
   }
 
+  let RICETTE_FILTRO_CATEGORIA = '';  // '' = tutte le categorie
+  function setFiltroCategoriaRicette(cat){
+    RICETTE_FILTRO_CATEGORIA = cat;
+    document.querySelectorAll('#ricette-categoria-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+    renderRicettario();
+  }
   function renderRicettario(){
     const termine = (document.getElementById('ricette-search-input').value || '').trim().toLowerCase();
     const risultati = (CP_RECIPES||[]).filter(r => {
+      if(RICETTE_FILTRO_CATEGORIA && r.categoria !== RICETTE_FILTRO_CATEGORIA) return false;
       if(!termine) return true;
       if(r.nome.toLowerCase().includes(termine)) return true;
       return r.ingredienti.some(ing => {
+        if(!ing.id) return false;
         const f = CP_FOODS_BY_ID[ing.id];
         return f && f.nome.toLowerCase().includes(termine);
       });
@@ -4847,7 +4937,7 @@
       // se il match arriva da un ingrediente (non dal titolo), lo segnaliamo sotto al nome
       let matchIngrediente = '';
       if(termine && !r.nome.toLowerCase().includes(termine)){
-        const ing = r.ingredienti.map(i => CP_FOODS_BY_ID[i.id]).find(f => f && f.nome.toLowerCase().includes(termine));
+        const ing = r.ingredienti.filter(i => i.id).map(i => CP_FOODS_BY_ID[i.id]).find(f => f && f.nome.toLowerCase().includes(termine));
         if(ing) matchIngrediente = `Contiene: ${cpEsc(cpSplitNomeMarca(ing.nome).base)}`;
       }
       return `
@@ -4902,6 +4992,15 @@
     const fattore = cpFattoreProzioni_();
     const el = document.getElementById('ricetta-detail-ingredienti');
     el.innerHTML = RICETTA_INGREDIENTI_ADATTATI.map(ing => {
+      if(ing.libero){
+        return `
+        <div class="ricetta-ingrediente-row">
+          <span class="ricetta-ingrediente-nome">
+            ${cpEsc(ing.testo)}
+            <span class="ricetta-ingrediente-fonte">a piacere</span>
+          </span>
+        </div>`;
+      }
       const gScalato = Math.round(ing.gBase * fattore);
       const inLista = ing.food ? cpAlimentoInLista(ing.id) : false;
       return `
@@ -5005,7 +5104,7 @@
   function apriFormRicetta(riga){
     const ricetta = riga ? (CP_RECIPES||[]).find(r => String(r.riga) === String(riga)) : null;
     RICETTA_ADMIN_RIGA = ricetta ? ricetta.riga : null;
-    RICETTA_ADMIN_INGREDIENTI = ricetta ? ricetta.ingredienti.map(i => ({ id:i.id, g:i.g })) : [];
+    RICETTA_ADMIN_INGREDIENTI = ricetta ? ricetta.ingredienti.map(i => i.id ? { id:i.id, g:i.g } : { testo:i.testo }) : [];
     document.getElementById('radm-form-title').textContent = ricetta ? 'Modifica ricetta' : 'Nuova ricetta';
     document.getElementById('radm-nome').value = ricetta ? ricetta.nome : '';
     document.getElementById('radm-categoria').value = ricetta ? ricetta.categoria : '';
@@ -5015,6 +5114,7 @@
     document.getElementById('radm-commento').value = ricetta ? ricetta.commento : '';
     document.getElementById('radm-form-error').textContent = '';
     document.getElementById('radm-ing-search-input').value = '';
+    document.getElementById('radm-ing-libero-input').value = '';
     renderRicetteAdminIngredienti();
     document.getElementById('radm-list-view').style.display = 'none';
     document.getElementById('radm-form-view').style.display = '';
@@ -5027,10 +5127,17 @@
   function renderRicetteAdminIngredienti(){
     const el = document.getElementById('radm-ingredienti');
     if(!RICETTA_ADMIN_INGREDIENTI.length){
-      el.innerHTML = `<p class="cp-empty-note">Nessun ingrediente ancora — cercalo qui sotto per aggiungerlo.</p>`;
+      el.innerHTML = `<p class="cp-empty-note">Nessun ingrediente ancora — cercalo qui sotto per aggiungerlo, oppure scrivine uno generico.</p>`;
       return;
     }
     el.innerHTML = RICETTA_ADMIN_INGREDIENTI.map((ing, idx) => {
+      if(!ing.id){
+        return `
+          <div class="radm-ing-row">
+            <span class="radm-ing-name">${cpEsc(ing.testo)} <span style="font-size:11px; color:var(--ink-faint); font-weight:500;">(generico, senza valori nutrizionali)</span></span>
+            <button type="button" class="cp-btn-remove" data-idx="${idx}" title="Rimuovi">${CP_ICON_X}</button>
+          </div>`;
+      }
       const f = CP_FOODS_BY_ID[ing.id];
       return `
         <div class="radm-ing-row">
@@ -5054,6 +5161,25 @@
       });
     });
   }
+
+  // Aggiunge un ingrediente "generico" scritto a mano (es. "Spezie a piacere", "Sale o salsa di
+  // soia"): non è collegato al database alimenti, quindi non ha grammatura né valori nutrizionali
+  // — compare nella lista ingredienti della ricetta così com'è, senza entrare nel calcolo.
+  function aggiungiIngredienteLiberoRicetta(){
+    const inp = document.getElementById('radm-ing-libero-input');
+    const testo = inp.value.trim();
+    if(!testo) return;
+    RICETTA_ADMIN_INGREDIENTI.push({ testo });
+    inp.value = '';
+    renderRicetteAdminIngredienti();
+    inp.focus();
+  }
+  document.addEventListener('keydown', (e) => {
+    if(e.target && e.target.id === 'radm-ing-libero-input' && e.key === 'Enter'){
+      e.preventDefault();
+      aggiungiIngredienteLiberoRicetta();
+    }
+  });
 
   // Ricerca alimenti da aggiungere alla ricetta in compilazione — stesso meccanismo delle
   // suggestions di "Crea piano" (cp-meal-search-input), qui su un singolo campo.
@@ -5124,12 +5250,13 @@
     const nome = document.getElementById('radm-nome').value.trim();
     if(!nome){ errEl.textContent = 'Dai un nome alla ricetta.'; document.getElementById('radm-nome').focus(); return; }
     if(!RICETTA_ADMIN_INGREDIENTI.length){ errEl.textContent = 'Aggiungi almeno un ingrediente.'; return; }
-    const categoria = document.getElementById('radm-categoria').value.trim();
+    const categoria = document.getElementById('radm-categoria').value;
+    if(!categoria){ errEl.textContent = 'Scegli una categoria.'; document.getElementById('radm-categoria').focus(); return; }
     const foto = document.getElementById('radm-foto').value.trim();
     const porzioni = Math.max(1, Math.round(Number(document.getElementById('radm-porzioni').value)) || 1);
     const procedimento = document.getElementById('radm-procedimento').value.trim();
     const commento = document.getElementById('radm-commento').value.trim();
-    const ingredienti = RICETTA_ADMIN_INGREDIENTI.map(i => ({ id:i.id, g:i.g }));
+    const ingredienti = RICETTA_ADMIN_INGREDIENTI.map(i => i.id ? { id:i.id, g:i.g } : { testo:i.testo });
     const body = { codice: SESSION.codice, nome, categoria, foto, porzioni, ingredienti, procedimento, commento };
     if(RICETTA_ADMIN_RIGA) body.riga = RICETTA_ADMIN_RIGA;
     try{
