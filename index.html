@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Percorso</title>
+<title>GM - Nutrizione e Benessere</title>
 <style>
   /* ---------- Design tokens ---------- */
   :root{
@@ -139,15 +139,20 @@
   #login-screen{
     min-height:80vh; display:flex; align-items:center; justify-content:center; padding:20px;
   }
-  .login-card{
-    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:34px 30px; text-align:center;
-  }
-  .login-mark{
-    width:52px; height:52px; border-radius:14px; margin:0 auto 18px; display:flex; align-items:center; justify-content:center;
+  .login-wrap{ width:100%; max-width:380px; display:flex; flex-direction:column; align-items:center; }
+  .login-hero{ text-align:center; margin-bottom:28px; }
+  .login-hero-brand{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:9px; }
+  .login-hero-mark{
+    width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none;
     background:linear-gradient(155deg, var(--accent) 0%, #0A6E60 100%); box-shadow:var(--shadow-1);
   }
-  .login-card h1{ font-size:22px; margin-bottom:6px; }
+  .login-hero-brand h1{ font-size:21px; }
+  .login-tagline{ font-size:13.5px; color:var(--accent-ink); font-weight:500; margin-bottom:12px; }
+  .login-features{ font-size:12px; color:var(--ink-faint); letter-spacing:.01em; }
+  .login-card{
+    width:100%; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:30px 30px 26px; text-align:center;
+  }
   .login-card p{ font-size:13.5px; color:var(--ink-faint); margin-bottom:22px; }
   .login-card input{
     width:100%; text-align:center; letter-spacing:.08em; font-family:var(--font-mono); font-size:16px;
@@ -974,14 +979,14 @@
 <body>
 <div class="shell">
 
-  <div class="topbar">
+  <div class="topbar" id="topbar" style="display:none;">
     <div class="brand">
       <div class="brand-mark">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
       </div>
       <div>
-        <div class="brand-name">GM Program - Gestionale pazienti</div>
-        <div class="brand-tag">Piano alimentare &amp; monitoraggio pazienti</div>
+        <div class="brand-name" id="topbar-brand-name">GM - Nutrizione e Benessere</div>
+        <div class="brand-tag" id="topbar-brand-tag" style="display:none;">Piano alimentare &amp; monitoraggio pazienti</div>
       </div>
     </div>
 
@@ -999,17 +1004,25 @@
   <!-- LOGIN                                                         -->
   <!-- =========================================================== -->
   <div id="login-screen">
-    <form class="login-card" onsubmit="return handleLogin(event)">
-      <div class="login-mark">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+    <div class="login-wrap">
+      <div class="login-hero">
+        <div class="login-hero-brand">
+          <div class="login-hero-mark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 7 6 10.5 6 14.5C6 18.6 8.7 21 12 21C15.3 21 18 18.6 18 14.5C18 10.5 15 7 12 3Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 21V12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </div>
+          <h1>GM - Nutrizione e Benessere</h1>
+        </div>
+        <p class="login-tagline">Il tuo percorso a portata di app</p>
+        <p class="login-features">Piano alimentare · Lista della spesa · Ricettario</p>
       </div>
-      <h1>Percorso</h1>
-      <p id="login-prompt">Inserisci il tuo codice di accesso per continuare.</p>
-      <input type="text" id="login-code" placeholder="CODICE DI ACCESSO" autocomplete="off" autocapitalize="characters">
-      <button type="submit" class="btn primary" id="login-submit-btn" style="width:100%; justify-content:center;">Accedi</button>
-      <div class="login-error" id="login-error"></div>
-      <div class="login-note" id="login-note">Il codice ti è stato fornito dal tuo o dalla tua nutrizionista.</div>
-    </form>
+      <form class="login-card" onsubmit="return handleLogin(event)">
+        <p id="login-prompt">Inserisci il tuo codice di accesso per continuare.</p>
+        <input type="text" id="login-code" placeholder="CODICE DI ACCESSO" autocomplete="off" autocapitalize="characters">
+        <button type="submit" class="btn primary" id="login-submit-btn" style="width:100%; justify-content:center;">Accedi</button>
+        <div class="login-error" id="login-error"></div>
+        <div class="login-note" id="login-note">Il codice ti è stato fornito dal tuo nutrizionista.</div>
+      </form>
+    </div>
   </div>
 
   <!-- =========================================================== -->
@@ -5380,11 +5393,15 @@
 
   async function enterApp(preloadedPazienti){
     document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('topbar').style.display = 'flex';
     document.getElementById('btn-logout').style.display = 'flex';
     if(SESSION.role === 'nutrizionista'){
       document.getElementById('view-nutri').style.display = 'grid';
       document.getElementById('view-paziente').style.display = 'none';
       document.getElementById('btn-ricettario-nutri').style.display = 'flex';
+      document.getElementById('topbar-brand-name').textContent = 'GM Program - Gestionale pazienti';
+      document.getElementById('topbar-brand-tag').textContent = 'Piano alimentare & monitoraggio pazienti';
+      document.getElementById('topbar-brand-tag').style.display = '';
       cpLoadFoods(); // in background: pronto per quando si apre il tab "Crea piano"
       if(preloadedPazienti){
         PATIENTS = preloadedPazienti;
@@ -5396,6 +5413,8 @@
     } else {
       document.getElementById('view-paziente').style.display = 'block';
       document.getElementById('view-nutri').style.display = 'none';
+      document.getElementById('topbar-brand-name').textContent = 'GM - Nutrizione e Benessere';
+      document.getElementById('topbar-brand-tag').style.display = 'none';
       await enterPazienteView();
     }
   }
@@ -5406,8 +5425,11 @@
     clearSavedCode();
     document.getElementById('view-nutri').style.display = 'none';
     document.getElementById('view-paziente').style.display = 'none';
+    document.getElementById('topbar').style.display = 'none';
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('btn-ricettario-nutri').style.display = 'none';
+    document.getElementById('topbar-brand-name').textContent = 'GM - Nutrizione e Benessere';
+    document.getElementById('topbar-brand-tag').style.display = 'none';
     document.getElementById('login-code').value = '';
     document.getElementById('login-error').textContent = '';
     document.getElementById('login-screen').style.display = 'flex';
