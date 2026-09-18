@@ -720,6 +720,10 @@
   .confronto-row .val.migliore{ color:var(--accent); font-weight:700; }
 
   .p-empty-note{ font-size:12.5px; color:var(--ink-faint); padding:20px 4px; text-align:center; }
+  /* Riga di caricamento con rotellina, usata nelle sezioni (ricettario, spesa, piano, andamento)
+     mentre si aspettano i dati dal server: stessa rotellina dei pulsanti (.btn-spinner), solo
+     centrata in riga col testo invece che dentro un pulsante. */
+  .p-loading-riga{ display:flex; align-items:center; justify-content:center; gap:8px; }
 
   @media print{
     body.printing-spesa > *:not(.modal-overlay){ display:none !important; }
@@ -1693,7 +1697,7 @@
               </div>
               <h4>Il tuo piano alimentare</h4>
               <p id="p-home-piano-data">—</p>
-              <button class="btn primary small" style="width:100%; justify-content:center;" onclick="setPatientScreen('piano')">Apri il piano →</button>
+              <button class="btn primary small" style="width:100%; justify-content:center;" onclick="setPatientScreen('piano'); cpApriSchedaPiano_();">Apri il piano →</button>
             </div>
 
             <div class="p-card">
@@ -1710,7 +1714,7 @@
             <div class="p-card">
               <div class="p-card-top"><h4>Il tuo andamento</h4></div>
               <div class="chart-wrap" id="chart-home-preview"></div>
-              <button class="btn small ghost" style="width:100%; justify-content:center; margin-top:10px;" onclick="setPatientScreen('andamento')">Vedi tutti i dati →</button>
+              <button class="btn small ghost" style="width:100%; justify-content:center; margin-top:10px;" onclick="setPatientScreen('andamento'); cpApriSchedaAndamento_();">Vedi tutti i dati →</button>
             </div>
           </div>
 
@@ -1718,6 +1722,7 @@
           <div class="p-screen" id="p-piano">
             <div class="p-greeting" style="font-size:18px;">Il tuo piano</div>
             <div class="p-sub" id="p-piano-sub">—</div>
+            <p id="p-piano-loading" class="p-empty-note p-loading-riga" style="display:none;"><span class="btn-spinner" aria-hidden="true"></span> Carico il piano…</p>
             <button type="button" class="btn small" id="p-piano-spesa-btn" style="width:100%; justify-content:center; margin-bottom:14px; display:none;" onclick="setPatientScreen('spesa'); setSpesaSubtab('lista')">
               <svg viewBox="0 0 24 24" fill="none"><path d="M3 4H5L7.2 15.2C7.35 16 8.05 16.5 8.85 16.5H18.1C18.85 16.5 19.5 16 19.7 15.3L21.5 8.5H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20" r="1.3" fill="currentColor"/></svg>
               Lista della spesa della settimana
@@ -1748,7 +1753,7 @@
               <button type="button" class="chip" data-subtab="cerca" onclick="setSpesaSubtab('cerca')">Cerca alimenti</button>
             </div>
 
-            <p id="p-spesa-loading" class="p-empty-note" style="display:none;">Carico il catalogo alimenti…</p>
+            <p id="p-spesa-loading" class="p-empty-note p-loading-riga" style="display:none;"><span class="btn-spinner" aria-hidden="true"></span> Carico il catalogo alimenti…</p>
             <div class="p-card" id="p-spesa-warning" style="display:none;">
               <p id="p-spesa-warning-text" style="margin-bottom:10px;">—</p>
               <button type="button" class="btn small" id="p-spesa-retry-btn" onclick="cpRiprovaCatalogoSpesa()" style="width:100%; justify-content:center;">Riprova</button>
@@ -1785,6 +1790,7 @@
                   <input type="number" id="spesa-giorni-custom" min="1" max="60" placeholder="Numero di giorni">
                   <button type="button" class="btn small primary" onclick="cpImpostaGiorniSpesaAutoCustom()">Calcola</button>
                 </div>
+                <p id="p-spesa-auto-loading" class="p-empty-note p-loading-riga" style="display:none;"><span class="btn-spinner" aria-hidden="true"></span> Carico il piano…</p>
                 <div id="p-spesa-auto-range" style="font-size:11.5px; color:var(--ink-faint); margin:12px 0 4px;">—</div>
                 <div id="p-spesa-auto-count" style="font-size:12px; font-weight:600; color:var(--accent-ink); margin-bottom:12px;">—</div>
                 <div id="p-spesa-auto-list"></div>
@@ -1813,7 +1819,7 @@
               <button type="button" class="chip" data-cat="Spuntini" onclick="setFiltroCategoriaRicette('Spuntini')">Spuntini</button>
               <button type="button" class="chip" data-cat="Cena - Secondo piatto" onclick="setFiltroCategoriaRicette('Cena - Secondo piatto')">Cena - Secondo piatto</button>
             </div>
-            <p id="ricette-loading" class="p-empty-note" style="display:none;">Carico il ricettario…</p>
+            <p id="ricette-loading" class="p-empty-note p-loading-riga" style="display:none;"><span class="btn-spinner" aria-hidden="true"></span> Carico il ricettario…</p>
             <div class="p-card" id="ricette-warning" style="display:none;">
               <p id="ricette-warning-text" style="margin-bottom:10px;">—</p>
               <button type="button" id="ricette-retry-btn" class="btn small" onclick="cpRiprovaRicette()" style="width:100%; justify-content:center;">Riprova</button>
@@ -1827,6 +1833,7 @@
             <div class="p-greeting" style="font-size:18px;">Il tuo andamento</div>
             <div class="p-sub" id="p-andamento-sub">Tocca una categoria per vedere il dettaglio.</div>
 
+            <p id="p-andamento-loading" class="p-empty-note p-loading-riga" style="display:none;"><span class="btn-spinner" aria-hidden="true"></span> Carico l'andamento…</p>
             <div class="andamento-tiles-grid" id="p-andamento-tiles"></div>
 
             <div id="p-andamento-dettaglio" style="display:none;">
@@ -1874,11 +1881,11 @@
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 11L12 4L20 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10V19C6 19.6 6.4 20 7 20H17C17.6 20 18 19.6 18 19V10" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             Home
           </button>
-          <button class="nav-btn" onclick="setPatientScreen('piano')" data-screen="piano">
+          <button class="nav-btn" onclick="setPatientScreen('piano'); cpApriSchedaPiano_();" data-screen="piano">
             <svg viewBox="0 0 24 24" fill="none"><path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" stroke="currentColor" stroke-width="1.7"/><path d="M8 12H16M8 15.5H16M8 8.5H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Piano
           </button>
-          <button class="nav-btn" onclick="setPatientScreen('andamento')" data-screen="andamento">
+          <button class="nav-btn" onclick="setPatientScreen('andamento'); cpApriSchedaAndamento_();" data-screen="andamento">
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V15M9.5 19V10M15 19V13M20 19V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             Andamento
           </button>
@@ -3957,6 +3964,56 @@
     }
   }
 
+  // ---- Caricamento "a richiesta" per la vista paziente ----
+  // All'accesso, l'app mostra subito la schermata Home senza aspettare nessun dato dal server:
+  // piano e misurazioni si caricano in sottofondo (vedi enterPazienteView), e il ricettario/
+  // catalogo alimenti solo quando il paziente apre davvero quelle sezioni (invariato). Queste due
+  // funzioni fanno da "cancello" condiviso: la prima volta che vengono chiamate avviano il
+  // caricamento vero, le chiamate successive (da schermate diverse che aspettano lo stesso dato)
+  // si limitano ad aspettare quella già in corso, così non si scarica mai la stessa cosa due volte.
+  let CP_PIANO_PAZIENTE_PRONTO = false;
+  let CP_PIANO_PAZIENTE_CARICAMENTO = null;
+  async function cpAssicuraPianoPaziente_(){
+    if(CP_PIANO_PAZIENTE_PRONTO) return;
+    if(CP_PIANO_PAZIENTE_CARICAMENTO) return CP_PIANO_PAZIENTE_CARICAMENTO;
+    CP_PIANO_PAZIENTE_CARICAMENTO = (async () => {
+      await Promise.all([loadPiano(SESSION.paziente.Codice), loadPianoStrutturato(SESSION.paziente.Codice)]);
+      CP_PIANO_PAZIENTE_PRONTO = true;
+    })();
+    await CP_PIANO_PAZIENTE_CARICAMENTO;
+    CP_PIANO_PAZIENTE_CARICAMENTO = null;
+  }
+  let CP_MISURAZIONI_PAZIENTE_PRONTO = false;
+  let CP_MISURAZIONI_PAZIENTE_CARICAMENTO = null;
+  async function cpAssicuraMisurazioniPaziente_(){
+    if(CP_MISURAZIONI_PAZIENTE_PRONTO) return;
+    if(CP_MISURAZIONI_PAZIENTE_CARICAMENTO) return CP_MISURAZIONI_PAZIENTE_CARICAMENTO;
+    CP_MISURAZIONI_PAZIENTE_CARICAMENTO = (async () => {
+      await loadMisurazioni(SESSION.paziente.Codice);
+      CP_MISURAZIONI_PAZIENTE_PRONTO = true;
+    })();
+    await CP_MISURAZIONI_PAZIENTE_CARICAMENTO;
+    CP_MISURAZIONI_PAZIENTE_CARICAMENTO = null;
+  }
+  // Apertura delle schede "Piano" e "Andamento" dalla barra in basso: se i dati sono già pronti
+  // (es. il caricamento in sottofondo avviato all'accesso è già finito) si vede tutto subito,
+  // altrimenti compare la rotellina di caricamento finché non arrivano.
+  async function cpApriSchedaPiano_(){
+    const loadingEl = document.getElementById('p-piano-loading');
+    if(!CP_PIANO_PAZIENTE_PRONTO) loadingEl.style.display = '';
+    await cpAssicuraPianoPaziente_();
+    loadingEl.style.display = 'none';
+    renderPatientHomeCards();
+  }
+  async function cpApriSchedaAndamento_(){
+    const loadingEl = document.getElementById('p-andamento-loading');
+    if(!CP_MISURAZIONI_PAZIENTE_PRONTO) loadingEl.style.display = '';
+    await cpAssicuraMisurazioniPaziente_();
+    loadingEl.style.display = 'none';
+    renderPatientCharts();
+    renderCheckinList();
+  }
+
   /* ================= VISTA NUTRIZIONISTA ================= */
   async function loadPazienti(keepCodice){
     const res = await apiGet('pazienti', { codice: SESSION.codice });
@@ -4486,7 +4543,16 @@
     // Nel frattempo l'utente potrebbe aver cambiato sotto-scheda: rendo quella davvero attiva ora.
     const attivo = document.querySelector('#spesa-subtab-chips .chip.active');
     const nomeAttuale = attivo ? attivo.dataset.subtab : name;
-    if(nomeAttuale==='lista'){ renderPatientSpesa(); renderSpesaAuto(); }
+    if(nomeAttuale==='lista'){
+      renderPatientSpesa(); // "La tua lista" (personale) non dipende dal piano, si vede subito
+      // "Lista automatica dal piano" invece sì: se il piano non è ancora arrivato dal caricamento
+      // in sottofondo avviato all'accesso, mostro la rotellina qui finché non è pronto.
+      const loadingEl = document.getElementById('p-spesa-auto-loading');
+      if(!CP_PIANO_PAZIENTE_PRONTO) loadingEl.style.display = '';
+      await cpAssicuraPianoPaziente_();
+      loadingEl.style.display = 'none';
+      renderSpesaAuto();
+    }
     if(nomeAttuale==='cerca') renderCercaAlimenti();
   }
   function rinfrescaSpesaSottoTabAttiva(){
@@ -5461,13 +5527,18 @@
     document.getElementById('p-home-prossimo').textContent = p.ProssimoControllo ? conOra_(p.ProssimoControllo) : 'Nessun controllo in programma';
     document.getElementById('p-home-calendario-btn').style.display = p.ProssimoControllo ? '' : 'none';
     currentMetric = 'peso'; patientMetric = 'peso';
-    // Il database alimenti (100+ voci) NON si carica qui: pesa troppo per essere scaricato ad ogni
-    // login. Si carica solo quando il paziente apre davvero la sezione "Spesa" — vedi cpAssicuraCatalogoSpesa().
-    await Promise.all([loadMisurazioni(p.Codice), loadPiano(p.Codice), loadPianoStrutturato(p.Codice)]);
-    renderPatientHomeCards();
-    renderPatientCharts();
-    renderCheckinList();
+    // La Home compare SUBITO, senza aspettare nessun dato dal server: niente più "app che sembra
+    // bloccata" al primo accesso. Piano e misurazioni si caricano qui in sottofondo (servono
+    // comunque alle card della Home) e riempiono le rispettive card non appena pronti, con una
+    // rotellina nel frattempo; il ricettario e il catalogo alimenti (Spesa) restano invece
+    // caricati solo quando il paziente apre davvero quelle sezioni — vedi cpAssicuraCatalogoSpesa()
+    // e cpAssicuraCatalogoRicette_().
     setPatientScreen('home');
+    document.getElementById('p-home-piano-badge').style.display = 'none'; // si riaccende da sola, se serve, quando arrivano i dati veri
+    document.getElementById('p-home-piano-data').innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Carico il piano…';
+    document.getElementById('chart-home-preview').innerHTML = '<p class="p-empty-note p-loading-riga"><span class="btn-spinner" aria-hidden="true"></span> Carico l\'andamento…</p>';
+    cpAssicuraPianoPaziente_().then(renderPatientHomeCards);
+    cpAssicuraMisurazioniPaziente_().then(() => { renderPatientCharts(); renderCheckinList(); });
   }
 
   function setPatientScreen(name){
@@ -5549,6 +5620,10 @@
   function logout(){
     SESSION = null; currentPatientCode = null; currentPatientMeta = null;
     currentRows = []; METRICS = {}; currentPlan = null; currentPlanHistory = [];
+    // Così un accesso successivo (magari di un altro paziente, nello stesso browser) ricarica
+    // davvero i dati invece di riusare quelli — ormai non più validi — del paziente precedente.
+    CP_PIANO_PAZIENTE_PRONTO = false; CP_PIANO_PAZIENTE_CARICAMENTO = null;
+    CP_MISURAZIONI_PAZIENTE_PRONTO = false; CP_MISURAZIONI_PAZIENTE_CARICAMENTO = null;
     clearSavedCode();
     document.getElementById('view-nutri').style.display = 'none';
     document.getElementById('view-paziente').style.display = 'none';
