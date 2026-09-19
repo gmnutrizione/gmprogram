@@ -3044,9 +3044,12 @@
     showToast("Bozza scartata — ripristinata l'ultima versione salvata");
   }
 
-  async function loadPianoStrutturato(codice){
+  // soloAttivo: stessa logica di loadPiano qui sopra, applicata al piano "Crea piano".
+  async function loadPianoStrutturato(codice, soloAttivo){
     try{
-      const res = await apiGet('pianoStrutturato', { codice: SESSION.codice, paziente: codice });
+      const params = { codice: SESSION.codice, paziente: codice };
+      if(soloAttivo) params.soloAttivo = '1';
+      const res = await apiGet('pianoStrutturato', params);
       if(res.ok && res.attivo && res.attivo.Plan){
         CP_PLAN = res.attivo.Plan;
         CP_GIORNI.forEach(g => { if(!CP_PLAN[g]) CP_PLAN[g] = {}; CP_MEALS.forEach(m => { if(!CP_PLAN[g][m]) CP_PLAN[g][m] = []; }); });
@@ -3952,9 +3955,14 @@
     populateCompareSelects();
   }
   let pianoLoadError = null;
-  async function loadPiano(codice){
+  // soloAttivo=true: usato dalla vista paziente (vedi cpAssicuraPianoPaziente_), che mostra solo il
+  // piano corrente e non lo storico — così il server non lo calcola nemmeno. Il gestionale della
+  // nutrizionista continua a chiamarla senza questo parametro, per avere lo storico completo.
+  async function loadPiano(codice, soloAttivo){
     try{
-      const res = await apiGet('piano', { codice: SESSION.codice, paziente: codice });
+      const params = { codice: SESSION.codice, paziente: codice };
+      if(soloAttivo) params.soloAttivo = '1';
+      const res = await apiGet('piano', params);
       currentPlan = res.ok ? res.attivo : null;
       currentPlanHistory = res.ok ? res.storico : [];
       pianoLoadError = res.ok ? null : (res.error || 'Errore nel caricamento del piano.');
@@ -3977,7 +3985,7 @@
     if(CP_PIANO_PAZIENTE_PRONTO) return;
     if(CP_PIANO_PAZIENTE_CARICAMENTO) return CP_PIANO_PAZIENTE_CARICAMENTO;
     CP_PIANO_PAZIENTE_CARICAMENTO = (async () => {
-      await Promise.all([loadPiano(SESSION.paziente.Codice), loadPianoStrutturato(SESSION.paziente.Codice)]);
+      await Promise.all([loadPiano(SESSION.paziente.Codice, true), loadPianoStrutturato(SESSION.paziente.Codice, true)]);
       CP_PIANO_PAZIENTE_PRONTO = true;
     })();
     await CP_PIANO_PAZIENTE_CARICAMENTO;
