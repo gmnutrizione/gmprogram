@@ -5669,7 +5669,9 @@
   const LOGIN_NOTE_HTML_ORIGINALE = document.getElementById('login-note').innerHTML;
 
   function ripristinaFormAccesso_(){
-    document.getElementById('login-prompt').textContent = LOGIN_PROMPT_TESTO_ORIGINALE;
+    const promptEl = document.getElementById('login-prompt');
+    promptEl.classList.remove('p-loading-riga'); // tolta la rotellina messa da tryAutoLogin, se c'era
+    promptEl.textContent = LOGIN_PROMPT_TESTO_ORIGINALE;
     document.getElementById('login-code').style.display = '';
     document.getElementById('login-submit-btn').style.display = '';
     document.getElementById('login-note').innerHTML = LOGIN_NOTE_HTML_ORIGINALE;
@@ -5683,7 +5685,10 @@
     const btnEl = document.getElementById('login-submit-btn');
     const noteEl = document.getElementById('login-note');
     // Nasconde subito il modulo interattivo: niente "richiesta di codice" visibile durante l'accesso automatico.
-    promptEl.textContent = 'Accesso in corso…';
+    // Rotellina + scritta, stesso trattamento usato per gli altri caricamenti dell'app: fa capire
+    // che il programma sta lavorando e non che si è bloccato.
+    promptEl.classList.add('p-loading-riga');
+    promptEl.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Accesso in corso…';
     inputEl.style.display = 'none';
     btnEl.style.display = 'none';
     noteEl.textContent = '';
